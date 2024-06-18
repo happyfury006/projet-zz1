@@ -78,7 +78,7 @@ void animation(SDL_Renderer* renderer)
    }
    
 }
-iint main(int argc, char** argv) {
+int main(int argc, char** argv) {
     (void)argc;
     (void)argv;
 
@@ -125,10 +125,9 @@ iint main(int argc, char** argv) {
             if (event.type == SDL_QUIT) {
                 running = SDL_FALSE;
             }
-        }
-
-        // Effacer l'écran
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+            
+                      // Effacer l'écran
+        SDL_SetRenderDrawColor(renderer, rand()%256, rand()%256, rand()%256, 255);
         SDL_RenderClear(renderer);
 
         // Dessiner le rectangle à la position actuelle
@@ -166,6 +165,9 @@ iint main(int argc, char** argv) {
                 droite = SDL_TRUE;
             }
         }
+
+        }
+
 
         // Délai pour contrôler la vitesse de l'animation
         SDL_Delay(50);  // Vous pouvez ajuster cette valeur pour changer la vitesse
