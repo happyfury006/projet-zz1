@@ -126,8 +126,11 @@ int main(int argc, char** argv) {
     
     SDL_Rect corps;
     SDL_Rect cou; 
-    SDL_Rect tete; 
-    
+    SDL_Rect tete;
+    SDL_Rect jambeg;
+    SDL_Rect jambed; 
+    SDL_Rect brasg;  
+    SDL_Rect brasd; 
 
     corps.x = screen.w/2 -40;                                             // x haut gauche du rectangle
     corps.y = screen.h/2 -100;                                                  // y haut gauche du rectangle
@@ -143,6 +146,26 @@ int main(int argc, char** argv) {
     tete.w=tete.h;
     tete.x = (cou.x+(cou.w/2))-tete.w/2;
     tete.y = cou.y-tete.h;
+
+    jambeg.h=110;
+    jambeg.w=15;
+    jambeg.x=corps.x+0.2*corps.w-jambeg.w/2;
+    jambeg.y=corps.y+corps.h;
+    
+    jambed.h=110;
+    jambed.w=15;
+    jambed.x=corps.x+0.8*corps.w-jambed.w/2;
+    jambed.y=corps.y+corps.h;
+
+    brasg.h=140;
+    brasg.w=15;
+    brasg.x=corps.x-brasg.w;
+    brasg.y=corps.y;
+
+    brasd.h=140;
+    brasd.w=15;
+    brasd.x=corps.x+corps.w;
+    brasd.y=corps.y;
 
     bool bouge = true;
     bool avant = true;
@@ -171,14 +194,22 @@ int main(int argc, char** argv) {
             corps.x += vitesse;
             cou.x += vitesse;
             tete.x += vitesse;
-            if (corps.x + corps.w >= screen.w) {
+            jambeg.x += vitesse;
+            jambed.x += vitesse;
+            brasd.x += vitesse;
+            brasg.x += vitesse;
+            if (brasd.x + brasd.w >= screen.w) {
                 avant = false;
             }
         } else {
             corps.x -= vitesse;
             cou.x -= vitesse;
             tete.x -= vitesse;
-            if (corps.x <= 0) {
+            jambeg.x -= vitesse;
+            jambed.x -= vitesse;
+            brasd.x -= vitesse;
+            brasg.x -= vitesse;
+            if (brasg.x <= 0) {
                 avant = true;
             }
         }
@@ -191,6 +222,10 @@ int main(int argc, char** argv) {
         SDL_RenderFillRect(renderer, &tete);
         SDL_SetRenderDrawColor(renderer, color2, 0, 0, 0);
         SDL_RenderFillRect(renderer, &cou);
+        SDL_RenderFillRect(renderer, &jambeg);
+        SDL_RenderFillRect(renderer, &jambed);
+        SDL_RenderFillRect(renderer, &brasg);
+        SDL_RenderFillRect(renderer, &brasd);
 
         SDL_RenderPresent(renderer);
 
