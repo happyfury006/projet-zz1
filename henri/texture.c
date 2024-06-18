@@ -140,11 +140,7 @@ int main(int argc, char** argv) {
     SDL_Window* window = NULL;
     SDL_Renderer* renderer = NULL;
     SDL_Texture* bg = NULL;
-    SDL_Texture* chen0 = NULL;
-    SDL_Texture* chen1 = NULL;
-    SDL_Texture* chen2 = NULL;
-    SDL_Texture* chen3 = NULL;
-    
+    SDL_Texture* perso = NULL;
 
     SDL_DisplayMode screen;
 
@@ -173,15 +169,16 @@ int main(int argc, char** argv) {
     
 
     /* Création du renderer */
-    bg = IMG_LoadTexture(renderer,"./images/kanto_route_1.jpg");
-    chen0 = IMG_LoadTexture(renderer,"./images/prof-1.png");
+    bg = IMG_LoadTexture(renderer,"./images/ciel.jpg");
+    perso = IMG_LoadTexture(renderer,"./images/goku.png");
     if (bg == NULL) end_sdl(0, "Echec du chargement de l'image dans la texture", window, renderer);
     if (perso == NULL) end_sdl(0, "Echec du chargement de l'image dans la texture", window, renderer);
 
     SDL_Rect 
         source = {0},                         // Rectangle définissant la zone de la texture à récupérer
         window_dimensions = {0},              // Rectangle définissant la fenêtre, on n'utilisera que largeur et hauteur
-        destination = {0};                    // Rectangle définissant où la zone_source doit être déposée dans le renderer
+        destination = {0},
+        state = {0};                     // Rectangle définissant où la zone_source doit être déposée dans le renderer
 
     SDL_GetWindowSize(
     window, &window_dimensions.w,
@@ -229,7 +226,7 @@ int main(int argc, char** argv) {
                         // celle de début de ligne
 
         SDL_RenderClear(renderer);           // Effacer l'image précédente avant de dessiner la nouvelle
-        SDL_RenderCopy(renderer, my_texture, // Préparation de l'affichage
+        SDL_RenderCopy(renderer, perso, // Préparation de l'affichage
                 &state,
                 &destination);  
         SDL_RenderPresent(renderer);         // Affichage
