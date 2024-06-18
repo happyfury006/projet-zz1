@@ -124,24 +124,25 @@ int main(int argc, char** argv) {
                     SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     if (renderer == NULL) end_sdl(0, "ERROR RENDERER CREATION", window, renderer);
     
-    SDL_Rect rectangle;
-    SDL_Rect rectangle2; 
-    SDL_Rect carre; 
+    SDL_Rect corps;
+    SDL_Rect cou; 
+    SDL_Rect tete; 
+    
 
-    rectangle.x = screen.w/2 -40;                                             // x haut gauche du rectangle
-    rectangle.y = screen.h/2 -100;                                                  // y haut gauche du rectangle
-    rectangle.w = 80;                                                // sa largeur (w = width)
-    rectangle.h = 200;
+    corps.x = screen.w/2 -40;                                             // x haut gauche du rectangle
+    corps.y = screen.h/2 -100;                                                  // y haut gauche du rectangle
+    corps.w = 80;                                                // sa largeur (w = width)
+    corps.h = 200;
 
-    rectangle2.w = 12;                                                // sa largeur (w = width)
-    rectangle2.h = 20;
-    rectangle2.x = (rectangle.x+(rectangle.w/2))-rectangle2.w/2;                                             // x haut gauche du rectangle
-    rectangle2.y = rectangle.y-rectangle2.h;                                                  // y haut gauche du rectangle
+    cou.w = 12;                                                // sa largeur (w = width)
+    cou.h = 20;
+    cou.x = (corps.x+(corps.w/2))-cou.w/2;                                             // x haut gauche du rectangle
+    cou.y = corps.y-cou.h;                                                  // y haut gauche du rectangle
      
-    carre.h= 60;
-    carre.w=carre.h;
-    carre.x = (rectangle2.x+(rectangle2.w/2))-carre.w/2;
-    carre.y = rectangle2.y-carre.h;
+    tete.h= 60;
+    tete.w=tete.h;
+    tete.x = (cou.x+(cou.w/2))-tete.w/2;
+    tete.y = cou.y-tete.h;
 
     bool bouge = true;
     bool avant = true;
@@ -167,17 +168,17 @@ int main(int argc, char** argv) {
         }
 
         if (avant) {
-            rectangle.x += vitesse;
-            rectangle2.x += vitesse;
-            carre.x += vitesse;
-            if (rectangle.x + rectangle.w >= screen.w) {
+            corps.x += vitesse;
+            cou.x += vitesse;
+            tete.x += vitesse;
+            if (corps.x + corps.w >= screen.w) {
                 avant = false;
             }
         } else {
-            rectangle.x -= vitesse;
-            rectangle2.x -= vitesse;
-            carre.x -= vitesse;
-            if (rectangle.x <= 0) {
+            corps.x -= vitesse;
+            cou.x -= vitesse;
+            tete.x -= vitesse;
+            if (corps.x <= 0) {
                 avant = true;
             }
         }
@@ -186,10 +187,10 @@ int main(int argc, char** argv) {
         SDL_RenderClear(renderer);
 
         SDL_SetRenderDrawColor(renderer, color1, 0, 0, 0);
-        SDL_RenderFillRect(renderer, &rectangle);
-        SDL_RenderFillRect(renderer, &carre);
+        SDL_RenderFillRect(renderer, &corps);
+        SDL_RenderFillRect(renderer, &tete);
         SDL_SetRenderDrawColor(renderer, color2, 0, 0, 0);
-        SDL_RenderFillRect(renderer, &rectangle2);
+        SDL_RenderFillRect(renderer, &cou);
 
         SDL_RenderPresent(renderer);
 
