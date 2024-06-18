@@ -36,29 +36,7 @@ void end_sdl(char ok,                                               // fin norma
 }      
 
 
-void play_with_texture_1(SDL_Texture *my_texture, SDL_Window *window,
-            SDL_Renderer *renderer) {
-    SDL_Rect 
-        source = {0},                         // Rectangle définissant la zone de la texture à récupérer
-        window_dimensions = {0},              // Rectangle définissant la fenêtre, on n'utilisera que largeur et hauteur
-        destination = {0};                    // Rectangle définissant où la zone_source doit être déposée dans le renderer
 
-    SDL_GetWindowSize(
-    window, &window_dimensions.w,
-    &window_dimensions.h);                    // Récupération des dimensions de la fenêtre
-    SDL_QueryTexture(my_texture, NULL, NULL,
-                &source.w, &source.h);       // Récupération des dimensions de l'image
-
-    destination = window_dimensions;              // On fixe les dimensions de l'affichage à  celles de la fenêtre
-
-    /* On veut afficher la texture de façon à ce que l'image occupe la totalité de la fenêtre */
-
-    SDL_RenderCopy(renderer, my_texture,
-            &source,
-            &destination);                 // Création de l'élément à afficher
-    SDL_RenderPresent(renderer);                  // Affichage
-    SDL_Delay(2000);                              // Pause en ms
-}
 
 
 void play_with_texture_3(SDL_Texture* my_texture,
@@ -101,6 +79,58 @@ void play_with_texture_3(SDL_Texture* my_texture,
     //SDL_RenderClear(renderer);                      // Effacer la fenêtre une fois le travail terminé
 }
 
+void play_with_texture_4(SDL_Texture* my_texture,
+               SDL_Window* window,
+               SDL_Renderer* renderer) {
+    SDL_Rect 
+        source = {0},                    // Rectangle définissant la zone totale de la planche
+        window_dimensions = {0},         // Rectangle définissant la fenêtre, on n'utilisera que largeur et hauteur
+        destination = {0},               // Rectangle définissant où la zone_source doit être déposée dans le renderer
+        state = {0};                     // Rectangle de la vignette en cours dans la planche 
+
+    SDL_GetWindowSize(window,              // Récupération des dimensions de la fenêtre
+            &window_dimensions.w,
+            &window_dimensions.h);
+    SDL_QueryTexture(my_texture,           // Récupération des dimensions de l'image
+            NULL, NULL,
+            &source.w, &source.h);
+
+    /* Mais pourquoi prendre la totalité de l'image, on peut n'en afficher qu'un morceau, et changer de morceau :-) */
+
+    int nb_images = 8;                     // Il y a 8 vignette dans la ligne de l'image qui nous intéresse
+    float zoom = 2;                        // zoom, car ces images sont un peu petites
+    int offset_x = source.w / nb_images,   // La largeur d'une vignette de l'image, marche car la planche est bien réglée
+        offset_y = source.h / 4;           // La hauteur d'une vignette de l'image, marche car la planche est bien réglée
+    
+
+    state.x = 0 ;                          // La première vignette est en début de ligne
+    state.y = 3 * offset_y;                // On s'intéresse à la 4ème ligne, le bonhomme qui court
+    state.w = offset_x;                    // Largeur de la vignette
+    state.h = offset_y;                    // Hauteur de la vignette
+
+    destination.w = offset_x * zoom;       // Largeur du sprite à l'écran
+    destination.h = offset_y * zoom;       // Hauteur du sprite à l'écran
+
+    destination.y =                        // La course se fait en milieu d'écran (en vertical)
+    (window_dimensions.h - destination.h) /2;
+
+    int speed = 9;
+    for (int x = 0; x < window_dimensions.w - destination.w; x += speed) {
+        destination.x = x;                   // Position en x pour l'affichage du sprite
+        state.x += offset_x;                 // On passe à la vignette suivante dans l'image
+        state.x %= source.w;                 // La vignette qui suit celle de fin de ligne est
+                        // celle de début de ligne
+
+        SDL_RenderClear(renderer);           // Effacer l'image précédente avant de dessiner la nouvelle
+        SDL_RenderCopy(renderer, my_texture, // Préparation de l'affichage
+                &state,
+                &destination);  
+        SDL_RenderPresent(renderer);         // Affichage
+        SDL_Delay(80);                       // Pause en ms
+    }
+    //SDL_RenderClear(renderer);             // Effacer la fenêtre avant de rendre la main
+}
+
 
 int main(int argc, char** argv) {
     (void)argc;
@@ -109,6 +139,10 @@ int main(int argc, char** argv) {
     SDL_Window* window = NULL;
     SDL_Renderer* renderer = NULL;
     SDL_Texture* bg = NULL;
+    SDL_Texture* chen0 = NULL;
+    SDL_Texture* chen1 = NULL;
+    SDL_Texture* chen2 = NULL;
+    SDL_Texture* chen3 = NULL;
     
 
     SDL_DisplayMode screen;
@@ -139,12 +173,56 @@ int main(int argc, char** argv) {
 
     /* Création du renderer */
     bg = IMG_LoadTexture(renderer,"./images/kanto_route_1.jpg");
+    chen0 = IMG_LoadTexture(renderer,"./images/prof-1.png");
+    chen1 = IMG_LoadTexture(renderer,"./images/prof.png");
+    chen2 = IMG_LoadTexture(renderer,"./images/prof1.png");
+    chen3 = IMG_LoadTexture(renderer,"./images/prof2.png");
     if (bg == NULL) end_sdl(0, "Echec du chargement de l'image dans la texture", window, renderer);
+    if (chen0 == NULL) end_sdl(0, "Echec du chargement de l'image dans la texture", window, renderer);
+    if (chen1 == NULL) end_sdl(0, "Echec du chargement de l'image dans la texture", window, renderer);
+    if (chen2 == NULL) end_sdl(0, "Echec du chargement de l'image dans la texture", window, renderer);
+    if (chen3 == NULL) end_sdl(0, "Echec du chargement de l'image dans la texture", window, renderer);
 
-    play_with_texture_1(bg, window, renderer);
+    SDL_Rect 
+        source = {0},                         // Rectangle définissant la zone de la texture à récupérer
+        window_dimensions = {0},              // Rectangle définissant la fenêtre, on n'utilisera que largeur et hauteur
+        destination = {0};                    // Rectangle définissant où la zone_source doit être déposée dans le renderer
 
+    SDL_GetWindowSize(
+    window, &window_dimensions.w,
+    &window_dimensions.h);                    // Récupération des dimensions de la fenêtre
+    
+    SDL_QueryTexture(bg, NULL, NULL,
+                &source.w, &source.h);       // Récupération des dimensions de l'image
 
-    SDL_Delay(3000);                             // Pause exprimée en ms                                   
+    destination = window_dimensions;              // On fixe les dimensions de l'affichage à  celles de la fenêtre
+
+    /* On veut afficher la texture de façon à ce que l'image occupe la totalité de la fenêtre */
+
+    SDL_RenderCopy(renderer, bg,
+            &source,
+            &destination); 
+
+    SDL_QueryTexture(chen0, NULL, NULL,
+                &source.w, &source.h);       // Récupération des dimensions de l'image
+
+    float zoom = 0.8;                        // Facteur de zoom à appliquer    
+    destination.w = source.w * zoom;         // La destination est un zoom de la source
+    destination.h = source.h * zoom;         // La destination est un zoom de la source
+    destination.x =
+     (window_dimensions.w - destination.w) /2;     // La destination est au milieu de la largeur de la fenêtre
+    destination.y =
+     (window_dimensions.h - 1.735*destination.h);
+
+    SDL_RenderCopy(renderer, chen0,
+            &source,
+            &destination); 
+    
+
+                                 
+    SDL_RenderPresent(renderer); 
+    SDL_Delay(3000);                      // Pause exprimée en ms                                   
+    
     
     IMG_Quit();
     SDL_RenderClear(renderer); 
