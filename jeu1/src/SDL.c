@@ -18,8 +18,9 @@ void play_with_texture_1_1(SDL_Texture *my_texture, SDL_Window *window,
     &window_dimensions.h);                    // Récupération des dimensions de la fenêtre
     SDL_QueryTexture(my_texture, NULL, NULL,
              &source.w, &source.h);       // Récupération des dimensions de l'image
-
-    destination = window_dimensions;              // On fixe les dimensions de l'affichage à  celles de la fenêtre
+    float zoom = 0.7; 
+    destination.w = zoom * window_dimensions.w;  
+    destination.h = zoom * window_dimensions.h;                     // On fixe les dimensions de l'affichage à  celles de la fenêtre
 
     /* On veut afficher la texture de façon à ce que l'image occupe la totalité de la fenêtre */
 
@@ -48,21 +49,21 @@ void play_with_texture_4(SDL_Texture* bg_texture, SDL_Texture* my_texture,
      /* Mais pourquoi prendre la totalité de l'image, on peut n'en afficher qu'un morceau, et changer de morceau :-) */
 
   int nb_images = 8;                     // Il y a 8 vignette dans la ligne de l'image qui nous intéresse
-  float zoom = 1.0;                        // zoom, car ces images sont un peu petites
+  float zoom = 1.2;                        // zoom, car ces images sont un peu petites
   int offset_x = source.w / nb_images,   // La largeur d'une vignette de l'image, marche car la planche est bien réglée
   offset_y = source.h / 4;           // La hauteur d'une vignette de l'image, marche car la planche est bien réglée
-
+  
 
   destination.w = offset_x * zoom;       // Largeur du sprite à l'écran
   destination.h = offset_y * zoom;       // Hauteur du sprite à l'écran
 
   destination.y =                        // La course se fait en milieu d'écran (en vertical)
-  (window_dimensions.h - destination.h) /2;
+  (window_dimensions.h - destination.h) /1.2;
 
   int speed = 9;
   for (int x = 0; x < window_dimensions.w - destination.w; x += speed) 
   {
-    destination.x = x;                   // Position en x pour l'affichage du sprite
+    destination.x = (window_dimensions.w - destination.w);                   // Position en x pour l'affichage du sprite
     SDL_RenderClear(renderer);           // Effacer l'image précédente avant de dessiner la nouvelle
     play_with_texture_1_1(bg_texture,window,renderer);
     SDL_RenderCopy(renderer, my_texture, // Préparation de l'affichage
@@ -105,21 +106,21 @@ int main(int argc, char* argv[])
     piece[13] = piece[12];
     piece[15] = piece[14];
 
-    
     if (bg_texture == NULL) 
     {
         // end_sdl(0, "Echec du chargement de l'image dans la texture", window, renderer);
     }
-    // for(int i =0; i <= 15,i++)
-    // 
+    for(int i =0; i <= 15;i++)
+     
     // play_with_texture_1_1(bg_texture,window,renderer);
-    play_with_texture_4(bg_texture,piece[0],window,renderer);
+    play_with_texture_4(bg_texture,piece[i],window,renderer);
     // }
     // position_depart(window,renderer,piece1b); // Avant le 1er coup
     SDL_Delay(1000);
     for(int i =15; i <= 0;i--)
     {
     SDL_DestroyTexture(piece[i]);
+    SDL_Delay(100);
     }
     SDL_DestroyTexture(bg_texture);
     SDL_DestroyRenderer(renderer);
