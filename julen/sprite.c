@@ -2,36 +2,42 @@
 #include <stdio.h>
 #include <string.h>
 #include <SDL2/SDL_image.h>
+#include "sdl.h"
+#include "sprite.h"
 
-void end_sdl(char ok, const char* msg, SDL_Window* window, SDL_Renderer* renderer) {
-    char msg_formated[255];
-    int l;
+// void end_sdl(char ok, const char* msg, SDL_Window* window, SDL_Renderer* renderer) {
+//     char msg_formated[255];
+//     int l;
 
-    if (!ok) {
-        strncpy(msg_formated, msg, 250);
-        l = strlen(msg_formated);
-        strcpy(msg_formated + l, " : %s\n");
+//     if (!ok) {
+//         strncpy(msg_formated, msg, 250);
+//         l = strlen(msg_formated);
+//         strcpy(msg_formated + l, " : %s\n");
 
-        SDL_Log(msg_formated, SDL_GetError());
-    }
+//         SDL_Log(msg_formated, SDL_GetError());
+//     }
 
-    if (renderer != NULL) {
-        SDL_DestroyRenderer(renderer);
-        renderer = NULL;
-    }
-    if (window != NULL) {
-        SDL_DestroyWindow(window);
-        window = NULL;
-    }
+//     if (renderer != NULL) {
+//         SDL_DestroyRenderer(renderer);
+//         renderer = NULL;
+//     }
+//     if (window != NULL) {
+//         SDL_DestroyWindow(window);
+//         window = NULL;
+//     }
 
-    SDL_Quit();
+//     SDL_Quit();
 
-    if (!ok) {
-        exit(EXIT_FAILURE);
-    }
-}
+//     if (!ok) {
+//         exit(EXIT_FAILURE);
+//     }
+// }
+            // Nécessaire pour la fonction IMG_Load
+                                            // Penser au flag -lsdl2_image à la compilation
+  //...
 
-void play_with_texture_3(SDL_Texture* bg_texture, SDL_Texture* anakin_texture,SDL_Texture* sebulba_texture,SDL_Texture* destroyer_texture, SDL_Window* window, SDL_Renderer* renderer) {
+
+void animationparallax(SDL_Texture* bg_texture, SDL_Texture* anakin_texture,SDL_Texture* sebulba_texture,SDL_Texture* destroyer_texture, SDL_Window* window, SDL_Renderer* renderer) {
     SDL_Rect source_bg = {0}, window_dimensions = {0}, destination_bg[3] = {{0}};
     SDL_Rect source_anakin = {0}, destination_anakin = {0};
     SDL_Rect source_sebulba = {0}, destination_sebulba = {0};
@@ -186,18 +192,18 @@ int main(int argc, char** argv) {
                     SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     if (renderer == NULL) end_sdl(0, "ERROR RENDERER CREATION", window, renderer);
 
-    bg = IMG_LoadTexture(renderer, "./image/desert_tatoine22.png");
+    bg = IMG_LoadTexture(renderer, "../image/desert_tatoine22.png");
     if (bg == NULL) end_sdl(0, "Echec du chargement de l'image dans la texture", window, renderer);
 
-    anakin = IMG_LoadTexture(renderer, "./image/file.png");
+    anakin = IMG_LoadTexture(renderer, "../image/file.png");
     if (anakin == NULL) end_sdl(0, "Echec du chargement de l'image de premier plan dans la texture", window, renderer);
-    destroyer = IMG_LoadTexture(renderer, "./image/destroyer.png");
+    destroyer = IMG_LoadTexture(renderer, "../image/destroyer.png");
     if (destroyer == NULL) end_sdl(0, "Echec du chargement de l'image de premier plan dans la texture", window, renderer);
-    sebulba = IMG_LoadTexture(renderer, "./image/sebulba.png");
+    sebulba = IMG_LoadTexture(renderer, "../image/sebulba.png");
     if (sebulba == NULL) end_sdl(0, "Echec du chargement de l'image de premier plan dans la texture", window, renderer);
 
 
-    play_with_texture_3(bg, anakin,sebulba,destroyer, window, renderer);
+    animationparallax(bg, anakin,sebulba,destroyer, window, renderer);
 
     SDL_Delay(3000);
 

@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include "animationbis.h"
+#include "sdl.h"
 
 #define speed 5
 

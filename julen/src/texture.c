@@ -3,34 +3,35 @@
 #include <string.h>
 #include <SDL2/SDL_image.h>
 #include "texture.h"
+#include "sdl.h"
 
-void end_sdl(char ok, const char* msg, SDL_Window* window, SDL_Renderer* renderer) {
-    char msg_formated[255];
-    int l;
+// void end_sdl(char ok, const char* msg, SDL_Window* window, SDL_Renderer* renderer) {
+//     char msg_formated[255];
+//     int l;
 
-    if (!ok) {
-        strncpy(msg_formated, msg, 250);
-        l = strlen(msg_formated);
-        strcpy(msg_formated + l, " : %s\n");
+//     if (!ok) {
+//         strncpy(msg_formated, msg, 250);
+//         l = strlen(msg_formated);
+//         strcpy(msg_formated + l, " : %s\n");
 
-        SDL_Log(msg_formated, SDL_GetError());
-    }
+//         SDL_Log(msg_formated, SDL_GetError());
+//     }
 
-    if (renderer != NULL) {
-        SDL_DestroyRenderer(renderer);
-        renderer = NULL;
-    }
-    if (window != NULL) {
-        SDL_DestroyWindow(window);
-        window = NULL;
-    }
+//     if (renderer != NULL) {
+//         SDL_DestroyRenderer(renderer);
+//         renderer = NULL;
+//     }
+//     if (window != NULL) {
+//         SDL_DestroyWindow(window);
+//         window = NULL;
+//     }
 
-    SDL_Quit();
+//     SDL_Quit();
 
-    if (!ok) {
-        exit(EXIT_FAILURE);
-    }
-}
+//     if (!ok) {
+//         exit(EXIT_FAILURE);
+//     }
+// }
 
 void play_with_texture_1(SDL_Texture *my_texture, SDL_Window *window, SDL_Renderer *renderer) {
     SDL_Rect source = {0}, window_dimensions = {0}, destination = {0};
