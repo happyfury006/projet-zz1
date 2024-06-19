@@ -18,8 +18,6 @@ enum formes{        // faire le lien entre la forme et un entier
 typedef struct piece {      //structure d'une pièce
     enum formes;             //forme de la pièce
     int joueur;             //0=>joueur1=>piece blanche | 1=>joueur2=>piece noir
-    int x;                  //position en x de la pièce sur le plateau
-    int y;                  //position en y de la pièce sur le plateau
 } piece;
 
 
@@ -30,14 +28,21 @@ typedef struct list {
 
 
 typedef struct joueur {
-    int numJoueur;          //0=>joueur1=>piece blanche | 1=>joueur2=>piece noir
-    int ia;                 //0=>joueur humain | >0 profondeur de l'arbre parcourue
-    int compteurCylindre;   //nbr de cylindre restant
-    int compteurCarre;
-    int compteurCone;
-    int compteurSphère;
+    int numJoueur;              //0=>joueur1=>piece blanche | 1=>joueur2=>piece noir
+    int ia;                     //0=>joueur humain | >0 profondeur de l'arbre parcourue
+    int piecerestante[4][2];    //tableau des pieces restantes
 } joueur;
 
+
+typedef struct grille {
+    piece grid[4][4];
+}
+
 piece creerPiece(forme forme,int player);
+grille creationplateau();
+void victoireligne(int x,grille plateau);
+void victoirecolonne(int y, grille plateau);
+void victoireregion(int x, int y, grille plateau);
+void victoire(grille plateau, int x, int y);
 
 #endif
