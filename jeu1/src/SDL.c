@@ -7,7 +7,7 @@ const int WINDOW_HAUTEUR = 600;
 
 void play_with_texture_1_1(SDL_Texture *my_texture, SDL_Window *window,
                SDL_Renderer *renderer) 
-  {
+{
     SDL_Rect 
     source = {0},                         // Rectangle définissant la zone de la texture à récupérer
     window_dimensions = {0},              // Rectangle définissant la fenêtre, on n'utilisera que largeur et hauteur
@@ -18,8 +18,9 @@ void play_with_texture_1_1(SDL_Texture *my_texture, SDL_Window *window,
     &window_dimensions.h);                    // Récupération des dimensions de la fenêtre
     SDL_QueryTexture(my_texture, NULL, NULL,
              &source.w, &source.h);       // Récupération des dimensions de l'image
-
-    destination = window_dimensions;              // On fixe les dimensions de l'affichage à  celles de la fenêtre
+    float zoom = 0.7; 
+    destination.w = zoom * window_dimensions.w;  
+    destination.h = zoom * window_dimensions.h;                     // On fixe les dimensions de l'affichage à  celles de la fenêtre
 
     /* On veut afficher la texture de façon à ce que l'image occupe la totalité de la fenêtre */
 
@@ -48,26 +49,26 @@ void play_with_texture_4(SDL_Texture* bg_texture, SDL_Texture* my_texture,
      /* Mais pourquoi prendre la totalité de l'image, on peut n'en afficher qu'un morceau, et changer de morceau :-) */
 
   int nb_images = 8;                     // Il y a 8 vignette dans la ligne de l'image qui nous intéresse
-  float zoom = 1.0;                        // zoom, car ces images sont un peu petites
+  float zoom = 1.2;                        // zoom, car ces images sont un peu petites
   int offset_x = source.w / nb_images,   // La largeur d'une vignette de l'image, marche car la planche est bien réglée
   offset_y = source.h / 4;           // La hauteur d'une vignette de l'image, marche car la planche est bien réglée
-
+  
 
   destination.w = offset_x * zoom;       // Largeur du sprite à l'écran
   destination.h = offset_y * zoom;       // Hauteur du sprite à l'écran
 
   destination.y =                        // La course se fait en milieu d'écran (en vertical)
-  (window_dimensions.h - destination.h) /2;
+  (window_dimensions.h - destination.h) /1.2;
 
   int speed = 9;
   for (int x = 0; x < window_dimensions.w - destination.w; x += speed) 
   {
-    destination.x = x;                   // Position en x pour l'affichage du sprite
+    destination.x = (window_dimensions.w - destination.w);                   // Position en x pour l'affichage du sprite
     SDL_RenderClear(renderer);           // Effacer l'image précédente avant de dessiner la nouvelle
     play_with_texture_1_1(bg_texture,window,renderer);
     SDL_RenderCopy(renderer, my_texture, // Préparation de l'affichage
-      NULL,
-      &destination);  
+    NULL,
+    &destination);  
     SDL_RenderPresent(renderer);         // Affichage
     SDL_Delay(80);                       // Pause en ms
   }
@@ -83,64 +84,44 @@ int main(int argc, char* argv[])
         printf("Erreur d'initialisation de la SDL: %s\n", SDL_GetError());
         return 1;
     }
-    SDL_Window* window = SDL_CreateWindow("Sprite avec SDL2", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_LARGEUR, WINDOW_HAUTEUR, 0);
+    SDL_Window* window = SDL_CreateWindow("Quantik avec SDL2", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_LARGEUR, WINDOW_HAUTEUR, 0);
     SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     SDL_Texture *bg_texture;
-    SDL_Texture *piece1b; 
-    SDL_Texture *piece2b; 
-    SDL_Texture *piece3b; 
-    SDL_Texture *piece4b; 
-    SDL_Texture *piece1n; 
-    SDL_Texture *piece2n; 
-    SDL_Texture *piece3n; 
-    SDL_Texture *piece4n; 
-    SDL_Texture *piece5b; 
-    SDL_Texture *piece6b; 
-    SDL_Texture *piece7b; 
-    SDL_Texture *piece8b;
-    SDL_Texture *piece5n;  
-    SDL_Texture *piece6n; 
-    SDL_Texture *piece7n; 
-    SDL_Texture *piece8n; 
-    bg_texture = IMG_LoadTexture(renderer,"/home/local.isima.fr/vatardy/shared/Projet/projet-zz1/valentin/fond.png");
-    piece1b = IMG_LoadTexture(renderer,"/home/local.isima.fr/vatardy/shared/Projet/projet-zz1/valentin/piece1b.png");
-    piece2b = IMG_LoadTexture(renderer,"/home/local.isima.fr/vatardy/shared/Projet/projet-zz1/valentin/piece2b.png");
-    piece3b = IMG_LoadTexture(renderer,"/home/local.isima.fr/vatardy/shared/Projet/projet-zz1/valentin/piece3bpng");
-    piece4b = IMG_LoadTexture(renderer,"/home/local.isima.fr/vatardy/shared/Projet/projet-zz1/valentin/piece4b.png");
-    piece1n = IMG_LoadTexture(renderer,"/home/local.isima.fr/vatardy/shared/Projet/projet-zz1/valentin/piece1n.png");
-    piece2n = IMG_LoadTexture(renderer,"/home/local.isima.fr/vatardy/shared/Projet/projet-zz1/valentin/piece2n.png");
-    piece3n = IMG_LoadTexture(renderer,"/home/local.isima.fr/vatardy/shared/Projet/projet-zz1/valentin/piece3n.png");
-    piece4n = IMG_LoadTexture(renderer,"/home/local.isima.fr/vatardy/shared/Projet/projet-zz1/valentin/piece4n.png");
-    piece5b = piece1b;
-    piece6b = piece2b;
-    piece7b = piece3b;
-    piece8b = piece4b;
-    piece5n = piece1n;
-    piece6n = piece2n;
-    piece7n = piece3n;
-    piece8n = piece4n;
+    SDL_Texture *piece[15] = {NULL};  
+    bg_texture = IMG_LoadTexture(renderer,"../images/plateau.png");
+    piece[0] = IMG_LoadTexture(renderer,"../images/coneblanc.png");
+    piece[2] = IMG_LoadTexture(renderer,"../images/cubeblanc.png");
+    piece[4] = IMG_LoadTexture(renderer,"../images/cylindreblanc.png");
+    piece[6] = IMG_LoadTexture(renderer,"../images/sphereblanche.png");
+    piece[8] = IMG_LoadTexture(renderer,"../images/conenoir.png");
+    piece[10] = IMG_LoadTexture(renderer,"../images/cubenoir.png");
+    piece[12] = IMG_LoadTexture(renderer,"../images/cylindrenoir.png");
+    piece[14] = IMG_LoadTexture(renderer,"../images/spherenoir.png");
+    piece[1] = piece[0];
+    piece[3] = piece[2];
+    piece[5] = piece[4];
+    piece[7] = piece[6];
+    piece[9] = piece[8];
+    piece[11] = piece[10];
+    piece[13] = piece[12];
+    piece[15] = piece[14];
+
     if (bg_texture == NULL) 
     {
         // end_sdl(0, "Echec du chargement de l'image dans la texture", window, renderer);
     }
-    play_with_texture_4(bg_texture,NULL,window,renderer);
+    for(int i =0; i <= 15;i++)
+     
+    // play_with_texture_1_1(bg_texture,window,renderer);
+    play_with_texture_4(bg_texture,piece[i],window,renderer);
+    // }
+    // position_depart(window,renderer,piece1b); // Avant le 1er coup
     SDL_Delay(1000);
-    SDL_DestroyTexture(piece8n);
-    SDL_DestroyTexture(piece7n);
-    SDL_DestroyTexture(piece6n);
-    SDL_DestroyTexture(piece5n);
-    SDL_DestroyTexture(piece8b);
-    SDL_DestroyTexture(piece7b);
-    SDL_DestroyTexture(piece6b);
-    SDL_DestroyTexture(piece5b);
-    SDL_DestroyTexture(piece4n);
-    SDL_DestroyTexture(piece3n);
-    SDL_DestroyTexture(piece2n);
-    SDL_DestroyTexture(piece1n);
-    SDL_DestroyTexture(piece4b);
-    SDL_DestroyTexture(piece3b);
-    SDL_DestroyTexture(piece2b);
-    SDL_DestroyTexture(piece1b);
+    for(int i =15; i <= 0;i--)
+    {
+    SDL_DestroyTexture(piece[i]);
+    SDL_Delay(100);
+    }
     SDL_DestroyTexture(bg_texture);
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
