@@ -3,35 +3,39 @@
 #include <stdbool.h>
 
 
-piece creerPiece(forme forme,int player){
-    newpiece = malloc(sizeof(piece));
+piece creerPiece(int forme,int player){
+    piece* newpiece = malloc(sizeof(piece));
     newpiece->formes = forme;
     newpiece->joueur = player;
-    newpiece->x = NULL;
-    newpiece->y = NULL;
-    return 
+
+    return *newpiece;
 }
 
 
-piece** creationplateau(){
-   piece** plateau = malloc(4 * sizeof(piece*));
+grille creationplateau(){
+   grille plateau ;
    for (int i = 0; i < 4; i++) {
-      plateau[i] = malloc(4 * sizeof(piece));
+      for (int j = 0; j < 4; j++)
+      {
+         plateau.grid[i][j] = NULL;
+      }
+      
+      
    }
    return plateau;
 }
 
 
 
-void victoireligne(int x,piece **plateau){
-   list * listdejaparcouru = NULL;
+void victoireligne(int x,grille plateau){
+   list * lparcouru = NULL;
    bool victoire = true;
    int i=0;
-    while (i < 4)
+    while (i < 4 && victoire == true)
     {
-      if (estdanslaliste(plateau[x][i],listdejaparcouru) == 0)
+      if (estdanslaliste(plateau.grid[x][i],lparcouru) == 0)
       {
-         ajoutliste(plateau[x][i],listdejaparcouru);
+         ajoutliste(plateau.grid[x][i],lparcouru);
       }
       else
       {
@@ -39,17 +43,22 @@ void victoireligne(int x,piece **plateau){
       }
       i++;
     }
+    if (victoire == true)
+    {
+      printf("Bravo vous avez fait une ligne!\n");
+    }
+    
     
 }
-void victoirecolonne(int y, ){
-   list * listdejaparcouru = NULL;
+void victoirecolonne(int y, grille plateau){
+   list * lparcouru = NULL;
    bool victoire = true;
    int j=0;
-    while (j < 4)
+    while (j < 4 && victoire == true)
     {
-      if (estdanslaliste(plateau[y][j],listdejaparcouru) == 0)
+      if (estdanslaliste(plateau.grid[y][j],lparcouru) == 0)
       {
-         ajoutliste(plateau[y][j],listdejaparcouru);
+         ajoutliste(plateau.grid[y][j],lparcouru);
       }
       else
       {
@@ -57,46 +66,68 @@ void victoirecolonne(int y, ){
       }
       j++;
     }
+    if (victoire == true)
+    {
+      printf("Bravo vous avez fait une colonne!\n");
+    }
+    
     
 }
-// void victoireregion(int x, int y){
-    
-//     if (x<2 )
-//     {
-//       if (y<2)
-//       {
-//          /* code */
-//       }
-//       else
-//       {
-//          /* code */
-//       }
+void chercheregion(int dx,int dy, int fx,int fy){
+   if 
+
+}
+
+void victoireregion(int x, int y, grille plateau){
+    int ix=x%2;
+    int iy=y%2;
+    list* lparcouru = plateau.grid[x][y];
+    if (x<2 )
+    {
+      if (y<2){
+         switch (position)
+         {
+         case 0:
+            
+            break;
+         
+         default:
+            break;
+         }
+         }
+         
+      else
+      {
+         /* code */
+      }   
+      }
       
       
-//     }
-//    else{
-//       if (y<2){
-//          /* code */
-//       }
-//       else
-//       {
-//          /* code */
-//       }         
-//       }
+      
     
-// }
+   else{
+      if (y<2){
+         /* code */
+      }
+      else
+      {
+         /* code */
+      }         
+      }
+    
+}
 
 
-void victoire(piece[][] plateau, int x, int y){
-   victoireligne(x);
-   victoirecolonne(y);
+void victoire(grille plateau, int x, int y){
+   victoireligne(x,plateau);
+   victoirecolonne(y,plateau);
    // victoireregion();
    printf("Bravo vous avez gagné !\n");
 }
 
 
 int main(){;
-   piece[][] plateau = creationplateau();
+   grille plateau = creationplateau();
    // coupjouer();
    // victoire(plateau);
    return 0;
