@@ -2,29 +2,30 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "test.h"
+#include "sdl.h"
 
 #define I 10
 #define N 10
 
-SDL_Window* creationwindow(const char* title, int x, int y, int w, int h) {
-    SDL_Window* window = NULL;
+// SDL_Window* creationwindow(const char* title, int x, int y, int w, int h) {
+//     SDL_Window* window = NULL;
 
-    /* Création de la fenêtre */
-    window = SDL_CreateWindow(
-        title,
-        x, y,
-        w, h,
-        SDL_WINDOW_RESIZABLE
-    );
+//     /* Création de la fenêtre */
+//     window = SDL_CreateWindow(
+//         title,
+//         x, y,
+//         w, h,
+//         SDL_WINDOW_RESIZABLE
+//     );
 
-    if (window == NULL) {
-        SDL_Log("Error : SDL window creation - %s\n", SDL_GetError());
-        SDL_Quit();
-        exit(EXIT_FAILURE);
-    }
+//     if (window == NULL) {
+//         SDL_Log("Error : SDL window creation - %s\n", SDL_GetError());
+//         SDL_Quit();
+//         exit(EXIT_FAILURE);
+//     }
 
-    return window;
-}
+//     return window;
+// }
 
 int maintest(int argc, char **argv) {
     (void)argc;

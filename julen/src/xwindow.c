@@ -1,6 +1,7 @@
     #include <SDL2/SDL.h>
     #include <stdio.h>
     #include "xwindow.h"
+      #include "sdl.h"
 
      /************************************/
      /*Intialisation des fenetres        */
