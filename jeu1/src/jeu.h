@@ -7,5 +7,26 @@
 // les fonctions implementees dans le fichier .c                                
 // les declaration de variables globales externes   
 
+enum forme{        // faire le lien entre la forme et un entier
+    cube = 0,
+    cone = 1,
+    cylindre = 2,
+    sphere = 3
+}forme;
+
+
+typedef struct piece {      //structure d'une pièce
+    enum forme;             //forme de la pièce
+    int joueur;             //0=>joueur1=>piece blanche | 1=>joueur2=>piece noir
+    int x;                  //position en x de la pièce sur le plateau
+    int y;                  //position en y de la pièce sur le plateau
+} piece;
+
+
+typedef struct joueur {
+        int value;
+        struct list * next;
+} joueur;
+
 
 #endif
