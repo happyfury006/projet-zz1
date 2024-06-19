@@ -3,6 +3,7 @@
 
 #include<stdio.h>
 
+
 // fichier d'entete classique ou l'on declare les types necessaires,            
 // les fonctions implementees dans le fichier .c                                
 // les declaration de variables globales externes   
@@ -19,12 +20,6 @@ typedef struct piece {      //structure d'une pièce
     int formes;             //forme de la pièce
     int joueur;             //0=>joueur1=>piece blanche | 1=>joueur2=>piece noir
 } piece;
-
-
-typedef struct list {
-    int value;          
-    struct list * next;
-} list;
 
 
 typedef struct joueur {
