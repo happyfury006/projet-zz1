@@ -6,43 +6,43 @@
 
 #define speed 5
 
-void end_sdl(char ok, char const* msg, SDL_Window* window, SDL_Renderer* renderer) {
-    char msg_formated[255];
-    int l;
+// void end_sdl(char ok, char const* msg, SDL_Window* window, SDL_Renderer* renderer) {
+//     char msg_formated[255];
+//     int l;
 
-    if (!ok) {
-        strncpy(msg_formated, msg, 250);
-        l = strlen(msg_formated);
-        strcpy(msg_formated + l, " : %s\n");
+//     if (!ok) {
+//         strncpy(msg_formated, msg, 250);
+//         l = strlen(msg_formated);
+//         strcpy(msg_formated + l, " : %s\n");
 
-        SDL_Log(msg_formated, SDL_GetError());
-    }
+//         SDL_Log(msg_formated, SDL_GetError());
+//     }
 
-    if (renderer != NULL) {
-        SDL_DestroyRenderer(renderer);
-        renderer = NULL;
-    }
-    if (window != NULL) {
-        SDL_DestroyWindow(window);
-        window = NULL;
-    }
+//     if (renderer != NULL) {
+//         SDL_DestroyRenderer(renderer);
+//         renderer = NULL;
+//     }
+//     if (window != NULL) {
+//         SDL_DestroyWindow(window);
+//         window = NULL;
+//     }
 
-    SDL_Quit();
+//     SDL_Quit();
 
-    if (!ok) {
-        exit(EXIT_FAILURE);
-    }
-}
+//     if (!ok) {
+//         exit(EXIT_FAILURE);
+//     }
+// }
 
-void drawRect(SDL_Renderer* renderer, int x, int y) {
-    SDL_Rect rectangle;
-    SDL_SetRenderDrawColor(renderer, rand() % 256, rand() % 256, rand() % 256, 255); // Couleur aléatoire
-    rectangle.x = x;
-    rectangle.y = y;
-    rectangle.w = 100;
-    rectangle.h = 100;
-    SDL_RenderFillRect(renderer, &rectangle);
-}
+// void drawRect(SDL_Renderer* renderer, int x, int y) {
+//     SDL_Rect rectangle;
+//     SDL_SetRenderDrawColor(renderer, rand() % 256, rand() % 256, rand() % 256, 255); // Couleur aléatoire
+//     rectangle.x = x;
+//     rectangle.y = y;
+//     rectangle.w = 100;
+//     rectangle.h = 100;
+//     SDL_RenderFillRect(renderer, &rectangle);
+// }
 
 int mainanimationbis(int argc, char** argv) {
     (void)argc;
