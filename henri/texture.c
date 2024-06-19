@@ -76,7 +76,7 @@ void displaybackground(SDL_Texture* my_texture,
         source = {0},                         // Rectangle définissant la zone de la texture à récupérer
         window_dimensions = {0},              // Rectangle définissant la fenêtre, on n'utilisera que largeur et hauteur
         destination = {0};
-
+        
     SDL_GetWindowSize(
     window, &window_dimensions.w,
     &window_dimensions.h);                    // Récupération des dimensions de la fenêtre
