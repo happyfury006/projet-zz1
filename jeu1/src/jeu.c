@@ -1,8 +1,20 @@
 #include "jeu.h"
+#include<stdio.h>
 #include <stdbool.h>
 
-piece[][] creationplateau(){
-   piece[][] plateau = malloc(4 * sizeof(piece*));
+
+piece creerPiece(forme forme,int player){
+    newpiece = malloc(sizeof(piece));
+    newpiece->formes = forme;
+    newpiece->joueur = player;
+    newpiece->x = NULL;
+    newpiece->y = NULL;
+    return 
+}
+
+
+piece** creationplateau(){
+   piece** plateau = malloc(4 * sizeof(piece*));
    for (int i = 0; i < 4; i++) {
       plateau[i] = malloc(4 * sizeof(piece));
    }
@@ -11,10 +23,7 @@ piece[][] creationplateau(){
 
 
 
-
-
-
-void victoireligne(int x,piece [][]plateau){
+void victoireligne(int x,piece **plateau){
    list * listdejaparcouru = NULL;
    bool victoire = true;
    int i=0;
@@ -91,4 +100,5 @@ int main(){;
    // coupjouer();
    // victoire(plateau);
    return 0;
+
 }
