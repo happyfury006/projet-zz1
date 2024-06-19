@@ -1,21 +1,34 @@
-SRC=premierefenetre.c rendu.c test.c test2.c xwindow.c main.c
-EXE=main
+CXX=gcc
+CXXFLAGS=-g -Wall -Wextra -Wfloat-equal
+LDFLAGS=-lm -lSDL2 -lSDL2_image
 
-CC=gcc
-CFLAGS:=-Wall -Wextra -MMD -Og -g $(shell sdl2-config --cflags)
-LDFLAGS:=-lSDL2_image -lSDL2_ttf -lSDL2_gfx -lm -lSDL2
+SRC_DIR=./src
+BUILD_DIR=./build
 
-OBJ=$(addprefix build/,$(SRC:.c=.o))
-DEP=$(addprefix build/,$(SRC:.c=.d))
+EXEC=main
+SRC=$(wildcard $(SRC_DIR)/*.c)
+OBJS=$(SRC:$(SRC_DIR)/%.c=$(BUILD_DIR)/%.o)
 
-all: $(OBJ)
-	$(CC) -o $(EXE) $^ $(LDFLAGS)
+# Règle par défaut : exécutable principal
+all: $(EXEC)
 
-build/%.o: %.c
-	@mkdir -p build
-	$(CC) $(CFLAGS) -o $@ -c $<
+# Règle pour générer la documentation avec Doxygen
+doc:
+	doxygen
 
+# Règle pour exécuter avec Valgrind
+valgrind: $(EXEC)
+	valgrind --leak-check=full $(BUILD_DIR)/$(EXEC)
+
+# Règle générale pour la compilation des objets .o
+$(BUILD_DIR)/%.o : $(SRC_DIR)/%.c
+	$(CXX) $(CXXFLAGS) -o $@ -c $< $(LDFLAGS)
+
+# Règle pour l'édition de liens de l'exécutable
+$(EXEC) : $(OBJS)
+	$(CXX) -o $(BUILD_DIR)/$(EXEC) $(OBJS) $(LDFLAGS)
+
+# Règle pour nettoyer les fichiers générés
 clean:
-	rm -rf build core *.o
-
--include $(DEP)
+	rm -f $(OBJS) $(BUILD_DIR)/$(EXEC)
+	rm -rf doc
