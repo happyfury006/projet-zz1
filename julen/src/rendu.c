@@ -4,7 +4,7 @@
      #include <math.h>
      #include <stdio.h>
      #include <string.h>
-
+      #include "rendu.h"
      /*********************************************************************************************************************/
      /*                              Programme d'exemple de création de rendu + dessin                                    */
      /*********************************************************************************************************************/
@@ -59,7 +59,8 @@
                                             
 
        /* tracer un cercle n'est en fait pas trivial, voilà le résultat sans algo intelligent ... */
-       for (float angle = 0; angle < 2 * M_PI; angle += M_PI / 4000) {      
+       float PI=3.14;
+       for (float angle = 0; angle < 2 * PI; angle += PI / 4000) {      
      SDL_SetRenderDrawColor(renderer,
                 (cos(angle * 2) + 1) * 255 / 2,          // quantité de Rouge      
                 (cos(angle * 5) + 1) * 255 / 2,          //          de vert 
@@ -71,7 +72,7 @@
        }
      }
 
-     int main(int argc, char** argv) {
+     int mainrendu(int argc, char** argv) {
        (void)argc;
        (void)argv;
 

@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include "animationbis.h"
 
 #define speed 5
 
@@ -43,7 +44,7 @@ void drawRect(SDL_Renderer* renderer, int x, int y) {
     SDL_RenderFillRect(renderer, &rectangle);
 }
 
-int main(int argc, char** argv) {
+int mainanimationbis(int argc, char** argv) {
     (void)argc;
     (void)argv;
 
