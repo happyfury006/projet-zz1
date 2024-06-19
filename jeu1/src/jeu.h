@@ -37,6 +37,7 @@ piece creerPiece(int forme,int player);
 grille creationplateau();
 void victoireligne(int x,grille plateau);
 void victoirecolonne(int y, grille plateau);
+void cherccheregion(int x, int y, grille plateau,list * lparcouru);
 void victoireregion(int x, int y, grille plateau);
 void victoire(grille plateau, int x, int y);
 

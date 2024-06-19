@@ -1,6 +1,7 @@
 #include "jeu.h"
 #include<stdio.h>
 #include <stdbool.h>
+#include "utils.h"
 
 
 piece creerPiece(int forme,int player){
@@ -62,7 +63,7 @@ void victoirecolonne(int y, grille plateau){
       }
       else
       {
-         victoire = true;
+         victoire = false;
       }
       j++;
     }
@@ -71,50 +72,41 @@ void victoirecolonne(int y, grille plateau){
       printf("Bravo vous avez fait une colonne!\n");
     }
     
-    
 }
-void chercheregion(int dx,int dy, int fx,int fy){
-   if 
 
+void chercheregion(int x,int y,grille plateau, list * lparcouru){
+   bool victoire = true;
+   int sectionx = x/2;
+   int sectiony = y/2;
+   int subsectionx = x%2;
+   int subsectiony = y%2;
+   for (int i = sectionx; i <subsectionx ; i++)
+   {
+      for (int j = sectiony; j < subsectiony; j++)
+      {
+         if (estdanslaliste(plateau.grid[i][j],lparcouru) == 0)
+         {
+            ajoutliste(plateau.grid[i][j],lparcouru);
+         }
+         else
+         {
+            victoire = false;
+         }  
+      }  
+   }
+   if (victoire == true)
+   {
+      printf("Bravo vous avez fait une region!\n");
+   }
+   
 }
 
 void victoireregion(int x, int y, grille plateau){
     int ix=x%2;
     int iy=y%2;
     list* lparcouru = plateau.grid[x][y];
-    if (x<2 )
-    {
-      if (y<2){
-         switch (position)
-         {
-         case 0:
-            
-            break;
-         
-         default:
-            break;
-         }
-         }
-         
-      else
-      {
-         /* code */
-      }   
-      }
+    chercheregion(ix,iy,plateau,lparcouru);
       
-      
-      
-    
-   else{
-      if (y<2){
-         /* code */
-      }
-      else
-      {
-         /* code */
-      }         
-      }
-    
 }
 
 
@@ -126,7 +118,7 @@ void victoire(grille plateau, int x, int y){
 }
 
 
-int main(){;
+int mainjeu(){;
    grille plateau = creationplateau();
    // coupjouer();
    // victoire(plateau);
