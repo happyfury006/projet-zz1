@@ -12,7 +12,7 @@ enum formes{        // faire le lien entre la forme et un entier
     cone = 1,
     cylindre = 2,
     sphere = 3
-}forme;
+}formes;
 
 
 typedef struct piece {      //structure d'une pièce
