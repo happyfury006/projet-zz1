@@ -1,11 +1,11 @@
      #include <SDL2/SDL.h>
      #include <stdio.h>
-
+     #include "premierefenetre.h"
      /************************************/
      /*  exemple de création de fenêtres */
      /************************************/
 
-     int main(int argc, char **argv) {
+     int mainpremierefenetre(int argc, char **argv) {
        (void)argc;
        (void)argv;
 

@@ -2,6 +2,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
+#include "animation.h"
 
 #define Time 1000
 #define speed 5
@@ -78,7 +79,7 @@ void animation(SDL_Renderer* renderer)
    }
    
 }
-int main(int argc, char** argv) {
+int mainanimation(int argc, char** argv) {
     (void)argc;
     (void)argv;
 

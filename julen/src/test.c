@@ -1,6 +1,7 @@
 #include <SDL2/SDL.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "test.h"
 
 #define I 10
 #define N 10
@@ -25,7 +26,7 @@ SDL_Window* creationwindow(const char* title, int x, int y, int w, int h) {
     return window;
 }
 
-int main(int argc, char **argv) {
+int maintest(int argc, char **argv) {
     (void)argc;
     (void)argv;
     int i = 0;
