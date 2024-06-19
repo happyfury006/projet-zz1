@@ -71,15 +71,13 @@ void play_with_texture_3(SDL_Texture* bg_texture, SDL_Texture* anakin_texture,SD
     float speedbg = 10.0;
     float speedanakin = 1.0;
     float speedsebulba = 5.0;
-    float speedestroyer = 1.0;
-
-
-    SDL_bool running = SDL_TRUE;
-    SDL_Event event;
+    float speedestroyer = 0.0;
 
     int direction = 0; // 0: right, 1: down, 2: left, 3: up
     int initial_x = destination_anakin.x;
    //  int initial_y = destination_anakin.y;
+   SDL_bool running = SDL_TRUE;
+   SDL_Event event;
 
     while (running) {
         while (SDL_PollEvent(&event)) {
