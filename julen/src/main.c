@@ -9,10 +9,10 @@
 #include "test.h"
 #include "texture.h"
 #include "premierefenetre.h"
-// #include "sprite.h"
+#include "sprite.h"
 
 
 int main(int argc, char ** argv){
-   mainanimation(argc,argv);
+   mainsprite(argc, argv);
    return 1;
 }
