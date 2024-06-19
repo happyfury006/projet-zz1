@@ -24,14 +24,18 @@ typedef struct piece {      //structure d'une pièce
 
 
 typedef struct list {
-        int value;
-        struct list * next;
+    int value;          
+    struct list * next;
 } list;
 
 
 typedef struct joueur {
-        int value;
-        struct list * next;
+    int numJoueur;          //0=>joueur1=>piece blanche | 1=>joueur2=>piece noir
+    int ia;                 //0=>joueur humain | >0 profondeur de l'arbre parcourue
+    int compteurCylindre;   //nbr de cylindre restant
+    int compteurCarre;
+    int compteurCone;
+    int compteurSphère;
 } joueur;
 
 
