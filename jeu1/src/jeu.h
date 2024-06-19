@@ -38,5 +38,6 @@ typedef struct joueur {
     int compteurSphère;
 } joueur;
 
+piece creerPiece(forme forme,int player);
 
 #endif
