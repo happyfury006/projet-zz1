@@ -16,7 +16,7 @@ enum formes{        // faire le lien entre la forme et un entier
 
 
 typedef struct piece {      //structure d'une pièce
-    enum formes;             //forme de la pièce
+    int formes;             //forme de la pièce
     int joueur;             //0=>joueur1=>piece blanche | 1=>joueur2=>piece noir
 } piece;
 
@@ -35,10 +35,10 @@ typedef struct joueur {
 
 
 typedef struct grille {
-    piece grid[4][4];
+    piece* grid[4][4];
 }grille;
 
-piece creerPiece(forme forme,int player);
+piece creerPiece(int forme,int player);
 grille creationplateau();
 void victoireligne(int x,grille plateau);
 void victoirecolonne(int y, grille plateau);
