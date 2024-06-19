@@ -23,6 +23,12 @@ typedef struct piece {      //structure d'une pièce
 } piece;
 
 
+typedef struct list {
+        int value;
+        struct list * next;
+} list;
+
+
 typedef struct joueur {
         int value;
         struct list * next;
