@@ -1,4 +1,4 @@
-// #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_image.h>
 #ifndef sprite_h
 #define sprite_h
 

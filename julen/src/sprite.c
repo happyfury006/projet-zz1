@@ -162,7 +162,7 @@ void animationparallax(SDL_Texture* bg_texture, SDL_Texture* anakin_texture,SDL_
     }
 }
 
-int main(int argc, char** argv) {
+int mainsprite(int argc, char** argv) {
     (void)argc;
     (void)argv;
 
@@ -192,14 +192,14 @@ int main(int argc, char** argv) {
                     SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     if (renderer == NULL) end_sdl(0, "ERROR RENDERER CREATION", window, renderer);
 
-    bg = IMG_LoadTexture(renderer, "../image/desert_tatoine22.png");
+    bg = IMG_LoadTexture(renderer, "./image/desert_tatoine22.png");
     if (bg == NULL) end_sdl(0, "Echec du chargement de l'image dans la texture", window, renderer);
 
-    anakin = IMG_LoadTexture(renderer, "../image/file.png");
+    anakin = IMG_LoadTexture(renderer, "./image/file.png");
     if (anakin == NULL) end_sdl(0, "Echec du chargement de l'image de premier plan dans la texture", window, renderer);
-    destroyer = IMG_LoadTexture(renderer, "../image/destroyer.png");
+    destroyer = IMG_LoadTexture(renderer, "./image/destroyer.png");
     if (destroyer == NULL) end_sdl(0, "Echec du chargement de l'image de premier plan dans la texture", window, renderer);
-    sebulba = IMG_LoadTexture(renderer, "../image/sebulba.png");
+    sebulba = IMG_LoadTexture(renderer, "./image/sebulba.png");
     if (sebulba == NULL) end_sdl(0, "Echec du chargement de l'image de premier plan dans la texture", window, renderer);
 
 
