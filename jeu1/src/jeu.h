@@ -32,6 +32,7 @@ typedef struct joueur {
 
 typedef struct grille {
     piece* grid[4][4];
+    int valeur;                  
 }grille;
 
 piece creerPiece(int forme,int player);
