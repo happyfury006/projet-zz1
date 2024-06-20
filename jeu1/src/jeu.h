@@ -2,6 +2,7 @@
 #define GARDIEN_UNIQUE_JEU_H
 
 #include<stdio.h>
+#include <stdbool.h>
 #include "utils.h"
 
 
@@ -37,11 +38,11 @@ typedef struct grille {
 
 piece creerPiece(int forme,int player);
 grille creationplateau();
-void victoireligne(int x,grille plateau);
-void victoirecolonne(int y, grille plateau);
-void cherccheregion(int x, int y, grille plateau,list * lparcouru);
-void victoireregion(int x, int y, grille plateau);
-void victoire(grille plateau, int x, int y);
+bool victoireligne(int x,grille plateau);
+bool victoirecolonne(int y, grille plateau);
+bool cherccheregion(int x, int y, grille plateau,list * lparcouru);
+bool victoireregion(int x, int y, grille plateau);
+bool victoire(grille plateau, int x, int y);
 grille ajoutpiece(grille plateau, piece pieceajoutee, int x, int y);
 void affichageplateau(grille plateau);
 
