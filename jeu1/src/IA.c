@@ -20,7 +20,6 @@ arbre generecoup(joueur j,grille plat){
                     {
                         grille platcopie=grillecopie(plat);
                         applique(platcopie,piecerestantes[i][1],j,k);
-                        inserttete(arb->fils,platecopie);
                         if (prof<PROFONDEUR)
                         {
                             prof+=1;
