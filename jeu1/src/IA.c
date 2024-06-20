@@ -4,10 +4,16 @@
 
 #define PROFONDEUR 6
 
+grille grillecopie(grille grid){
+    grille copie = malloc(sizeof(grille));
+    return copie;
+}
+
 arbre generecoup(joueur j,grille plat){
     int prof = 0;
-    arbre arb= malloc(sizeof(arbre));
+    arbre* arb= malloc(sizeof(arbre));
     arb->plateau=plat;
+    arb->plateau->valeur=evaluation(plat);
     for(int i=0; i<4; i++)
     {
         if (j->piecerestantes[i][1]>0)
@@ -19,11 +25,11 @@ arbre generecoup(joueur j,grille plat){
                     if(valide(i, j, k, plat->grid))
                     {
                         grille platcopie=grillecopie(plat);
-                        applique(platcopie,j->piecerestantes[i][0],j,k);
+                        platcopie=ajoutpiece(platcopie,j->piecerestantes[i][0],j,k);
                         if (prof<PROFONDEUR)
                         {
                             prof+=1;
-                            arbre sousarb = arb->fils[0];
+                            arbre* sousarb = arb->fils[0];
                             sousarb->derniercoup->x = j;
                             sousarb->derniercoup->y = k;
                             sousarb->derniercoup->joueur = j->numJoueur;
