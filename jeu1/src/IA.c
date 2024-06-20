@@ -4,8 +4,10 @@
 
 #define PROFONDEUR 6
 
-grille grillecopie(grille grid){
+grille grillecopie(grille acopier){
     grille* copie = (grille*)malloc(sizeof(grille));
+    copie->grid=acopier->grid;
+    copie->value=acopier->value;
     return copie;
 }
 
@@ -22,7 +24,7 @@ arbre generecoup(joueur j,grille plat){
             {
                 for(int k=0; k<4; k++)
                 {
-                    if(valide(i, j, k, plat->grid))
+                    if(valide(i, j.numJoueur j, k, plat->grid))
                     {
                         grille platcopie=grillecopie(plat);
                         platcopie=ajoutpiece(platcopie,j.piecerestante[i][0],j,k);
