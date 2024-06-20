@@ -22,7 +22,7 @@ void ajoutliste(int forme,list * listdejaparcouru){
     {
         tmp = tmp->next;
     }
-    tmp->next = malloc(sizeof(list));
+    tmp->next = (list*)malloc(sizeof(list));
     tmp->next->value = forme;
     tmp->next->next = NULL;
 }

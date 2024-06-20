@@ -6,25 +6,29 @@
 
 // enum formes forme;
 
-piece creerPiece(int forme,int player){
-	 piece* newpiece = malloc(sizeof(piece));
+piece* creerPiece(int forme,int player){
+	 piece* newpiece = (piece*)malloc(sizeof(piece));
 	 if (newpiece != NULL)
 	 {
 		newpiece->formes = forme;
 	  newpiece->joueur = player;
-	  return *newpiece;
+	  return newpiece;
 	 }
 }
 
-grille creationplateau(){
-	grille plateau ;
-	for (int i = 0; i < 4; i++) {
-		for (int j = 0; j < 4; j++)
-		{
-			plateau.grid[i][j] = NULL;
-		}
-	}
-	return plateau;
+grille* creationplateau() {
+    grille* plateau = (grille*)malloc(sizeof(grille));  // Alloue de la mémoire pour la structure grille
+    if (plateau == NULL) {
+        // Gérer l'erreur d'allocation mémoire
+        return NULL;
+    }
+
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            plateau->grid[i][j] = NULL; //initialisation de la grille
+        }
+    }
+    return plateau;
 }
 
 
@@ -103,10 +107,11 @@ bool valide(int forme,int joueur,int x, int y, grille plateau){
 	return possible;
 }
 
-grille ajoutpiece(grille plateau, piece pieceajoutee, int x, int y){
-	if (valide(pieceajoutee.formes,pieceajoutee.joueur,x,y,plateau) == true)
+grille* ajoutpiece(grille* plateau, piece * pieceajoutee, int x, int y){
+	bool valide = valide(pieceajoutee->formes,pieceajoutee->joueur,x,y,plateau);
+	if (valide == true)
 	{
-		plateau.grid[x][y] = &pieceajoutee;
+		plateau->grid[x][y] = &pieceajoutee;
 		return plateau;
 	}
 	else{
@@ -133,12 +138,14 @@ void affichageplateau(grille plateau){
 }
 
 bool victoireligne(int x,grille plateau){
-	list * lparcouru = NULL;
+	list * lparcouru = malloc(sizeof(list));
+	lparcouru->value = NULL;
+	lparcouru->next = NULL;
 	bool victoire = true;
 	int i=0;
 	while (i < 4 && victoire == true)
 	{
-		if (estdanslaliste(plateau.grid[x][i],lparcouru) == 0)
+		if (estdanslaliste(plateau.grid[x][i]->formes,lparcouru) == 0)
 		{
 			ajoutliste(plateau.grid[x][i],lparcouru);
 		}
@@ -229,7 +236,7 @@ bool victoire(grille plateau, int x, int y){
 
 void jeuencours1VSIA(){
    bool running = false;
-   grille plateau = creationplateau();
+   grille* plateau = creationplateau();
 
       while (running == false)
    {
@@ -238,7 +245,7 @@ void jeuencours1VSIA(){
       printf("Entrez la forme de la piece que vous voulez jouer\n");
       int forme;
       scanf("%d",&forme);
-      piece pieceajoutee = creerPiece(forme,1);
+      piece* pieceajoutee = creerPiece(forme,1);
       printf("Entrez la position x de la piece que vous voulez jouer\n");
       int x;
       scanf("%d",&x);
@@ -246,8 +253,8 @@ void jeuencours1VSIA(){
       int y;
       scanf("%d",&y);
       
-      plateau = ajoutpiece(plateau,pieceajoutee,x,y);
-			bool victoryJ1 = victoire(plateau,x,y);
+      grille* plateau = ajoutpiece(plateau,pieceajoutee,x,y);
+			bool victoryJ1 = victoire(*plateau,x,y);
       if (victoryJ1== true)
       {
          printf("Bravo vous avez gagne!\n");
@@ -258,7 +265,7 @@ void jeuencours1VSIA(){
       int xIA;
 			int yIA;
       // plateau = ajoutpiece(plateau,pieceIA,xIA,yIA);
-			bool victoryIA = victoire(plateau,xIA,yIA);
+			bool victoryIA = victoire(*plateau,xIA,yIA);
       if (victoryIA == true)
       {
          printf("L'IA a gagne!\n");
@@ -270,7 +277,7 @@ void jeuencours1VSIA(){
 
 void jeuencours1VS1(){
    bool running = false;
-   grille plateau = creationplateau();
+   grille* plateau = creationplateau();
       while (running == false)
    {
    // On demande au joueur1 de jouer
@@ -278,7 +285,7 @@ void jeuencours1VS1(){
       printf("Entrez la forme de la piece que vous voulez jouer\n");
       int forme1;
       scanf("%d",&forme1);
-      piece pieceajoutee = creerPiece(forme1,1);
+      piece* pieceajoutee = creerPiece(forme1,1);
       printf("Entrez la position x de la piece que vous voulez jouer\n");
       int x1;
       scanf("%d",&x1);
@@ -286,9 +293,9 @@ void jeuencours1VS1(){
       int y1;
       scanf("%d",&y1);
       
-      plateau = ajoutpiece(plateau,pieceajoutee,x1,y1);
+			plateau = ajoutpiece(plateau,pieceajoutee,x1,y1);
 
-			bool victoryJ1 = victoire(plateau,x1,y1);
+			bool victoryJ1 = victoire(*plateau,x1,y1);
       
 			if (victoryJ1 == true)
       {
@@ -310,7 +317,7 @@ void jeuencours1VS1(){
       scanf("%d",&y2);
       
       plateau = ajoutpiece(plateau,pieceajoutee,x2,y2);
-			bool victoryJ2 = victoire(plateau,x2,y2);
+			bool victoryJ2 = victoire(*plateau,x2,y2);
 
       if (victoryJ2 == true)
       {
