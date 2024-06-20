@@ -5,8 +5,8 @@
  // Include the header file that contains the definition of 'enum forme'
 // enum formes forme;
 
-int estdanslaliste(piece* piece,list * listdejaparcouru){
-    list * tmp = listdejaparcouru;
+int estdanslaliste(piece* piece,list * listparcouru){
+    list * tmp = listparcouru;
     while (tmp != NULL)
     {
         if (tmp->piece == piece)
@@ -17,8 +17,8 @@ int estdanslaliste(piece* piece,list * listdejaparcouru){
     }
     return 0;
 }
-void ajoutliste(piece* piece,list * listdejaparcouru){
-    list * tmp = listdejaparcouru;
+void ajoutliste(piece* piece,list * listparcouru){
+    list * tmp = listparcouru;
     while (tmp->next != NULL)
     {
         tmp = tmp->next;

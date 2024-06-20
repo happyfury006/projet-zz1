@@ -39,14 +39,15 @@ bool valideligne(int x, int joueur, int forme, grille *plateau);
 bool validecolonne(int y, int joueur, int forme, grille* plateau);
 bool valideregion(int x, int y, int joueur, int forme, grille* plateau);
 bool valide(int forme, int joueur, int x, int y, grille *plateau);
-grille* ajoutpiece(grille* plateau, piece* pieceajoutee, int x, int y);
+grille* ajoutpiece(grille* plateau, piece* pieceajoutee,joueur* joueur, int x, int y);
 void affichageplateau(grille* plateau);
 bool victoireligne(int x, grille* plateau);
 bool victoirecolonne(int y, grille* plateau);
 bool chercheregion(int x, int y, grille* plateau, list *lparcouru);
 bool victoireregion(int x, int y, grille* plateau);
 bool victoire(grille *plateau, int x, int y);
+grille* demandepiece(grille* plateau, joueur* joueur);
 void jeuencours1VSIA();
-void jeuencours1VS1();
+bool jeuencours1VS1();
 
 #endif

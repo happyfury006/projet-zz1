@@ -5,10 +5,10 @@
 
 
 enum formes{        // faire le lien entre la forme et un entier
-    cube = 0,
-    cone = 1,
-    cylindre = 2,
-    sphere = 3
+    cube = 1,
+    cone = 2,
+    cylindre = 3,
+    sphere = 4
 };
 
 // extern enum formes forme;
@@ -23,8 +23,8 @@ typedef struct list {
 } list;
 
 
-int estdanslaliste(piece* piece,list * listdejaparcouru);
-void ajoutliste(piece* piece,list * listdejaparcouru);
+int estdanslaliste(piece* piece,list * listparcouru);
+void ajoutliste(piece* piece,list * listparcouru);
 // fichier d'entete classique ou l'on declare les types necessaires,            
 // les fonctions implementees dans le fichier .c                                
 // les declaration de variables globales externes   
