@@ -10,6 +10,12 @@ void play_with_texture_4(SDL_Texture* bg_texture, SDL_Texture* my_texture,
       SDL_Window* window,
       SDL_Renderer* renderer);
 
+typedef struct {
+    SDL_Texture *texture;
+    SDL_Rect rect;
+    int selected;
+} Piece;
+
 // fichier d'entete classique ou l'on declare les types necessaires,            
 // les fonctions implementees dans le fichier .c                                
 // les declaration de variables globales externes   
