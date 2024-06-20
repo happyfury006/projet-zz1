@@ -3,6 +3,68 @@
 #include <limits.h>
 #include <math.h>
 #include <stdlib.h>
+#include <stdbool.h>
+
+
+bool victoiretouteligne(grille*plat)
+{
+    for(int x=0; x<4; x++)
+    {
+        if(victoireligne(x,plat))
+            return true;
+    }
+    return false;
+}
+
+bool victoiretoutecolonne(grille*plat)
+{
+    for(int y=0; y<4; y++)
+    {
+        if(victoirecolonne(y,plat))
+            return true;
+    }
+    return false;
+}
+
+
+bool victoiretouteregion(grille*plat)
+{
+    if(victoireregion(0,0,plat)||victoireregion(3,0,plat)||victoireregion(0,3,plat)||victoireregion(3,3,plat))
+        return true;
+    
+    return false;
+}
+
+
+int evaluation(grille*plat, int profondeur)
+{
+    int score = 0;
+    int paire = profondeur % 2 
+    if(victoiretouteligne(plat) || victoiretoutecolonne(plat) || victoiretouteregion(plat))
+    {
+        if (paire)
+            return 100000;
+        else
+            return -100000;
+    }
+
+    score3=aligne3(plat);
+    score2=aligne2(plat);
+    score1=aligne1(plat);
+
+    if(paire)
+    {
+        score-=score3;
+        score+=score2;
+        score+=score1;
+    }
+    else
+    {
+        score+=score3;
+        score-=score2;
+        score-=score1;
+    }
+}
 
 
 grille* grillecopie(grille* acopier) {
@@ -65,7 +127,7 @@ arbre* generecoup(joueur jo,grille* plat,int profondeur){
 int minmax(arbre* noeud, int profondeur, int maximizingPlayer) {
     if (profondeur == 0)             //si c'est une feuille (de notre profondeur)
     {
-        return evaluation(noeud->plateau);
+        return evaluation(noeud->plateau,maximizingPlayer);
     }
 
     if (maximizingPlayer)             //on maximise pour le joueur
@@ -111,3 +173,5 @@ coups trouver_meilleur_coup(arbre* racine, int profondeur) {
     }
     return meilleur_coup;
 }
+
+

@@ -25,8 +25,13 @@ typedef struct arbre{       //structure de l'arbre
 } arbre;
 
 
+bool victoiretouteligne(grille*plat);
+bool victoiretoutecolonne(grille*plat);
+bool victoiretouteregion(grille*plat);
+int evaluation(grille*plat, int profondeur);
 grille* grillecopie(grille* acopier);
 arbre* generecoup(joueur j,grille* plat, int profondeur);
 int minimax(arbre* noeud, int profondeur, int maximizingPlayer);
+coups trouver_meilleur_coup(arbre* racine, int profondeur);
 
 #endif
