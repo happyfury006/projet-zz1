@@ -20,32 +20,32 @@ grille* grillecopie(grille* acopier) {
     return copie;
 }
 
-arbre generecoup(joueur joueur,grille plat){
-    int prof = 0;
-    arbre* arb= malloc(sizeof(arbre));
+arbre* generecoup(struct joueur j,grille* plat,int profondeur){
+    int index=0;
+    arbre* arb= (arbre*)malloc(sizeof(arbre));
     arb->plateau=plat;
     arb->plateau->valeur=evaluation(plat);
     for(int i=0; i<4; i++)
     {
-        if (joueur.piecerestante[i][1]>0)
+        if (j.piecerestante[i][1]>0)
         {
             for(int j=0; j<4; j++)
             {
                 for(int k=0; k<4; k++)
                 {
-                    if(valide(i, joueur.numJoueur, j, k, plat->grid))
+                    if(valide(i, j.numJoueur, j, k, plat->grid))
                     {
                         grille platcopie=grillecopie(plat);
-                        platcopie=ajoutpiece(platcopie,joueur.piecerestante[i][0],j,k);
-                        if (prof<PROFONDEUR)
+                        platcopie=ajoutpiece(platcopie,j.piecerestante[i][0],j,k);
+                        if (index<profondeur)
                         {
-                            prof+=1;
+                            index+=1;
                             arbre* sousarb = arb->fils[0];
                             sousarb->derniercoup.x = j;
                             sousarb->derniercoup.y = k;
-                            sousarb->derniercoup.joueur = joueur.numJoueur;
-                            sousarb->derniercoup.forme = joueur.piecerestante[i][0];
-                            sousarb=generecoup(abs(joueur.numJoueur-1),platcopie);
+                            sousarb->derniercoup.j = j.numJoueur;
+                            sousarb->derniercoup.forme = j.piecerestante[i][0];
+                            sousarb=generecoup(abs(j.numJoueur-1),platcopie);
                         }
                         prof-=1;
                     }
@@ -57,52 +57,3 @@ arbre generecoup(joueur joueur,grille plat){
 }
 
 
-int minimax(arbre* noeud, int profondeur, int maximizingPlayer) {
-    if (profondeur == 0) 
-    {
-        return evaluer_plateau(noeud->plateau);
-    }
-
-    if (maximizingPlayer) 
-    {
-        int maxEval = INT_MIN;
-        for (int i = 0; i < N && noeud->fils[i] != NULL; i++) 
-        {
-            int eval = minimax(noeud->fils[i], profondeur - 1, 0);
-            if (eval > maxEval) 
-            {
-                maxEval = eval;
-            }
-        }
-        return maxEval;
-    } 
-    else 
-    {
-        int minEval = INT_MAX;
-        for (int i = 0; i < N && noeud->fils[i] != NULL; i++) 
-        {
-            int eval = minimax(noeud->fils[i], profondeur - 1, 1);
-            if (eval < minEval) 
-            {
-                minEval = eval;
-            }
-        }
-        return minEval;
-    }
-}
-
-
-coups trouver_meilleur_coup(arbre* racine, int profondeur) {
-    int meilleur_valeur = INT_MIN;
-    coups meilleur_coup;
-    for (int i = 0; i < N && racine->fils[i] != NULL; i++) 
-    {
-        int valeur = minimax(racine->fils[i], profondeur - 1, 0);
-        if (valeur > meilleur_valeur) 
-        {
-            meilleur_valeur = valeur;
-            meilleur_coup = racine->fils[i]->derniercoup;
-        }
-    }
-    return meilleur_coup;
-}

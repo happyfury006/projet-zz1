@@ -19,12 +19,12 @@ typedef struct coups{
 }coups;
 
 typedef struct arbre{       //structure de l'arbre
-    grille* plateau;          //noeud : plateau actualisé
-    arbre fils[N];             //enfants : un tableau de sous arbres
-    coups derniercoup;
+    struct grille* plateau;          //noeud : plateau actualisé
+    struct arbre* fils[N];             //enfants : un tableau de sous arbres
+    struct coups derniercoup;
 } arbre;
 
 
-arbre generecoup(joueur j,grille plat);
+arbre* generecoup(joueur j,grille* plat, int profondeur);
 
 #endif
