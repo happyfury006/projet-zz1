@@ -2,18 +2,19 @@
 #define GARDIEN_UNIQUE_JEU_H
 
 #include<stdio.h>
+#include "utils.h"
 
 
 // fichier d'entete classique ou l'on declare les types necessaires,            
 // les fonctions implementees dans le fichier .c                                
 // les declaration de variables globales externes   
 
-enum formes{        // faire le lien entre la forme et un entier
-    cube = 0,
-    cone = 1,
-    cylindre = 2,
-    sphere = 3
-}formes;
+// enum formes{        // faire le lien entre la forme et un entier
+//     cube = 0,
+//     cone = 1,
+//     cylindre = 2,
+//     sphere = 3
+// }formes;
 
 
 typedef struct piece {      //structure d'une pièce
@@ -40,5 +41,8 @@ void victoirecolonne(int y, grille plateau);
 void cherccheregion(int x, int y, grille plateau,list * lparcouru);
 void victoireregion(int x, int y, grille plateau);
 void victoire(grille plateau, int x, int y);
+grille ajoutpiece(grille plateau, piece pieceajoutee, int x, int y);
+void affichageplateau(grille plateau);
+
 
 #endif
