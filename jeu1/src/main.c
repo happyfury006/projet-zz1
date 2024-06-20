@@ -19,8 +19,9 @@ int main(){
    printf("Voulez vous jouez seul en 1VSIA ou a 2 en 1VS1\n");
    printf("(1,1VSIA), (2,1VSIA):");
    int choix;
-   
    scanf("%d",&choix);
+   grille plateau=creationplateau();
+   
    if (choix == 1)
    {
       jeuencours1VSIA();
@@ -29,12 +30,8 @@ int main(){
    {
       jeuencours1VS1();
    }
-   
-
-   
-   grille plateau=creationplateau();
-   affichageplateau(plateau);
-   plateau=ajoutpiece(plateau,creerPiece(3,1),0,0);
+   // affichageplateau(plateau);
+   // plateau=ajoutpiece(plateau,creerPiece(3,1),0,0);
    affichageplateau(plateau);
    
    return 0;
