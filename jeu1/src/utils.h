@@ -8,7 +8,9 @@ enum formes{        // faire le lien entre la forme et un entier
     cone = 1,
     cylindre = 2,
     sphere = 3
-}forme;
+};
+
+extern enum formes forme;
 
 typedef struct list {
     int value;          
