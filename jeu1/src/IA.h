@@ -15,4 +15,6 @@ typedef struct arbre{       //structure de l'arbre
 } arbre;
 
 
+arbre generecoup(joueur j,grille plat);
+
 #endif
