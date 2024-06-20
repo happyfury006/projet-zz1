@@ -13,6 +13,13 @@ const int CELL_WIDTH = 100; // Largeur de chaque cellule du plateau
 const int CELL_HEIGHT = 100; // Hauteur de chaque cellule du plateau
 
 
+SDL_Point grid_positions[GRID_ROWS][GRID_COLS] = {
+    {{100, 100}, {200, 100}, {300, 100}, {400, 100}},
+    {{100, 200}, {200, 200}, {300, 200}, {400, 200}},
+    {{100, 300}, {200, 300}, {300, 300}, {400, 300}},
+    {{100, 400}, {200, 400}, {300, 400}, {400, 400}}
+};
+
 void end_sdl(int ok, const char* msg, SDL_Window* window, SDL_Renderer* renderer) {
     char msg_formated[255];
     int l;
@@ -112,10 +119,22 @@ int is_valid_position(int x, int y, Piece pieces[], int piece_count) {
 }
 
 void snap_to_grid(Piece *piece) {
-    int cell_x = piece->rect.x / CELL_WIDTH;
-    int cell_y = piece->rect.y / CELL_HEIGHT;
-    piece->rect.x = cell_x * CELL_WIDTH + (CELL_WIDTH - piece->rect.w) / 2;
-    piece->rect.y = cell_y * CELL_HEIGHT + (CELL_HEIGHT - piece->rect.h) / 2;
+    int nearest_dist = INT_MAX;
+    SDL_Point nearest_position = {0, 0};
+    
+    for (int i = 0; i < GRID_ROWS; i++) {
+        for (int j = 0; j < GRID_COLS; j++) {
+            int dist = (piece->rect.x - grid_positions[i][j].x) * (piece->rect.x - grid_positions[i][j].x) +
+                       (piece->rect.y - grid_positions[i][j].y) * (piece->rect.y - grid_positions[i][j].y);
+            if (dist < nearest_dist) {
+                nearest_dist = dist;
+                nearest_position = grid_positions[i][j];
+            }
+        }
+    }
+
+    piece->rect.x = nearest_position.x - piece->rect.w / 2;
+    piece->rect.y = nearest_position.y - piece->rect.h / 2;
 }
 
 void handle_events(SDL_Event *event, Piece pieces[], int piece_count, int *selected_piece) {
@@ -145,10 +164,6 @@ void handle_events(SDL_Event *event, Piece pieces[], int piece_count, int *selec
                     if (is_valid_position(x, y, pieces, piece_count)) {
                         // Snap the piece to the grid
                         snap_to_grid(&pieces[*selected_piece]);
-                    } else {
-                        // If not valid, reset the piece to its original position
-                        pieces[*selected_piece].rect.x = pieces[*selected_piece].rect.x - pieces[*selected_piece].rect.w / 2;
-                        pieces[*selected_piece].rect.y = pieces[*selected_piece].rect.y - pieces[*selected_piece].rect.h / 2;
                     }
                     // Release the selected piece
                     pieces[*selected_piece].selected = 0;
@@ -171,7 +186,7 @@ void handle_events(SDL_Event *event, Piece pieces[], int piece_count, int *selec
     }
 }
 
-void display(SDL_Texture* bgv2_texture, SDL_Texture* bg_texture,SDL_Texture* extra_texture1,SDL_Texture* extra_texture2, Piece pieces[], int piece_count, SDL_Window* window, SDL_Renderer* renderer) {
+void display(SDL_Texture* bgv2_texture, SDL_Texture* bg_texture, SDL_Texture* extra_texture1, SDL_Texture* extra_texture2, Piece pieces[], int piece_count, SDL_Window* window, SDL_Renderer* renderer) {
     SDL_RenderClear(renderer);
 
     render_texture_fullscreen(bgv2_texture, renderer);
@@ -194,9 +209,8 @@ int main(int argc, char* argv[]) {
     SDL_Texture *bgv2_texture;
     SDL_Texture *j1_texture;
     SDL_Texture *j2_texture;
-    SDL_Texture *ia_texture;
     Piece pieces[16] = {0};
-    
+
     bg_texture = IMG_LoadTexture(renderer, "../images/nouveaufond.png");
     bgv2_texture = IMG_LoadTexture(renderer, "../images/fondblanc.png");
     j1_texture = IMG_LoadTexture(renderer, "../images/joueur1.png");
@@ -222,7 +236,7 @@ int main(int argc, char* argv[]) {
         pieces[i].selected = 0;
     }
 
-    if (bg_texture == NULL || bgv2_texture == NULL) {
+    if (bg_texture == NULL || bgv2_texture == NULL || j1_texture == NULL || j2_texture == NULL) {
         end_sdl(0, "Echec du chargement de l'image dans la texture", window, renderer);
     }
 
@@ -234,19 +248,19 @@ int main(int argc, char* argv[]) {
         while (SDL_PollEvent(&event)) {
             handle_events(&event, pieces, 16, &selected_piece);
         }
-        display(bgv2_texture, bg_texture,j2_texture,j1_texture, pieces, 16, window, renderer);
+        display(bgv2_texture, bg_texture,j2_texture, j1_texture, pieces, 16, window, renderer);
         SDL_Delay(16); // Approximately 60 FPS
     }
     for (int i = 0; i < 16; i++) {
         if (pieces[i].texture) SDL_DestroyTexture(pieces[i].texture);
     }
-    SDL_DestroyTexture(j1_texture);
     SDL_DestroyTexture(j2_texture);
+    SDL_DestroyTexture(j1_texture);
     SDL_DestroyTexture(bgv2_texture);
     SDL_DestroyTexture(bg_texture);
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     SDL_Quit();
     IMG_Quit();
-    return 0; 
+    return 0;
 }
