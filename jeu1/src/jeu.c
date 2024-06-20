@@ -8,15 +8,15 @@
 
 piece creerPiece(int forme,int player){
 	 piece* newpiece = malloc(sizeof(piece));
-	 if (newpiece == NULL)
+	 if (newpiece != NULL)
 	 {
-		/* code */
-	 }
-	 
-	 newpiece->formes = forme;
+		newpiece->formes = forme;
 	 newpiece->joueur = player;
 
 	 return *newpiece;
+	 }
+	 
+	 
 }
 
 
@@ -36,6 +36,79 @@ grille creationplateau(){
 grille ajoutpiece(grille plateau, piece pieceajoutee, int x, int y){
 	plateau.grid[x][y] = &pieceajoutee;
 	return plateau;
+}
+
+bool valideligne(int x, int joueur,int forme, grille plateau){
+	bool possible = false;
+	bool running = true;
+	int i=0;
+	piece pieceverif = creerPiece(forme,joueur);
+	while (i<4 && running == true)
+	{
+		if (plateau.grid[x][i] == pieceverif)
+		{
+			running = false;
+		}
+		i++;
+	}
+	if (running == true)
+	{
+		possible = true;
+	}
+	return possible;
+}
+
+bool validecolonne(int y, int joueur,int forme, grille plateau){
+	bool possible = false;
+	bool running = true;
+	int i=0;
+	piece pieceverif = creerPiece(forme,joueur);
+	while (i<4 && running == true)
+	{
+		if (plateau.grid[i][y] == pieceverif)
+		{
+			running = false;
+		}
+		i++;
+	}
+	if (running == true)
+	{
+		possible = true;
+	}
+	return possible;
+}
+bool valideregion(int x, int y, int joueur,int forme, grille plateau){
+	bool possible = false;
+	bool running = true;
+	int sectionx = x/2;
+	int sectiony = y/2;
+	int subsectionx = x%2;
+	int subsectiony = y%2;
+	piece pieceverif = creerPiece(forme,joueur);
+	for (int i = sectionx; i <subsectionx ; i++)
+	{
+		for (int j = sectiony; j < subsectiony; j++)
+		{
+			if (plateau.grid[i][j] == pieceverif)
+			{
+				running = false;
+			}
+		}
+	}
+	if (running == true)
+	{
+		possible = true;
+	}
+	return possible;
+}
+
+bool valide(int forme,int joueur,int x, int y, grille plateau){
+	bool possible = false;
+	if (valideligne(x,joueur,forme,plateau) == true || validecolonne(y,joueur,forme,plateau) == true || valideregion(x,y,joueur,forme,plateau) == true)
+	{
+		possible = true;
+	}
+	return possible;
 }
 
 void affichageplateau(grille plateau){
