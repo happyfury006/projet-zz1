@@ -10,7 +10,7 @@ arbre generecoup(joueur j,grille plat){
     arb->plateau=plat;
     for(int i=0; i<4; i++)
     {
-        if (j->piecerestantes[i][2]>0)
+        if (j->piecerestantes[i][1]>0)
         {
             for(int j=0; j<4; j++)
             {
@@ -19,11 +19,16 @@ arbre generecoup(joueur j,grille plat){
                     if(valide(i, j, k, plat->grid))
                     {
                         grille platcopie=grillecopie(plat);
-                        applique(platcopie,piecerestantes[i][1],j,k);
+                        applique(platcopie,j->piecerestantes[i][0],j,k);
                         if (prof<PROFONDEUR)
                         {
                             prof+=1;
-                            arb->fils[0]=generecoup(abs(j-1),platcopie);
+                            arbre sousarb = arb->fils[0];
+                            sousarb->derniercoup->x = j;
+                            sousarb->derniercoup->y = k;
+                            sousarb->derniercoup->joueur = j->numJoueur;
+                            sousarb->derniercoup->forme = j->piecerestantes[i][0];
+                            sousarb=generecoup(abs(j-1),platcopie);
                         }
                         prof-=1;
                     }

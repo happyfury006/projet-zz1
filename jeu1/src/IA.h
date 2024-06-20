@@ -9,9 +9,17 @@
 // les fonctions implementees dans le fichier .c                                
 // les declaration de variables globales externes   
 
+typedef struct coups{
+    int x;
+    int y;
+    int joueur;
+    int forme;
+}coups;
+
 typedef struct arbre{       //structure de l'arbre
     grille* plateau;          //noeud : plateau actualisé
     arbre fils[N];             //enfants : un tableau de sous arbres
+    coups derniercoup;
 } arbre;
 
 
