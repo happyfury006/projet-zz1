@@ -219,7 +219,7 @@ int main(int argc, char** argv) {
     flip=SDL_FLIP_HORIZONTAL;
     
 
-    for (int frame = 0; frame<200; frame++) 
+    for (int frame = 0; frame<150; frame++) 
     {
         displaybackground(bg, window, renderer);  
 
@@ -237,18 +237,18 @@ int main(int argc, char** argv) {
         }
         SDL_RenderCopyEx(renderer, route2, &source3, &destination3,0,NULL,flip);
 
-        destination2.x -=  10;
+        destination2.x -=  15;
         if (destination2.x < -window_dimensions.w)
         {
-            destination2.x =window_dimensions.w-10;
+            destination2.x =window_dimensions.w-15;
         }
         SDL_RenderCopy(renderer, eau, &source2, &destination2); 
  
 
-        destination4.x -=  10;
+        destination4.x -=  15;
         if (destination4.x < -window_dimensions.w)
         {
-            destination4.x =window_dimensions.w-10;
+            destination4.x =window_dimensions.w-15;
         }
         SDL_RenderCopyEx(renderer, eau2, &source4, &destination4,0,NULL,flip);        
 
