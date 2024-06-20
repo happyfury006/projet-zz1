@@ -22,7 +22,6 @@ grille* grillecopie(grille* acopier) {
             }
         }
     }
-    copie->valeur = acopier->valeur;                         //copie de la valeur
     return copie;
 }
 
