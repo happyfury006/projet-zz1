@@ -26,31 +26,31 @@ grille* grillecopie(grille* acopier) {
 }
 
 
-arbre* generecoup(joueur j,grille* plat,int profondeur){
+arbre* generecoup(joueur jo,grille* plat,int profondeur){
     int index=0;
     arbre* arb= (arbre*)malloc(sizeof(arbre));
     arb->plateau=plat;
     for(int i=0; i<4; i++)
     {
-        if (j.piecerestante[i][1]>0)
+        if (jo.piecerestante[i][1]>0)
         {
             for(int j=0; j<4; j++)
             {
                 for(int k=0; k<4; k++)
                 {
-                    if(valide(i, j.numJoueur, j, k, plat->grid))
+                    if(valide(i, jo.numJoueur, j, k, plat->grid))
                     {
-                        grille platcopie=grillecopie(plat);
-                        platcopie=ajoutpiece(platcopie,j.piecerestante[i][0],j,k);
+                        grille* platcopie=grillecopie(plat);
+                        platcopie=ajoutpiece(platcopie,jo.piecerestante[i][0],j,k);
                         if (index<profondeur)
                         {
                             index+=1;
                             arbre* sousarb = arb->fils[0];
                             sousarb->derniercoup.x = j;
                             sousarb->derniercoup.y = k;
-                            sousarb->derniercoup.j = j.numJoueur;
-                            sousarb->derniercoup.forme = j.piecerestante[i][0];
-                            sousarb=generecoup(abs(j.numJoueur-1),platcopie);
+                            sousarb->derniercoup.joueur = jo.numJoueur;
+                            sousarb->derniercoup.forme = jo.piecerestante[i][0];
+                            sousarb=generecoup(abs(jo.numJoueur-1),platcopie);
                         }
                         prof-=1;
                     }
@@ -97,3 +97,17 @@ int minmax(arbre* noeud, int profondeur, int maximizingPlayer) {
 }
 
 
+coups trouver_meilleur_coup(arbre* racine, int profondeur) {
+    int meilleur_valeur = INT_MIN;
+    coups meilleur_coup;
+    for (int i = 0; i < N && racine->fils[i] != NULL; i++) 
+    {
+        int valeur = minmax(racine->fils[i], profondeur - 1, 0);
+        if (valeur > meilleur_valeur) 
+        {
+            meilleur_valeur = valeur;
+            meilleur_coup = racine->fils[i]->derniercoup;
+        }
+    }
+    return meilleur_coup;
+}
