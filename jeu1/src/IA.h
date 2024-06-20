@@ -25,6 +25,8 @@ typedef struct arbre{       //structure de l'arbre
 } arbre;
 
 
+grille* grillecopie(grille* acopier);
 arbre* generecoup(joueur j,grille* plat, int profondeur);
+int minimax(arbre* noeud, int profondeur, int maximizingPlayer);
 
 #endif

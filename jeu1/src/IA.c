@@ -1,5 +1,6 @@
 #include "IA.h"
 #include "jeu.h"
+#include <limits.h>
 #include <math.h>
 #include <stdlib.h>
 
@@ -54,6 +55,41 @@ arbre* generecoup(struct joueur j,grille* plat,int profondeur){
         }
     }
     return arb;
+}
+
+
+int minmax(arbre* noeud, int profondeur, int maximizingPlayer) {
+    if (profondeur == 0) 
+    {
+        return evaluation(noeud->plateau);
+    }
+
+    if (maximizingPlayer) 
+    {
+        int maxEval = INT_MIN;
+        for (int i = 0; i < N && noeud->fils[i] != NULL; i++) 
+        {
+            int eval = minmax(noeud->fils[i], profondeur - 1, 0);
+            if (eval > maxEval) 
+            {
+                maxEval = eval;
+            }
+        }
+        return maxEval;
+    } 
+    else 
+    {
+        int minEval = INT_MAX;
+        for (int i = 0; i < N && noeud->fils[i] != NULL; i++) 
+        {
+            int eval = minmax(noeud->fils[i], profondeur - 1, 1);
+            if (eval < minEval) 
+            {
+                minEval = eval;
+            }
+        }
+        return minEval;
+    }
 }
 
 
