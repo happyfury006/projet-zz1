@@ -18,10 +18,7 @@
 // }formes;
 
 
-typedef struct piece {      //structure d'une pièce
-    int formes;             //forme de la pièce
-    int joueur;             //0=>joueur1=>piece blanche | 1=>joueur2=>piece noir
-} piece;
+
 
 
 typedef struct joueur {
@@ -38,17 +35,17 @@ typedef struct grille {
 
 piece* creerPiece(int forme, int player);
 grille* creationplateau();
-bool valideligne(int x, int joueur, int forme, grille plateau);
-bool validecolonne(int y, int joueur, int forme, grille plateau);
-bool valideregion(int x, int y, int joueur, int forme, grille plateau);
-bool valide(int forme, int joueur, int x, int y, grille plateau);
+bool valideligne(int x, int joueur, int forme, grille *plateau);
+bool validecolonne(int y, int joueur, int forme, grille* plateau);
+bool valideregion(int x, int y, int joueur, int forme, grille* plateau);
+bool valide(int forme, int joueur, int x, int y, grille *plateau);
 grille* ajoutpiece(grille* plateau, piece* pieceajoutee, int x, int y);
-void affichageplateau(grille plateau);
-bool victoireligne(int x, grille plateau);
-bool victoirecolonne(int y, grille plateau);
-bool chercheregion(int x, int y, grille plateau, list *lparcouru);
-bool victoireregion(int x, int y, grille plateau);
-bool victoire(grille plateau, int x, int y);
+void affichageplateau(grille* plateau);
+bool victoireligne(int x, grille* plateau);
+bool victoirecolonne(int y, grille* plateau);
+bool chercheregion(int x, int y, grille* plateau, list *lparcouru);
+bool victoireregion(int x, int y, grille* plateau);
+bool victoire(grille *plateau, int x, int y);
 void jeuencours1VSIA();
 void jeuencours1VS1();
 

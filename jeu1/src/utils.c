@@ -1,14 +1,15 @@
 #include "utils.h"
 #include <stdlib.h>
+#include "jeu.h"
 
  // Include the header file that contains the definition of 'enum forme'
 // enum formes forme;
 
-int estdanslaliste(int forme,list * listdejaparcouru){
+int estdanslaliste(piece* piece,list * listdejaparcouru){
     list * tmp = listdejaparcouru;
     while (tmp != NULL)
     {
-        if (tmp->value == forme)
+        if (tmp->piece == piece)
         {
             return 1;
         }
@@ -16,14 +17,14 @@ int estdanslaliste(int forme,list * listdejaparcouru){
     }
     return 0;
 }
-void ajoutliste(int forme,list * listdejaparcouru){
+void ajoutliste(piece* piece,list * listdejaparcouru){
     list * tmp = listdejaparcouru;
     while (tmp->next != NULL)
     {
         tmp = tmp->next;
     }
     tmp->next = (list*)malloc(sizeof(list));
-    tmp->next->value = forme;
+    tmp->next->piece = piece;
     tmp->next->next = NULL;
 }
 

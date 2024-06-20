@@ -12,8 +12,8 @@ piece* creerPiece(int forme,int player){
 	 {
 		newpiece->formes = forme;
 	  newpiece->joueur = player;
-	  return newpiece;
 	 }
+	 return newpiece;
 }
 
 grille* creationplateau() {
@@ -22,10 +22,11 @@ grille* creationplateau() {
         // Gérer l'erreur d'allocation mémoire
         return NULL;
     }
+		
 
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
-            plateau->grid[i][j] = NULL; //initialisation de la grille
+            plateau->grid[i][j] = NULL;
         }
     }
     return plateau;
@@ -33,14 +34,14 @@ grille* creationplateau() {
 
 
 
-bool valideligne(int x, int joueur,int forme, grille plateau){
+bool valideligne(int x, int joueur,int forme, grille* plateau){
 	bool possible = false;
 	bool running = true;
 	int i=0;
 	
 	while (i<4 && running == true)
 	{
-		if (plateau.grid[x][i]->formes == forme && plateau.grid[x][i]->joueur == joueur)
+		if ( plateau->grid[x][i] != NULL && plateau->grid[x][i]->formes == forme && plateau->grid[x][i]->joueur == joueur)
 		{
 			running = false;
 		}
@@ -53,14 +54,14 @@ bool valideligne(int x, int joueur,int forme, grille plateau){
 	return possible;
 }
 
-bool validecolonne(int y, int joueur,int forme, grille plateau){
+bool validecolonne(int y, int joueur,int forme, grille *plateau){
 	bool possible = false;
 	bool running = true;
 	int i=0;
 
 	while (i<4 && running == true)
 	{
-		if (plateau.grid[i][y]->formes == forme && plateau.grid[i][y]->joueur == joueur)
+		if (plateau->grid[i][y] !=NULL && plateau->grid[i][y]->formes == forme && plateau->grid[i][y]->joueur == joueur)
 		{
 			running = false;
 		}
@@ -73,7 +74,7 @@ bool validecolonne(int y, int joueur,int forme, grille plateau){
 	return possible;
 }
 
-bool valideregion(int x, int y, int joueur,int forme, grille plateau){
+bool valideregion(int x, int y, int joueur,int forme, grille* plateau){
 	bool possible = false;
 	bool running = true;
 	int sectionx = x/2;
@@ -85,7 +86,7 @@ bool valideregion(int x, int y, int joueur,int forme, grille plateau){
 	{
 		for (int j = sectiony; j < subsectiony; j++)
 		{
-			if (plateau.grid[i][j]->formes == forme && plateau.grid[i][j]->joueur == joueur)
+			if (plateau->grid[i][j] !=NULL && plateau->grid[i][j]->formes == forme && plateau->grid[i][j]->joueur == joueur)
 			{
 				running = false;
 			}
@@ -98,62 +99,66 @@ bool valideregion(int x, int y, int joueur,int forme, grille plateau){
 	return possible;
 }
 
-bool valide(int forme,int joueur,int x, int y, grille plateau){
-	bool possible = false;
-	if (valideligne(x,joueur,forme,plateau) == true || validecolonne(y,joueur,forme,plateau) == true || valideregion(x,y,joueur,forme,plateau) == true)
+bool valide(int forme, int joueur, int x, int y, grille* plateau) {
+	if (plateau->grid[x][y] != NULL)
 	{
-		possible = true;
-	}
-	return possible;
-}
-
-grille* ajoutpiece(grille* plateau, piece * pieceajoutee, int x, int y){
-	bool valide = valide(pieceajoutee->formes,pieceajoutee->joueur,x,y,plateau);
-	if (valide == true)
-	{
-		plateau->grid[x][y] = &pieceajoutee;
-		return plateau;
+		return false;
 	}
 	else{
-		printf("Impossible de placer la piece a cet endroit\n");
-		return plateau;
+		return valideligne(x, joueur, forme, plateau) && validecolonne(y, joueur, forme, plateau) && valideregion(x, y, joueur, forme, plateau);
 	}
-	
 }
-void affichageplateau(grille plateau){
+
+grille* ajoutpiece(grille* plateau, piece* pieceajoutee, int x, int y) {
+    if (valide(pieceajoutee->formes, pieceajoutee->joueur, x, y, plateau)) {
+        plateau->grid[x][y] = pieceajoutee;
+    } else {
+        printf("Impossible de placer la piece a cet endroit\n");
+    }
+    return plateau;
+}
+	
+
+void affichageplateau(grille* plateau){
+	printf("|");
 	for (int i = 0; i < 4; i++) {
 		for (int j = 0; j < 4; j++)
 		{
-			if (plateau.grid[i][j] == NULL)
+			if (plateau->grid[i][j] == NULL)
 			{
 				printf("0");
 			}
 			else
 			{
-				printf("%d ",plateau.grid[i][j]->formes);
+				printf("%d",plateau->grid[i][j]->formes);
 			}
 		}
 		printf("|\n|");
 	}
 }
 
-bool victoireligne(int x,grille plateau){
+bool victoireligne(int x,grille* plateau){
 	list * lparcouru = malloc(sizeof(list));
-	lparcouru->value = NULL;
-	lparcouru->next = NULL;
-	bool victoire = true;
-	int i=0;
-	while (i < 4 && victoire == true)
+	if (lparcouru == NULL)
 	{
-		if (estdanslaliste(plateau.grid[x][i]->formes,lparcouru) == 0)
+		return false;
+	}
+	
+	bool victoire = false;
+	int i=0;
+	while (i < 4 && victoire == false)
+	{
+		if (plateau->grid[x][i] != NULL && estdanslaliste(plateau->grid[x][i],lparcouru) == 0)
 		{
-			ajoutliste(plateau.grid[x][i],lparcouru);
+			ajoutliste(plateau->grid[x][i],lparcouru);
 		}
 		else
 		{
 			victoire = false;
 		}
+		{
 		i++;
+		}
 	}
 	if (victoire == true)
 	{
@@ -163,15 +168,19 @@ bool victoireligne(int x,grille plateau){
 	 
 }
 
-bool victoirecolonne(int y, grille plateau){
-	list * lparcouru = NULL;
+bool victoirecolonne(int y, grille* plateau){
+	list * lparcouru = malloc(sizeof(list));
+	if (lparcouru == NULL)
+	{
+		return false;
+	}
 	bool victoire = true;
 	int j=0;
 	 while (j < 4 && victoire == true)
 	 {
-		if (estdanslaliste(plateau.grid[y][j],lparcouru) == 0)
+		if (plateau->grid[j][y] !=NULL &&estdanslaliste(plateau->grid[j][y],lparcouru) == 0)
 		{
-			ajoutliste(plateau.grid[y][j],lparcouru);
+			ajoutliste(plateau->grid[j][y],lparcouru);
 		}
 		else
 		{
@@ -186,7 +195,7 @@ bool victoirecolonne(int y, grille plateau){
 	 return victoire;
 }
 
-bool chercheregion(int x,int y,grille plateau, list * lparcouru){
+bool chercheregion(int x,int y,grille* plateau, list * lparcouru){
 	bool victoire = true;
 	int sectionx = x/2;
 	int sectiony = y/2;
@@ -196,9 +205,9 @@ bool chercheregion(int x,int y,grille plateau, list * lparcouru){
 	{
 		for (int j = sectiony; j < subsectiony; j++)
 		{
-			if (estdanslaliste(plateau.grid[i][j],lparcouru) == 0)
+			if (estdanslaliste(plateau->grid[i][j],lparcouru) == 0)
 			{
-				ajoutliste(plateau.grid[i][j],lparcouru);
+				ajoutliste(plateau->grid[i][j],lparcouru);
 			}
 			else
 			{
@@ -213,24 +222,30 @@ bool chercheregion(int x,int y,grille plateau, list * lparcouru){
 	return victoire;
 }
 
-bool victoireregion(int x, int y, grille plateau){
+bool victoireregion(int x, int y, grille* plateau){
 	bool victoire = false;
-	 int ix=x%2;
-	 int iy=y%2;
-	 list* lparcouru = plateau.grid[x][y];
+	int ix=x%2;
+	int iy=y%2;
+	list * lparcouru = malloc(sizeof(list));
+	if (lparcouru == NULL)
+	{
+		return false;
+	}
+	ajoutliste(plateau->grid[ix][iy],lparcouru);
 
-	 victoire = chercheregion(ix,iy,plateau,lparcouru);
-	 return victoire;
+	victoire = chercheregion(ix,iy,plateau,lparcouru);
+	return victoire;
 		
 }
 
-bool victoire(grille plateau, int x, int y){
+bool victoire(grille* plateau, int x, int y){
 	bool victoire = false;
 	if (victoireligne(x,plateau) == true || victoirecolonne(y,plateau) == true || victoireregion(x,y,plateau) == true)
 	{
 		victoire = true;
+		
 	}
-	printf("Bravo vous avez gagné !\n");
+	
 	return victoire;
 }
 
@@ -254,7 +269,7 @@ void jeuencours1VSIA(){
       scanf("%d",&y);
       
       grille* plateau = ajoutpiece(plateau,pieceajoutee,x,y);
-			bool victoryJ1 = victoire(*plateau,x,y);
+			bool victoryJ1 = victoire(plateau,x,y);
       if (victoryJ1== true)
       {
          printf("Bravo vous avez gagne!\n");
@@ -265,7 +280,7 @@ void jeuencours1VSIA(){
       int xIA;
 			int yIA;
       // plateau = ajoutpiece(plateau,pieceIA,xIA,yIA);
-			bool victoryIA = victoire(*plateau,xIA,yIA);
+			bool victoryIA = victoire(plateau,xIA,yIA);
       if (victoryIA == true)
       {
          printf("L'IA a gagne!\n");
@@ -278,6 +293,7 @@ void jeuencours1VSIA(){
 void jeuencours1VS1(){
    bool running = false;
    grille* plateau = creationplateau();
+	 grille* newplateau=plateau;
       while (running == false)
    {
    // On demande au joueur1 de jouer
@@ -293,9 +309,10 @@ void jeuencours1VS1(){
       int y1;
       scanf("%d",&y1);
       
-			plateau = ajoutpiece(plateau,pieceajoutee,x1,y1);
+			newplateau = ajoutpiece(plateau,pieceajoutee,x1,y1);
+			affichageplateau(newplateau);
 
-			bool victoryJ1 = victoire(*plateau,x1,y1);
+			bool victoryJ1 = victoire(newplateau,x1,y1);
       
 			if (victoryJ1 == true)
       {
@@ -316,14 +333,19 @@ void jeuencours1VS1(){
       int y2;
       scanf("%d",&y2);
       
-      plateau = ajoutpiece(plateau,pieceajoutee,x2,y2);
-			bool victoryJ2 = victoire(*plateau,x2,y2);
+			plateau=newplateau;
+
+      newplateau = ajoutpiece(plateau,pieceajoutee,x2,y2);
+			affichageplateau(newplateau);
+			bool victoryJ2 = victoire(newplateau,x2,y2);
 
       if (victoryJ2 == true)
       {
          printf("Bravo vous avez gagne!\n");
          running = true;
       }
+			plateau=newplateau;
+
 }
 }
 
