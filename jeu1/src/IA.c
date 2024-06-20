@@ -6,26 +6,31 @@
 
 
 grille* grillecopie(grille* acopier) {
-    grille* copie = (grille*)malloc(sizeof(grille));
-    for (int i = 0; i < 4; i++) {
-        for (int j = 0; j < 4; j++) {
-            if (acopier->grid[i][j] != NULL) {
-                copie->grid[i][j] = (piece*)malloc(sizeof(piece));
-                *(copie->grid[i][j]) = *(acopier->grid[i][j]);
-            } else {
+    grille* copie = (grille*)malloc(sizeof(grille));          //allocation de la copie
+    for (int i = 0; i < 4; i++)                               //parcours de la grille
+    {                                
+        for (int j = 0; j < 4; j++)                             
+        {
+            if (acopier->grid[i][j] != NULL)                  //si la case n'est pas vide
+            {
+                copie->grid[i][j] = (piece*)malloc(sizeof(piece));      //on alloue la piece
+                *(copie->grid[i][j]) = *(acopier->grid[i][j]);           //on copie la piece dans la copie
+            } 
+            else 
+            {
                 copie->grid[i][j] = NULL;
             }
         }
     }
-    copie->valeur = acopier->valeur;
+    copie->valeur = acopier->valeur;                         //copie de la valeur
     return copie;
 }
 
-arbre* generecoup(struct joueur j,grille* plat,int profondeur){
+
+arbre* generecoup(joueur j,grille* plat,int profondeur){
     int index=0;
     arbre* arb= (arbre*)malloc(sizeof(arbre));
     arb->plateau=plat;
-    arb->plateau->valeur=evaluation(plat);
     for(int i=0; i<4; i++)
     {
         if (j.piecerestante[i][1]>0)
@@ -59,12 +64,12 @@ arbre* generecoup(struct joueur j,grille* plat,int profondeur){
 
 
 int minmax(arbre* noeud, int profondeur, int maximizingPlayer) {
-    if (profondeur == 0) 
+    if (profondeur == 0)             //si c'est une feuille (de notre profondeur)
     {
         return evaluation(noeud->plateau);
     }
 
-    if (maximizingPlayer) 
+    if (maximizingPlayer)             //on maximise pour le joueur
     {
         int maxEval = INT_MIN;
         for (int i = 0; i < N && noeud->fils[i] != NULL; i++) 
@@ -77,7 +82,7 @@ int minmax(arbre* noeud, int profondeur, int maximizingPlayer) {
         }
         return maxEval;
     } 
-    else 
+    else                                //on minimise pour l'adversaire
     {
         int minEval = INT_MAX;
         for (int i = 0; i < N && noeud->fils[i] != NULL; i++) 
