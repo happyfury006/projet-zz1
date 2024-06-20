@@ -48,7 +48,7 @@ void displaySprite(SDL_Texture * texture, SDL_Window * window, SDL_Renderer * re
     SDL_QueryTexture(texture, NULL, NULL,&source.w, &source.h);
 
     int nb_images= 8;
-    float zoom = 3; 
+    float zoom = 2; 
     int offset_x = source.w / nb_images;
     int offset_y = source.h;
 
@@ -60,8 +60,8 @@ void displaySprite(SDL_Texture * texture, SDL_Window * window, SDL_Renderer * re
     destination.w = offset_x * zoom;
     destination.h = offset_y * zoom;
 
-    destination.x = window_dimensions.w/2;
-    destination.y = window_dimensions.h*0.85;
+    destination.x = window_dimensions.w*0.4;
+    destination.y = window_dimensions.h*0.675;
 
     state.x += frame*offset_x;
     state.x%=source.w;
@@ -93,47 +93,33 @@ void displaybackground(SDL_Texture* my_texture,
             &destination); 
 }
 
+void displaymoving(SDL_Texture* my_texture, SDL_Window* window, SDL_Renderer* renderer,int vitesse) {
+    SDL_Rect source = {0}, window_dimensions = {0}, destination = {0};
 
-void play_with_texture_3(SDL_Texture* my_texture,
-            SDL_Window* window, SDL_Renderer* renderer) {
-    SDL_Rect 
-    source = {0},                             // Rectangle définissant la zone de la texture à récupérer
-    window_dimensions = {0},                  // Rectangle définissant la fenêtre, on n'utilisera que largeur et hauteur
-    destination = {0};                        // Rectangle définissant où la zone_source doit être déposée dans le renderer
-                            
-    SDL_GetWindowSize(                      
-    window, &window_dimensions.w,               
-    &window_dimensions.h);                      // Récupération des dimensions de la fenêtre
-    SDL_QueryTexture(my_texture, NULL, NULL,         
-                        &source.w,                 
-                &source.h);                    // Récupération des dimensions de l'image
-                                
-    /* On décide de déplacer dans la fenêtre         cette image */
-    float zoom = 0.25;                              // Facteur de zoom entre l'image source et l'image affichée
-                                
-    int nb_it = 200;                                // Nombre d'images de l'animation
-    destination.w = source.w * zoom;                // On applique le zoom sur la largeur
-    destination.h = source.h * zoom;                // On applique le zoom sur la hauteur
-    destination.x =                     
-    (window_dimensions.w - destination.w) / 2;  // On centre en largeur
-    float h = window_dimensions.h - destination.h;  // hauteur du déplacement à effectuer
+    SDL_GetWindowSize(window, &window_dimensions.w, &window_dimensions.h);
+    SDL_QueryTexture(my_texture, NULL, NULL, &source.w, &source.h);
+    
 
-    for (int i = 0; i < nb_it; ++i) {
-        destination.y =
-        h * (1 - exp(-5.0 * i / nb_it) / 2 *
-                (1 + cos(10.0 * i / nb_it * 2 *
-                M_PI)));            // hauteur en fonction du numéro d'image
+    destination.w = window_dimensions.w;
+    destination.h = window_dimensions.h;
+    destination.x = 0;
+    destination.y= 0;
+   
+    float speed= vitesse;
 
-        SDL_RenderClear(renderer);                    // Effacer l'image précédente
-
-        SDL_SetTextureAlphaMod(my_texture,(1.0-1.0*i/nb_it)*255);      // L'opacité va passer de 255 à 0 au fil de l'animation
-        SDL_RenderCopy(renderer, my_texture, &source, &destination);   // Préparation de l'affichage
-        SDL_RenderPresent(renderer);                  // Affichage de la nouvelle image
-        SDL_Delay(30);                                // Pause en ms
-    }                               
-    //SDL_RenderClear(renderer);                      // Effacer la fenêtre une fois le travail terminé
+    destination.x += speed;
+    if (destination.x > destination.w)
+    {
+        destination.x =0;
+    }
+    
+    SDL_RenderCopy(renderer, my_texture, &source, &destination);
+    
+    
+    
+    SDL_Delay(30);
+    
 }
-
 
 
 int main(int argc, char** argv) {
@@ -144,6 +130,12 @@ int main(int argc, char** argv) {
     SDL_Renderer* renderer = NULL;
     SDL_Texture* bg = NULL;
     SDL_Texture* perso = NULL;
+    SDL_Texture* eau = NULL;
+    SDL_Texture* eau2 = NULL;
+    SDL_Texture* route = NULL;
+    SDL_Texture* route2 = NULL;
+
+    SDL_RendererFlip flip = SDL_FLIP_NONE;
 
     SDL_DisplayMode screen;
 
@@ -159,8 +151,8 @@ int main(int argc, char** argv) {
     /* Création de la fenêtre */
     window = SDL_CreateWindow("Premier dessin",
                 SDL_WINDOWPOS_CENTERED,
-                SDL_WINDOWPOS_CENTERED, screen.w,
-                screen.h,
+                SDL_WINDOWPOS_CENTERED, screen.w*0.7,
+                screen.h*0.7,
                 SDL_WINDOW_OPENGL);
     if (window == NULL) end_sdl(0, "ERROR WINDOW CREATION", window, renderer);
 
@@ -173,13 +165,93 @@ int main(int argc, char** argv) {
 
     /* Création du renderer */
     bg = IMG_LoadTexture(renderer,"./images/ciel.jpg");
+    route = IMG_LoadTexture(renderer,"./images/kanto_route_1_route.png");
+    route2 = IMG_LoadTexture(renderer,"./images/kanto_route_1_route.png");
+    eau = IMG_LoadTexture(renderer,"./images/kanto_route_1_eau.png");
+    eau2 = IMG_LoadTexture(renderer,"./images/kanto_route_1_eau.png");
     perso = IMG_LoadTexture(renderer,"./images/run.png");
     if (bg == NULL) end_sdl(0, "Echec du chargement de l'image dans la texture", window, renderer);
     if (perso == NULL) end_sdl(0, "Echec du chargement de l'image dans la texture", window, renderer);
+    if (eau == NULL) end_sdl(0, "Echec du chargement de l'image dans la texture", window, renderer);
+    if (eau2 == NULL) end_sdl(0, "Echec du chargement de l'image dans la texture", window, renderer);
+    if (route == NULL) end_sdl(0, "Echec du chargement de l'image dans la texture", window, renderer);
 
-    for (int frame = 0; frame<400; frame++) 
+    SDL_Rect source = {0}, window_dimensions = {0}, destination = {0};
+
+    SDL_GetWindowSize(window, &window_dimensions.w, &window_dimensions.h);
+    SDL_QueryTexture(route, NULL, NULL, &source.w, &source.h);
+    
+    destination.w = window_dimensions.w;
+    destination.h = window_dimensions.h;
+    destination.x = 0;
+    destination.y= 0;
+
+    SDL_Rect source2 = {0}, destination2 = {0};
+
+   
+    SDL_QueryTexture(eau, NULL, NULL, &source2.w, &source2.h);
+    
+    destination2.w = window_dimensions.w;
+    destination2.h = window_dimensions.h;
+    destination2.x = 0;
+    destination2.y= 0;
+
+    SDL_Rect source3 = {0}, destination3 = {0};
+
+   
+    SDL_QueryTexture(route2, NULL, NULL, &source3.w, &source3.h);
+    
+    destination3.w = window_dimensions.w;
+    destination3.h = window_dimensions.h;
+    destination3.x = window_dimensions.w;
+    destination3.y= 0;
+
+    SDL_Rect source4 = {0}, destination4 = {0};
+
+   
+    SDL_QueryTexture(eau2, NULL, NULL, &source4.w, &source4.h);
+    
+    destination4.w = window_dimensions.w;
+    destination4.h = window_dimensions.h;
+    destination4.x = window_dimensions.w;
+    destination4.y= 0;
+    
+    flip=SDL_FLIP_HORIZONTAL;
+    
+
+    for (int frame = 0; frame<200; frame++) 
     {
-        displaybackground(bg, window, renderer);                     
+        displaybackground(bg, window, renderer);  
+
+        destination.x -=  5;
+        if (destination.x  < -window_dimensions.w)
+        {
+            destination.x =window_dimensions.w-5;
+        }
+        SDL_RenderCopy(renderer, route, &source, &destination);
+
+        destination3.x -=  5;
+        if (destination3.x < -window_dimensions.w)
+        {
+            destination3.x =window_dimensions.w-5;
+        }
+        SDL_RenderCopyEx(renderer, route2, &source3, &destination3,0,NULL,flip);
+
+        destination2.x -=  10;
+        if (destination2.x < -window_dimensions.w)
+        {
+            destination2.x =window_dimensions.w-10;
+        }
+        SDL_RenderCopy(renderer, eau, &source2, &destination2); 
+ 
+
+        destination4.x -=  10;
+        if (destination4.x < -window_dimensions.w)
+        {
+            destination4.x =window_dimensions.w-10;
+        }
+        SDL_RenderCopyEx(renderer, eau2, &source4, &destination4,0,NULL,flip);        
+
         displaySprite(perso, window, renderer, frame);
 
         SDL_RenderPresent(renderer);
@@ -188,11 +260,7 @@ int main(int argc, char** argv) {
     }
 
     
-                               
-    
-    
     IMG_Quit();
-    SDL_RenderClear(renderer); 
 
     /* on referme proprement la SDL */
     end_sdl(1, "Normal ending", window, renderer);
