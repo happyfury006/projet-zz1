@@ -2,85 +2,80 @@
 #include <SDL2/SDL.h>
 #include <stdio.h>
 #include <SDL2/SDL_image.h>
-const int WINDOW_LARGEUR = 800;
-const int WINDOW_HAUTEUR = 600;
 
-void play_with_texture_1_1(SDL_Texture *my_texture, SDL_Window *window,
-               SDL_Renderer *renderer) 
-{
-    SDL_Rect 
-    source = {0},                         // Rectangle définissant la zone de la texture à récupérer
-    window_dimensions = {0},              // Rectangle définissant la fenêtre, on n'utilisera que largeur et hauteur
-    destination = {0};                    // Rectangle définissant où la zone_source doit être déposée dans le renderer
+const int WINDOW_LARGEUR = 1000;
+const int WINDOW_HAUTEUR = 800;
 
-    SDL_GetWindowSize(
-    window, &window_dimensions.w,
-    &window_dimensions.h);                    // Récupération des dimensions de la fenêtre
-    SDL_QueryTexture(my_texture, NULL, NULL,
-             &source.w, &source.h);       // Récupération des dimensions de l'image
-    float zoom = 0.7; 
-    destination.w = zoom * window_dimensions.w;  
-    destination.h = zoom * window_dimensions.h;                     // On fixe les dimensions de l'affichage à  celles de la fenêtre
-
-    /* On veut afficher la texture de façon à ce que l'image occupe la totalité de la fenêtre */
-
-    SDL_RenderCopy(renderer, my_texture,
-      &source,
-      &destination);                 // Création de l'élément à afficher
-                            // Pause en ms
-    SDL_RenderPresent(renderer);                    // Effacer la fenêtre
+void end_sdl(int ok, const char* msg, SDL_Window* window, SDL_Renderer* renderer) {
+    char msg_formated[255];
+    int l;
+    if (!ok) {
+        strncpy(msg_formated, msg, 250);
+        l = strlen(msg_formated);
+        strcpy(msg_formated + l, " : %s\n");
+        SDL_Log(msg_formated, SDL_GetError());
+    }
+    if (renderer != NULL) SDL_DestroyRenderer(renderer);
+    if (window != NULL) SDL_DestroyWindow(window);
+    SDL_Quit();
+    if (!ok) {
+        exit(EXIT_FAILURE);
+    }
 }
 
-void play_with_texture_4(SDL_Texture* bg_texture, SDL_Texture* my_texture,
-      SDL_Window* window,
-      SDL_Renderer* renderer) {
-  SDL_Rect 
-  source = {0},                    // Rectangle définissant la zone totale de la planche
-  window_dimensions = {0},         // Rectangle définissant la fenêtre, on n'utilisera que largeur et hauteur
-  destination = {0};               // Rectangle définissant où la zone_source doit être déposée dans le renderer
-
-  SDL_GetWindowSize(window,              // Récupération des dimensions de la fenêtre
-      &window_dimensions.w,
-      &window_dimensions.h);
-  SDL_QueryTexture(my_texture,           // Récupération des dimensions de l'image
-      NULL, NULL,
-      &source.w, &source.h);
-
-     /* Mais pourquoi prendre la totalité de l'image, on peut n'en afficher qu'un morceau, et changer de morceau :-) */
-
-  int nb_images = 8;                     // Il y a 8 vignette dans la ligne de l'image qui nous intéresse
-  float zoom = 1.2;                        // zoom, car ces images sont un peu petites
-  int offset_x = source.w / nb_images,   // La largeur d'une vignette de l'image, marche car la planche est bien réglée
-  offset_y = source.h / 4;           // La hauteur d'une vignette de l'image, marche car la planche est bien réglée
-  
-
-  destination.w = offset_x * zoom;       // Largeur du sprite à l'écran
-  destination.h = offset_y * zoom;       // Hauteur du sprite à l'écran
-
-  destination.y =                        // La course se fait en milieu d'écran (en vertical)
-  (window_dimensions.h - destination.h) /1.2;
-
-  int speed = 9;
-  for (int x = 0; x < window_dimensions.w - destination.w; x += speed) 
-  {
-    destination.x = (window_dimensions.w - destination.w);                   // Position en x pour l'affichage du sprite
-    SDL_RenderClear(renderer);           // Effacer l'image précédente avant de dessiner la nouvelle
-    play_with_texture_1_1(bg_texture,window,renderer);
-    SDL_RenderCopy(renderer, my_texture, // Préparation de l'affichage
-    NULL,
-    &destination);  
-    SDL_RenderPresent(renderer);         // Affichage
-    SDL_Delay(80);                       // Pause en ms
-  }
-  SDL_RenderClear(renderer);             // Effacer la fenêtre avant de rendre la main
+void render_texture_fullscreen(SDL_Texture *texture, SDL_Renderer *renderer) {
+    SDL_Rect destination = {0, 0, WINDOW_LARGEUR, WINDOW_HAUTEUR};
+    SDL_RenderCopy(renderer, texture, NULL, &destination);
 }
 
-int mainsdl(int argc, char* argv[])
-{
+void render_texture_centered(SDL_Texture *texture, SDL_Renderer *renderer) {
+    SDL_Rect source = {0};
+    SDL_QueryTexture(texture, NULL, NULL, &source.w, &source.h);
+
+    SDL_Rect destination = {0};
+    destination.w = source.w;
+    destination.h = source.h;
+    destination.x = (WINDOW_LARGEUR - source.w) / 2;
+    destination.y = (WINDOW_HAUTEUR - source.h) / 2;
+
+    SDL_RenderCopy(renderer, texture, &source, &destination);
+}
+
+void render_pieces_top_and_bottom(SDL_Texture *pieces[], int piece_count, SDL_Renderer *renderer) {
+    SDL_Rect destination = {0};
+    int piece_width = WINDOW_LARGEUR / (piece_count / 2);
+
+    for (int i = 0; i < piece_count; i++) {
+        SDL_QueryTexture(pieces[i], NULL, NULL, &destination.w, &destination.h);
+
+        if (i < 8) {
+            // Placer les pièces 0 à 7 en bas du plateau
+            destination.x = i * piece_width + (piece_width - destination.w) / 2;
+            destination.y = WINDOW_HAUTEUR - destination.h - 1; // 10 pixels au-dessus du bas de la fenêtre
+        } else {
+            // Placer les pièces 8 à 15 en haut du plateau
+            destination.x = (i - 8) * piece_width + (piece_width - destination.w) / 2;
+            destination.y = 1; // 10 pixels en dessous du haut de la fenêtre
+        }
+
+        SDL_RenderCopy(renderer, pieces[i], NULL, &destination);
+    }
+}
+
+void display(SDL_Texture* bgv2_texture, SDL_Texture* bg_texture, SDL_Texture* pieces[], SDL_Window* window, SDL_Renderer* renderer) {
+    SDL_RenderClear(renderer);
+
+    render_texture_fullscreen(bgv2_texture, renderer);
+    render_texture_centered(bg_texture, renderer);
+    render_pieces_top_and_bottom(pieces, 16, renderer);
+
+    SDL_RenderPresent(renderer);
+}
+
+int mainSDL(int argc, char* argv[]) {
     (void)argc;
     (void)argv;
-    if (SDL_Init(SDL_INIT_VIDEO) != 0) 
-    {
+    if (SDL_Init(SDL_INIT_VIDEO) != 0) {
         printf("Erreur d'initialisation de la SDL: %s\n", SDL_GetError());
         return 1;
     }
@@ -88,17 +83,19 @@ int mainsdl(int argc, char* argv[])
     SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     SDL_Texture *bg_texture;
     SDL_Texture *bgv2_texture;
-    SDL_Texture *piece[15] = {NULL};  
-    bg_texture = IMG_LoadTexture(renderer,"../images/plateau.png");
-    bgv2_texture = IMG_LoadTexture(renderer,"../images/fond.png");
-    piece[0] = IMG_LoadTexture(renderer,"../images/coneblanc.png");
-    piece[2] = IMG_LoadTexture(renderer,"../images/cubeblanc.png");
-    piece[4] = IMG_LoadTexture(renderer,"../images/cylindreblanc.png");
-    piece[6] = IMG_LoadTexture(renderer,"../images/sphereblanche.png");
-    piece[8] = IMG_LoadTexture(renderer,"../images/conenoir.png");
-    piece[10] = IMG_LoadTexture(renderer,"../images/cubenoir.png");
-    piece[12] = IMG_LoadTexture(renderer,"../images/cylindrenoir.png");
-    piece[14] = IMG_LoadTexture(renderer,"../images/spherenoir.png");
+    SDL_Texture *piece[16] = {NULL};
+
+    bg_texture = IMG_LoadTexture(renderer, "../images/plateau.png");
+    bgv2_texture = IMG_LoadTexture(renderer, "../images/fondblanc.png");
+    piece[0] = IMG_LoadTexture(renderer, "../images/coneblanc.png");
+    piece[2] = IMG_LoadTexture(renderer, "../images/cubeblanc.png");
+    piece[4] = IMG_LoadTexture(renderer, "../images/cylindreblanc.png");
+    piece[6] = IMG_LoadTexture(renderer, "../images/sphereblanche.png");
+    piece[8] = IMG_LoadTexture(renderer, "../images/conenoir.png");
+    piece[10] = IMG_LoadTexture(renderer, "../images/cubenoir.png");
+    piece[12] = IMG_LoadTexture(renderer, "../images/cylindrenoir.png");
+    piece[14] = IMG_LoadTexture(renderer, "../images/spherenoir.png");
+
     piece[1] = piece[0];
     piece[3] = piece[2];
     piece[5] = piece[4];
@@ -108,21 +105,19 @@ int mainsdl(int argc, char* argv[])
     piece[13] = piece[12];
     piece[15] = piece[14];
 
-    if (bg_texture == NULL) 
-    {
+    if (bg_texture == NULL || bgv2_texture == NULL) {
         end_sdl(0, "Echec du chargement de l'image dans la texture", window, renderer);
     }
-    for(int i =0; i <= 15;i++)
-    {
-    play_with_texture_4(bg_texture,piece[i],window,renderer);
-    }
-    SDL_Delay(1000);
-    for(int i =15; i <= 0;i--)
-    {
-    SDL_DestroyTexture(piece[i]);
-    SDL_Delay(100);
+
+    display(bgv2_texture, bg_texture, piece, window, renderer);
+
+    SDL_Delay(5000);
+
+    for (int i = 0; i < 16; i++) {
+        if (piece[i]) SDL_DestroyTexture(piece[i]);
     }
     SDL_DestroyTexture(bg_texture);
+    SDL_DestroyTexture(bgv2_texture);
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     SDL_Quit();
