@@ -132,7 +132,7 @@ void display(SDL_Texture* bgv2_texture, SDL_Texture* bg_texture, Piece pieces[],
     SDL_RenderPresent(renderer);
 }
 
-int main(int argc, char* argv[]) {
+int mainsdl(int argc, char* argv[]) {
     (void)argc;
     (void)argv;
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
