@@ -2,7 +2,7 @@
 #include <stdlib.h>
 
  // Include the header file that contains the definition of 'enum forme'
-
+// enum formes forme;
 
 int estdanslaliste(int forme,list * listdejaparcouru){
     list * tmp = listdejaparcouru;
