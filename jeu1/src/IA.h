@@ -3,7 +3,9 @@
 
 #include <stdio.h>
 #include "jeu.h"
+
 #define N 4*16
+#define PROFONDEUR 6
 
 // fichier d'entete classique ou l'on declare les types necessaires,            
 // les fonctions implementees dans le fichier .c                                
