@@ -1,6 +1,7 @@
 #include "jeu.h"
 #include<stdio.h>
 #include <stdbool.h>
+#include <stdlib.h>
 #include "utils.h"
 
 
@@ -20,13 +21,33 @@ grille creationplateau(){
 		{
 			plateau.grid[i][j] = NULL;
 		}
-		
-		
 	}
 	return plateau;
 }
 
 
+
+grille ajoutpiece(grille plateau, piece pieceajoutee, int x, int y){
+	plateau.grid[x][y] = &pieceajoutee;
+	return plateau;
+}
+
+void affichageplateau(grille plateau){
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 4; j++)
+		{
+			if (plateau.grid[i][j] == NULL)
+			{
+				printf("0");
+			}
+			else
+			{
+				printf("%d",plateau.grid[i][j]->formes);
+			}
+		}
+		printf("\n");
+	}
+}
 
 void victoireligne(int x,grille plateau){
 	list * lparcouru = NULL;
@@ -118,10 +139,10 @@ void victoire(grille plateau, int x, int y){
 }
 
 
-int mainjeu(){;
+grille mainjeu(int x, int y, piece){;
 	grille plateau = creationplateau();
 	// coupjouer();
 	// victoire(plateau);
-	return 0;
+	return plateau;
 
 }

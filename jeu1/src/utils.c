@@ -1,4 +1,5 @@
 #include "utils.h"
+#include <stdlib.h>
 
  // Include the header file that contains the definition of 'enum forme'
 
