@@ -4,12 +4,13 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
 
-const int WINDOW_LARGEUR = 1000;
-const int WINDOW_HAUTEUR = 800;
+const int WINDOW_LARGEUR = 1300;
+const int WINDOW_HAUTEUR = 900;
+
 const int GRID_ROWS = 4;
 const int GRID_COLS = 4;
-const int CELL_SIZE = 100; // Taille d'une cellule du plateau
-
+const int CELL_WIDTH = 100; // Largeur de chaque cellule du plateau
+const int CELL_HEIGHT = 100; // Hauteur de chaque cellule du plateau
 
 
 void end_sdl(int ok, const char* msg, SDL_Window* window, SDL_Renderer* renderer) {
@@ -53,6 +54,27 @@ void render_pieces(Piece pieces[], int piece_count, SDL_Renderer *renderer) {
     }
 }
 
+void render_extra_textures(SDL_Texture* texture1, SDL_Texture* texture2, SDL_Renderer *renderer) {
+    SDL_Rect source1 = {0}, source2 = {0};
+    SDL_QueryTexture(texture1, NULL, NULL, &source1.w, &source1.h);
+    SDL_QueryTexture(texture2, NULL, NULL, &source2.w, &source2.h);
+
+    SDL_Rect destination1 = {0};
+    destination1.w = source1.w;
+    destination1.h = source1.h;
+    destination1.x = 0;
+    destination1.y = 110;
+
+    SDL_Rect destination2 = {0};
+    destination2.w = source2.w;
+    destination2.h = source2.h;
+    destination2.x = WINDOW_LARGEUR - destination2.w;
+    destination2.y = WINDOW_HAUTEUR - destination2.h - 110;
+
+    SDL_RenderCopy(renderer, texture1, &source1, &destination1);
+    SDL_RenderCopy(renderer, texture2, &source2, &destination2);
+}
+
 void place_pieces_initial(Piece pieces[]) {
     int piece_width = WINDOW_LARGEUR / 8;
 
@@ -67,18 +89,36 @@ void place_pieces_initial(Piece pieces[]) {
     }
 }
 
-int is_valid_position(int x, int y, SDL_Rect grid[][GRID_COLS], int grid_status[][GRID_COLS]) {
-    for (int i = 0; i < GRID_ROWS; i++) {
-        for (int j = 0; j < GRID_COLS; j++) {
-            if (SDL_PointInRect(&(SDL_Point){x, y}, &grid[i][j]) && grid_status[i][j] == 0) {
-                return 1;
-            }
+int is_valid_position(int x, int y, Piece pieces[], int piece_count) {
+    // Check if the position is within the board's grid
+    if (x < 0 || x >= WINDOW_LARGEUR || y < 0 || y >= WINDOW_HAUTEUR) {
+        return 0;
+    }
+    // Check if the position is within the grid cells
+    int cell_x = x / CELL_WIDTH;
+    int cell_y = y / CELL_HEIGHT;
+    if (cell_x >= GRID_COLS || cell_y >= GRID_ROWS) {
+        return 0;
+    }
+    // Check if the cell is already occupied
+    for (int i = 0; i < piece_count; i++) {
+        int piece_cell_x = pieces[i].rect.x / CELL_WIDTH;
+        int piece_cell_y = pieces[i].rect.y / CELL_HEIGHT;
+        if (piece_cell_x == cell_x && piece_cell_y == cell_y) {
+            return 0;
         }
     }
-    return 0;
+    return 1;
 }
 
-void handle_events(SDL_Event *event, Piece pieces[], int piece_count, int *selected_piece, SDL_Rect grid[][GRID_COLS], int grid_status[][GRID_COLS]) {
+void snap_to_grid(Piece *piece) {
+    int cell_x = piece->rect.x / CELL_WIDTH;
+    int cell_y = piece->rect.y / CELL_HEIGHT;
+    piece->rect.x = cell_x * CELL_WIDTH + (CELL_WIDTH - piece->rect.w) / 2;
+    piece->rect.y = cell_y * CELL_HEIGHT + (CELL_HEIGHT - piece->rect.h) / 2;
+}
+
+void handle_events(SDL_Event *event, Piece pieces[], int piece_count, int *selected_piece) {
     switch (event->type) {
         case SDL_MOUSEBUTTONDOWN:
             if (event->button.button == SDL_BUTTON_LEFT) {
@@ -93,26 +133,36 @@ void handle_events(SDL_Event *event, Piece pieces[], int piece_count, int *selec
                             break;
                         }
                     }
-                } else {
-                    // Check if the selected position is valid
-                    if (is_valid_position(x, y, grid, grid_status)) {
-                        // Place the selected piece
-                        pieces[*selected_piece].rect.x = x - pieces[*selected_piece].rect.w / 2;
-                        pieces[*selected_piece].rect.y = y - pieces[*selected_piece].rect.h / 2;
-                        pieces[*selected_piece].selected = 0;
-
-                        // Mark the grid cell as occupied
-                        for (int i = 0; i < GRID_ROWS; i++) {
-                            for (int j = 0; j < GRID_COLS; j++) {
-                                if (SDL_PointInRect(&(SDL_Point){x, y}, &grid[i][j])) {
-                                    grid_status[i][j] = 1;
-                                }
-                            }
-                        }
-
-                        *selected_piece = -1;
-                    }
                 }
+            }
+            break;
+        case SDL_MOUSEBUTTONUP:
+            if (event->button.button == SDL_BUTTON_LEFT) {
+                if (*selected_piece != -1) {
+                    int x = event->button.x;
+                    int y = event->button.y;
+                    // Check if the new position is valid
+                    if (is_valid_position(x, y, pieces, piece_count)) {
+                        // Snap the piece to the grid
+                        snap_to_grid(&pieces[*selected_piece]);
+                    } else {
+                        // If not valid, reset the piece to its original position
+                        pieces[*selected_piece].rect.x = pieces[*selected_piece].rect.x - pieces[*selected_piece].rect.w / 2;
+                        pieces[*selected_piece].rect.y = pieces[*selected_piece].rect.y - pieces[*selected_piece].rect.h / 2;
+                    }
+                    // Release the selected piece
+                    pieces[*selected_piece].selected = 0;
+                    *selected_piece = -1;
+                }
+            }
+            break;
+        case SDL_MOUSEMOTION:
+            if (*selected_piece != -1) {
+                int x = event->motion.x;
+                int y = event->motion.y;
+                // Update the position of the selected piece
+                pieces[*selected_piece].rect.x = x - pieces[*selected_piece].rect.w / 2;
+                pieces[*selected_piece].rect.y = y - pieces[*selected_piece].rect.h / 2;
             }
             break;
         case SDL_QUIT:
@@ -121,18 +171,17 @@ void handle_events(SDL_Event *event, Piece pieces[], int piece_count, int *selec
     }
 }
 
-
-void display(SDL_Texture* bgv2_texture, SDL_Texture* bg_texture, Piece pieces[], int piece_count, SDL_Window* window, SDL_Renderer* renderer) {
+void display(SDL_Texture* bgv2_texture, SDL_Texture* bg_texture,SDL_Texture* extra_texture1,SDL_Texture* extra_texture2, Piece pieces[], int piece_count, SDL_Window* window, SDL_Renderer* renderer) {
     SDL_RenderClear(renderer);
 
     render_texture_fullscreen(bgv2_texture, renderer);
     render_texture_centered(bg_texture, renderer);
     render_pieces(pieces, piece_count, renderer);
-
+    render_extra_textures(extra_texture1, extra_texture2, renderer);
     SDL_RenderPresent(renderer);
 }
 
-int mainsdl(int argc, char* argv[]) {
+int main(int argc, char* argv[]) {
     (void)argc;
     (void)argv;
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
@@ -148,11 +197,10 @@ int mainsdl(int argc, char* argv[]) {
     SDL_Texture *ia_texture;
     Piece pieces[16] = {0};
     
-    bg_texture = IMG_LoadTexture(renderer, "../images/plateau.png");
+    bg_texture = IMG_LoadTexture(renderer, "../images/nouveaufond.png");
     bgv2_texture = IMG_LoadTexture(renderer, "../images/fondblanc.png");
     j1_texture = IMG_LoadTexture(renderer, "../images/joueur1.png");
     j2_texture = IMG_LoadTexture(renderer, "../images/joueur2.png");
-    ia_texture = IMG_LoadTexture(renderer, "../images/ia.png");
     pieces[0].texture = IMG_LoadTexture(renderer, "../images/coneblanc.png");
     pieces[2].texture = IMG_LoadTexture(renderer, "../images/cubeblanc.png");
     pieces[4].texture = IMG_LoadTexture(renderer, "../images/cylindreblanc.png");
@@ -167,10 +215,9 @@ int mainsdl(int argc, char* argv[]) {
     pieces[7] = pieces[6];
     pieces[9] = pieces[8];
     pieces[11] = pieces[10];
-    pieces[13] = pieces[14];
-
-    for (int i = 0; i < 16; i++) 
-    {
+    pieces[13] = pieces[12];
+    pieces[15] = pieces[14];
+    for (int i = 0; i < 16; i++) {
         SDL_QueryTexture(pieces[i].texture, NULL, NULL, &pieces[i].rect.w, &pieces[i].rect.h);
         pieces[i].selected = 0;
     }
@@ -180,45 +227,26 @@ int mainsdl(int argc, char* argv[]) {
     }
 
     place_pieces_initial(pieces);
-
-    SDL_Rect grid[GRID_ROWS][GRID_COLS];
-    int grid_status[GRID_ROWS][GRID_COLS];
-
-    // Initialize the grid cells and grid status
-    int grid_start_x = (WINDOW_LARGEUR - (GRID_COLS * CELL_SIZE)) / 2;
-    int grid_start_y = (WINDOW_HAUTEUR - (GRID_ROWS * CELL_SIZE)) / 2;
-    for (int i = 0; i < GRID_ROWS; i++) {
-        for (int j = 0; j < GRID_COLS; j++) {
-            grid[i][j].x = grid_start_x + j * CELL_SIZE;
-            grid[i][j].y = grid_start_y + i * CELL_SIZE;
-            grid[i][j].w = CELL_SIZE;
-            grid[i][j].h = CELL_SIZE;
-            grid_status[i][j] = 0; // Initialize all cells as empty
-        }
-    }
-
     int selected_piece = -1;
 
     while (1) {
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
-            handle_events(&event, pieces, 16, &selected_piece, grid, grid_status);
+            handle_events(&event, pieces, 16, &selected_piece);
         }
-        display(bgv2_texture, bg_texture, pieces, 16, window, renderer);
+        display(bgv2_texture, bg_texture,j2_texture,j1_texture, pieces, 16, window, renderer);
         SDL_Delay(16); // Approximately 60 FPS
     }
-    for (int i = 0; i < 16; i++) 
-    {
+    for (int i = 0; i < 16; i++) {
         if (pieces[i].texture) SDL_DestroyTexture(pieces[i].texture);
     }
-    SDL_DestroyTexture(ia_texture);
-    SDL_DestroyTexture(j2_texture);
     SDL_DestroyTexture(j1_texture);
+    SDL_DestroyTexture(j2_texture);
     SDL_DestroyTexture(bgv2_texture);
     SDL_DestroyTexture(bg_texture);
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     SDL_Quit();
     IMG_Quit();
-    return 0;
+    return 0; 
 }
