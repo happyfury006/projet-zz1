@@ -4,9 +4,15 @@
 #include <stdlib.h>
 #include "utils.h"
 
+// enum formes forme;
 
 piece creerPiece(int forme,int player){
 	 piece* newpiece = malloc(sizeof(piece));
+	 if (newpiece == NULL)
+	 {
+		/* code */
+	 }
+	 
 	 newpiece->formes = forme;
 	 newpiece->joueur = player;
 

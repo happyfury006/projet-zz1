@@ -51,7 +51,8 @@ int main(){
    
    grille plateau=creationplateau();
    affichageplateau(plateau);
-   plateau=ajoutpiece(plateau,creerPiece(0,1),0,0);
+   plateau=ajoutpiece(plateau,creerPiece(3,1),0,0);
+   affichageplateau(plateau);
    
    return 0;
 }
