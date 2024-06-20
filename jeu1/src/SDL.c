@@ -75,7 +75,7 @@ void play_with_texture_4(SDL_Texture* bg_texture, SDL_Texture* my_texture,
   SDL_RenderClear(renderer);             // Effacer la fenêtre avant de rendre la main
 }
 
-int main(int argc, char* argv[])
+int mainsdl(int argc, char* argv[])
 {
     (void)argc;
     (void)argv;
@@ -87,8 +87,10 @@ int main(int argc, char* argv[])
     SDL_Window* window = SDL_CreateWindow("Quantik avec SDL2", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_LARGEUR, WINDOW_HAUTEUR, 0);
     SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     SDL_Texture *bg_texture;
+    SDL_Texture *bgv2_texture;
     SDL_Texture *piece[15] = {NULL};  
     bg_texture = IMG_LoadTexture(renderer,"../images/plateau.png");
+    bgv2_texture = IMG_LoadTexture(renderer,"../images/fond.png");
     piece[0] = IMG_LoadTexture(renderer,"../images/coneblanc.png");
     piece[2] = IMG_LoadTexture(renderer,"../images/cubeblanc.png");
     piece[4] = IMG_LoadTexture(renderer,"../images/cylindreblanc.png");
@@ -108,14 +110,12 @@ int main(int argc, char* argv[])
 
     if (bg_texture == NULL) 
     {
-        // end_sdl(0, "Echec du chargement de l'image dans la texture", window, renderer);
+        end_sdl(0, "Echec du chargement de l'image dans la texture", window, renderer);
     }
     for(int i =0; i <= 15;i++)
-     
-    // play_with_texture_1_1(bg_texture,window,renderer);
+    {
     play_with_texture_4(bg_texture,piece[i],window,renderer);
-    // }
-    // position_depart(window,renderer,piece1b); // Avant le 1er coup
+    }
     SDL_Delay(1000);
     for(int i =15; i <= 0;i--)
     {
