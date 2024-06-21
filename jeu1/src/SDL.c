@@ -109,19 +109,35 @@ void place_pieces_initial(Piece pieces[]) {
     }
 }
 
-void snap_to_grid(Piece* piece, Paire tableau[4][4]) {
+// Fonction auxiliaire pour calculer la distance entre deux points
+int distance(int x1, int y1, int x2, int y2) {
+    return sqrt(pow(x2 - x1, 2) + pow(y2 - y1, 2));
+}
+
+void snap_to_grid(Piece *piece, Paire tableau[4][4]) {
+    // Parcourir la grille pour trouver le centre le plus proche
     for (int i = 0; i < 4; ++i) {
         for (int j = 0; j < 4; ++j) {
             int centerX = tableau[i][j].premier;
             int centerY = tableau[i][j].deuxieme;
-            if (abs(piece->rect.x + piece->rect.w / 2 - centerX) < 10 && abs(piece->rect.y + piece->rect.h / 2 - centerY) < 10) {
-                piece->rect.x = centerX;// - piece->rect.w / 2;
-                piece->rect.y = centerY; // - piece->rect.h / 2;
-                return;
+
+            // Vérifier la distance avec le centre de la case de la grille
+            if (distance(piece->rect.x + piece->rect.w / 2, piece->rect.y + piece->rect.h / 2, centerX, centerY) < 50) {
+                // Ajuster la position pour centrer sur la case de la grille
+                piece->rect.x = centerX - piece->rect.w / 2;
+                piece->rect.y = centerY - piece->rect.h / 2;
+                return; // Sortir de la fonction après avoir centré la pièce
             }
         }
     }
+
+    // Si la pièce n'est pas assez proche, revenir à la position initiale
+    // piece->rect.x = piece->initial_x;
+    // piece->rect.y = piece->initial_y;
 }
+
+
+
 
 void handle_events(SDL_Event *event, Piece pieces[], int piece_count, int *selected_piece, Paire tableau[4][4]) {
     switch (event->type) {
@@ -147,8 +163,8 @@ void handle_events(SDL_Event *event, Piece pieces[], int piece_count, int *selec
                     int x = event->button.x;
                     int y = event->button.y;
                     // Release the selected piece
-                    snap_to_grid(&pieces[*selected_piece], tableau);
                     pieces[*selected_piece].selected = 0;
+                    snap_to_grid(&pieces[*selected_piece], tableau);
                     *selected_piece = -1;
                 }
             }
