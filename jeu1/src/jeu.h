@@ -10,6 +10,7 @@
 // les fonctions implementees dans le fichier .c                                
 // les declaration de variables globales externes   
 
+<<<<<<< HEAD
 // enum formes{        // faire le lien entre la forme et un entier
 //     cube = 0,
 //     cone = 1,
@@ -33,17 +34,31 @@ typedef struct joueur {
 
 typedef struct grille {
     piece* grid[4][4];                 
+=======
+
+typedef struct grille {
+    struct piece* grid[4][4];
+    int valeur;                  
+>>>>>>> jeu1julen
 }grille;
 
-piece creerPiece(int forme,int player);
-grille creationplateau();
-bool victoireligne(int x,grille plateau);
-bool victoirecolonne(int y, grille plateau);
-bool cherccheregion(int x, int y, grille plateau,list * lparcouru);
-bool victoireregion(int x, int y, grille plateau);
-bool victoire(grille plateau, int x, int y);
-grille ajoutpiece(grille plateau, piece pieceajoutee, int x, int y);
-void affichageplateau(grille plateau);
 
+joueur* creerjoueur(int numJoueur, int ia);
+piece* creerPiece(int forme, joueur* player);
+grille* creationplateau();
+bool valideligne(int x, int joueur, int forme, grille *plateau);
+bool validecolonne(int y, int joueur, int forme, grille* plateau);
+bool valideregion(int x, int y, int joueur, int forme, grille* plateau);
+bool valide(int forme, int joueur, int x, int y, grille *plateau);
+grille* ajoutpiece(grille* plateau, piece* pieceajoutee,joueur* joueur, int x, int y);
+void affichageplateau(grille* plateau);
+bool victoireligne(int x, grille* plateau);
+bool victoirecolonne(int y, grille* plateau);
+bool chercheregion(int x, int y, grille* plateau, list *lparcouru);
+bool victoireregion(int x, int y, grille* plateau);
+bool victoire(grille *plateau, int x, int y);
+grille* demandepiece(grille* plateau, joueur* joueur);
+void jeuencours1VSIA();
+bool jeuencours1VS1();
 
 #endif
