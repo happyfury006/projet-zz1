@@ -14,9 +14,10 @@
 
 
 int main(int argc, char ** argv){
-   SDL_Delay(2000);
-   mainxwindow(argc, argv);
-   SDL_Delay(2000);  
+   // SDL_Delay(2000);
+   // // mainxwindow(argc, argv);
+   // // SDL_Delay(2000);  
+   // mainanimationbis(argc, argv);
    mainsprite(argc, argv);
    return 1;
 }
