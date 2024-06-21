@@ -5,6 +5,7 @@
 #include <SDL2/SDL_ttf.h>
 #include <stdbool.h>  
 #include <math.h>
+#include "utils.h"
 
 const int WINDOW_LARGEUR = 1300;
 const int WINDOW_HAUTEUR = 900;
@@ -68,7 +69,7 @@ void render_texture_centered(SDL_Texture *texture, SDL_Renderer *renderer) {
     SDL_RenderCopy(renderer, texture, &source, &destination);
 }
 
-void render_pieces(Piece pieces[], int piece_count, SDL_Renderer *renderer) {
+void render_pieces(piece pieces[], int piece_count, SDL_Renderer *renderer) {
     for (int i = 0; i < piece_count; i++) {
         SDL_RenderCopy(renderer, pieces[i].texture, NULL, &pieces[i].rect);
     }
@@ -95,7 +96,7 @@ void render_extra_textures(SDL_Texture* texture1, SDL_Texture* texture2, SDL_Ren
     SDL_RenderCopy(renderer, texture2, &source2, &destination2);
 }
 
-void place_pieces_initial(Piece pieces[]) {
+void place_pieces_initial(piece pieces[]) {
     int piece_width = WINDOW_LARGEUR / 8;
 
     for (int i = 0; i < 8; i++) {
@@ -114,7 +115,7 @@ int distance(int x1, int y1, int x2, int y2) {
     return sqrt(pow(x2 - x1, 2) + pow(y2 - y1, 2));
 }
 
-void snap_to_grid(Piece *piece, Paire tableau[4][4]) {
+void snap_to_grid(piece *piece, Paire tableau[4][4]) {
     // Parcourir la grille pour trouver le centre le plus proche
     for (int i = 0; i < 4; ++i) {
         for (int j = 0; j < 4; ++j) {
@@ -139,8 +140,13 @@ void snap_to_grid(Piece *piece, Paire tableau[4][4]) {
 
 
 
-void handle_events(SDL_Event *event, Piece pieces[], int piece_count, int *selected_piece, Paire tableau[4][4]) {
+void handle_events(SDL_Event *event, piece pieces[], int piece_count, int *selected_piece, Paire tableau[4][4]) {
+    int compteur_coup = 0;
     switch (event->type) {
+        // if(compteurcoup %2 == 0)
+            // {
+                        
+            // }
         case SDL_MOUSEBUTTONDOWN:
             if (event->button.button == SDL_BUTTON_LEFT) {
                 int x = event->button.x;
@@ -184,7 +190,7 @@ void handle_events(SDL_Event *event, Piece pieces[], int piece_count, int *selec
     }
 }
 
-void display(SDL_Texture* bgv2_texture, SDL_Texture* bg_texture, SDL_Texture* extra_texture1, SDL_Texture* extra_texture2, Piece pieces[], int piece_count, SDL_Window* window, SDL_Renderer* renderer) {
+void display(SDL_Texture* bgv2_texture, SDL_Texture* bg_texture, SDL_Texture* extra_texture1, SDL_Texture* extra_texture2, piece pieces[], int piece_count, SDL_Window* window, SDL_Renderer* renderer) {
     SDL_RenderClear(renderer);
     render_texture_fullscreen(bgv2_texture, renderer);
     render_texture_centered(bg_texture, renderer);
@@ -242,7 +248,7 @@ int main(int argc, char* argv[]) {
     SDL_Texture *j2_win;
     SDL_Texture *one_player_texture;
     SDL_Texture *two_player_texture;
-    Piece pieces[16] = {0};
+    piece pieces[16] = {0};
     Paire tableau[4][4];
     
     bg_texture = IMG_LoadTexture(renderer, "../images/nouveaufond.png");

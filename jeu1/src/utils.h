@@ -20,7 +20,10 @@ typedef struct joueur {
 // extern enum formes forme;
 typedef struct piece {      //structure d'une pièce
     int formes;             //forme de la pièce
-    struct joueur* joueur;             //0=>joueur1=>piece blanche | 1=>joueur2=>piece noir
+    struct joueur* joueur;  //0=>joueur1=>piece blanche | 1=>joueur2=>piece noir
+    SDL_Texture *texture;
+    SDL_Rect rect;
+    int selected;             
 } piece;
 
 typedef struct list {
