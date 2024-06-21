@@ -35,7 +35,7 @@ int aligneregion(int x, int y, grille* plateau,int n);
 int aligne(grille* plateau, int n);
 int evaluation(grille*plat, int profondeur);
 grille* grillecopie(grille* acopier);
-arbre* generecoup(joueur jo1,joueur jo2,grille* plat,int profondeur,int profondeurmax);
+arbre* generecoup(joueur* jo1,joueur* jo2,grille* plat,int profondeur,int profondeurmax);
 int minimax(arbre* noeud, int profondeur, int maximizingPlayer);
 coups trouver_meilleur_coup(arbre* racine, int profondeur);
 
