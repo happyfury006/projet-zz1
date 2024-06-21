@@ -50,7 +50,7 @@ int aligneligne(int x,grille* plateau,int n){
 	int scoreligne = 0;
 	int i=0;
 	int compteur = 0;
-	while (i < 4 && victoire == false)
+	while (i < 4)
 	{
 		if (plateau->grid[x][i] != NULL && estdanslaliste(plateau->grid[x][i],lparcouru) == 0)
 		{
@@ -91,7 +91,7 @@ int alignecolonne(int y, grille* plateau,int n){
 	int scorecolonne = 0;
 	int j=0;
 	int compteur = 0;
-	 while (j < 4 && victoire == false)
+	 while (j < 4)
 	 {
 		if (plateau->grid[j][y] !=NULL &&estdanslaliste(plateau->grid[j][y],lparcouru) == 0)
 		{
@@ -274,7 +274,7 @@ arbre* generecoup(joueur* jo1,joueur* jo2,grille* plat,int profondeur,int profon
 int minmax(arbre* noeud, int profondeur, int maximizingPlayer) {
     if (profondeur == 0)             //si c'est une feuille (de notre profondeur)
     {
-        return evaluation(noeud->plateau,maximizingPlayer);
+        return evaluation(noeud->plateau,profondeur);
     }
 
     if (maximizingPlayer)             //on maximise pour le joueur
@@ -308,7 +308,7 @@ int minmax(arbre* noeud, int profondeur, int maximizingPlayer) {
 
 int minmaxalphabeta(arbre* noeud, int profondeur, int maximizingPlayer, int alpha, int beta) {
     if (profondeur == 0) {
-        return evaluer_plateau(noeud->plateau);
+        return evaluation(noeud->plateau, profondeur);
     }
 
     if (maximizingPlayer) {
