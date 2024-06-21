@@ -7,12 +7,16 @@
 #include "animationbis.h"
 #include "rendu.h"
 #include "test.h"
-#include "texture.h"
+#include "xwindow.h"
+// #include "texture.h"
 #include "premierefenetre.h"
 #include "sprite.h"
 
 
 int main(int argc, char ** argv){
+   SDL_Delay(2000);
+   mainxwindow(argc, argv);
+   SDL_Delay(2000);  
    mainsprite(argc, argv);
    return 1;
 }
