@@ -290,14 +290,11 @@ bool jeuencours1VSIA() {
       printf("L'IA gagne!\n");
       return true;
     }
+  
+}
 
-    if (plateau == newplateau) {
-    }
-
-    plateau = newplateau;
-  }
-
-  bool jeuencours1VS1() {
+}
+bool jeuencours1VS1() {
     bool running = false;
     grille *plateau = creationplateau();
     grille *newplateau = plateau;
@@ -334,8 +331,6 @@ bool jeuencours1VSIA() {
     }
     return false;
   }
-}
-
 // grille mainjeu(int x, int y, piece){;
 // 	grille plateau = creationplateau();
 // 	// coupjouer();

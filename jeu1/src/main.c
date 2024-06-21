@@ -21,12 +21,12 @@ int main() {
   grille *plateau = creationplateau();
 
   if (choix == 1) {
-    jeuencours1VSIA();
+    return jeuencours1VSIA();
   } else if (choix == 2) {
-    jeuencours1VS1();
+    return jeuencours1VS1();
   }
   // affichageplateau(plateau);
   // plateau=ajoutpiece(plateau,creerPiece(3,1),0,0);
 
-  return 0;
+  
 }
