@@ -186,6 +186,7 @@ int evaluation(grille *plat, int profondeur) {
     score -= score2;
     score -= score1;
   }
+  return score;
 }
 
 grille *grillecopie(grille *acopier) {
@@ -220,16 +221,16 @@ arbre *generecoup(joueur *jo1, joueur *jo2, grille *plat, int profondeur,
             platcopie = ajoutpiece(platcopie, jo1->piecerestante[i][0],
                                    jo1, j, k);
             if (profondeur < profondeurmax) {
-              profondeur -= 1;
+              profondeur += 1;
               arbre *sousarb = arb->fils[0];
-              sousarb->derniercoup.x = j;
-              sousarb->derniercoup.y = k;
-              sousarb->derniercoup.joueur = jo1->numJoueur;
-              sousarb->derniercoup.forme = jo1->piecerestante[i][0];
+              sousarb->derniercoup->x = j;
+              sousarb->derniercoup->y = k;
+              sousarb->derniercoup->joueur = jo1->numJoueur;
+              sousarb->derniercoup->forme = jo1->piecerestante[i][0];
               sousarb =
                   generecoup(jo2, jo1, platcopie, profondeur, profondeurmax);
             }
-            profondeur += 1;
+            profondeur -= 1;
           }
         }
       }
@@ -308,9 +309,9 @@ int minmaxalphabeta(arbre *noeud, int profondeur, int maximizingPlayer,
   }
 }
 
-coups trouver_meilleur_coup(arbre *racine, int profondeur) {
+coups* trouver_meilleur_coup(arbre *racine, int profondeur) {
   int meilleur_valeur = INT_MIN;
-  coups meilleur_coup;
+  coups* meilleur_coup;
   for (int i = 0; i < N && racine->fils[i] != NULL; i++) {
     int valeur = minmax(racine->fils[i], profondeur - 1, 0);
     if (valeur > meilleur_valeur) {
