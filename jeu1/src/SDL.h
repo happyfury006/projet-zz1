@@ -16,6 +16,12 @@ typedef struct {
     int selected;
 } Piece;
 
+struct Paire {
+    int premier;
+    int deuxieme;
+};
+
+
 // fichier d'entete classique ou l'on declare les types necessaires,            
 // les fonctions implementees dans le fichier .c                                
 // les declaration de variables globales externes   
