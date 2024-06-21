@@ -5,8 +5,8 @@
 
 
 enum formes{        // faire le lien entre la forme et un entier
-    cube = 1,
-    cone = 2,
+    cone = 1,
+    cube = 2,
     cylindre = 3,
     sphere = 4
 };
