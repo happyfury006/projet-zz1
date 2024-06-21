@@ -4,7 +4,7 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
 #include <stdbool.h>  
-
+#include <math.h>
 
 const int WINDOW_LARGEUR = 1300;
 const int WINDOW_HAUTEUR = 900;
@@ -13,10 +13,11 @@ const int GRID_ROWS = 4;
 const int GRID_COLS = 4;
 const int CELL_WIDTH = 100; // Largeur de chaque cellule du plateau
 const int CELL_HEIGHT = 100; // Hauteur de chaque cellule du plateau
-  
-/*void grille()
+
+
+void grille(Paire tableau[4][4])
 {
-    struct Paire tableau[4][4] = 
+    Paire temp[4][4] = 
     {
         {{419, 231}, {562, 231}, {703, 231}, {848, 231}},
         {{419, 386}, {562, 386}, {703, 386}, {848, 386}},
@@ -24,17 +25,13 @@ const int CELL_HEIGHT = 100; // Hauteur de chaque cellule du plateau
         {{419, 694}, {562, 694}, {703, 694}, {848, 694}}
     };
 
-    // Affichage du tableau
-    printf("Tableau 4x4 avec paires de nombres :\n");
+    // Copier les valeurs dans le tableau passé en paramètre
     for (int i = 0; i < 4; ++i) {
         for (int j = 0; j < 4; ++j) {
-            printf("(%d, %d) ", tableau[i][j].premier, tableau[i][j].deuxieme);
+            tableau[i][j] = temp[i][j];
         }
-        printf("\n");
     }
-}*/
-
-
+}
 
 void end_sdl(int ok, const char* msg, SDL_Window* window, SDL_Renderer* renderer) {
     char msg_formated[255];
@@ -111,29 +108,22 @@ void place_pieces_initial(Piece pieces[]) {
         pieces[i].rect.y = 10; // Top row
     }
 }
-/*void bouger_piece(Piece pieces[], struct Paire tableau[4][4]) {
-    int pieceIndex, caseIndex;
-    generecoup(&pieceIndex, &caseIndex);
 
-    // Vérifie que les indices sont dans la plage valide
-    if (pieceIndex < 8 || pieceIndex >= 16 || caseIndex < 0 || caseIndex >= 16) {
-        printf("Indices invalides\n");
-        return;
+void snap_to_grid(Piece* piece, Paire tableau[4][4]) {
+    for (int i = 0; i < 4; ++i) {
+        for (int j = 0; j < 4; ++j) {
+            int centerX = tableau[i][j].premier;
+            int centerY = tableau[i][j].deuxieme;
+            if (abs(piece->rect.x + piece->rect.w / 2 - centerX) < 10 && abs(piece->rect.y + piece->rect.h / 2 - centerY) < 10) {
+                piece->rect.x = centerX;// - piece->rect.w / 2;
+                piece->rect.y = centerY; // - piece->rect.h / 2;
+                return;
+            }
+        }
     }
+}
 
-    // Calculer les indices i et j de la case
-    int i = caseIndex / 4;
-    int j = caseIndex % 4;
-
-    // Bouger la pièce spécifiée à la case cible
-    pieces[pieceIndex].rect.x = tableau[i][j].premier;
-    pieces[pieceIndex].rect.y = tableau[i][j].deuxieme;
-
-    // Afficher la nouvelle position de la pièce
-    printf("Piece %d moved to (%d, %d)\n", pieceIndex, pieces[pieceIndex].rect.x, pieces[pieceIndex].rect.y);
-}*/
-
-void handle_events(SDL_Event *event, Piece pieces[], int piece_count, int *selected_piece) {
+void handle_events(SDL_Event *event, Piece pieces[], int piece_count, int *selected_piece, Paire tableau[4][4]) {
     switch (event->type) {
         case SDL_MOUSEBUTTONDOWN:
             if (event->button.button == SDL_BUTTON_LEFT) {
@@ -157,6 +147,7 @@ void handle_events(SDL_Event *event, Piece pieces[], int piece_count, int *selec
                     int x = event->button.x;
                     int y = event->button.y;
                     // Release the selected piece
+                    snap_to_grid(&pieces[*selected_piece], tableau);
                     pieces[*selected_piece].selected = 0;
                     *selected_piece = -1;
                 }
@@ -177,32 +168,6 @@ void handle_events(SDL_Event *event, Piece pieces[], int piece_count, int *selec
     }
 }
 
-/*void display_vic(SDL_Texture* j1_win,SDL_Texture* j2_win,SDL_Renderer* renderer ) 
-{
-    bool i = victoire();
-    bool j = victoire(j2);
-    SDL_Rect source1 = {0}, source2 = {0};
-    SDL_QueryTexture(j1_win, NULL, NULL, &source1.w, &source1.h);
-    SDL_QueryTexture(j2_win, NULL, NULL, &source2.w, &source2.h);
-
-    SDL_Rect destination1 = {0};
-    destination1.w = source1.w;
-    destination1.h = source1.h;
-    destination1.x = 0;
-    destination1.y = 110;
-
-    SDL_Rect destination2 = {0};
-    destination2.w = source2.w;
-    destination2.h = source2.h;
-    destination2.x = WINDOW_LARGEUR - destination2.w;
-    destination2.y = WINDOW_HAUTEUR - destination2.h - 110;
-    if(i == true)
-    { 
-        SDL_RenderCopy(renderer, j1_win, &source1, &destination1);
-    }
-}*/
-
-
 void display(SDL_Texture* bgv2_texture, SDL_Texture* bg_texture, SDL_Texture* extra_texture1, SDL_Texture* extra_texture2, Piece pieces[], int piece_count, SDL_Window* window, SDL_Renderer* renderer) {
     SDL_RenderClear(renderer);
     render_texture_fullscreen(bgv2_texture, renderer);
@@ -212,38 +177,6 @@ void display(SDL_Texture* bgv2_texture, SDL_Texture* bg_texture, SDL_Texture* ex
 
     SDL_RenderPresent(renderer);
 }
-
-/*int display_menu(SDL_Renderer* renderer, SDL_Texture* menu_texture, SDL_Texture* one_player_texture, SDL_Texture* two_player_texture) {
-    SDL_Rect one_player_rect = {600, 300, 400, 100};
-    SDL_Rect two_player_rect = {600, 500, 400, 100};
-
-    while (1) {
-        SDL_RenderClear(renderer);
-        render_texture_fullscreen(menu_texture, renderer);
-
-        SDL_RenderCopy(renderer, one_player_texture, NULL, &one_player_rect);
-        SDL_RenderCopy(renderer, two_player_texture, NULL, &two_player_rect);
-        
-        SDL_RenderPresent(renderer);
-
-        SDL_Event event;
-        while (SDL_PollEvent(&event)) {
-            if (event.type == SDL_QUIT) {
-                exit(0);
-            }
-            if (event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT) {
-                int x = event.button.x;
-                int y = event.button.y;
-
-                if (SDL_PointInRect(&(SDL_Point){x, y}, &one_player_rect)) {
-                    return 1;
-                } else if (SDL_PointInRect(&(SDL_Point){x, y}, &two_player_rect)) {
-                    return 2;
-                }
-            }
-        }
-    }
-}*/
 
 int display_menu(SDL_Renderer* renderer, SDL_Texture* menu_texture, SDL_Texture* one_player_texture, SDL_Texture* two_player_texture) {
     SDL_Rect one_player_rect = {WINDOW_LARGEUR / 2 - 200, WINDOW_HAUTEUR / 2 - 100, 400, 100};
@@ -276,7 +209,6 @@ int display_menu(SDL_Renderer* renderer, SDL_Texture* menu_texture, SDL_Texture*
     }
 }
 
-
 int main(int argc, char* argv[]) {
     (void)argc;
     (void)argv;
@@ -295,6 +227,7 @@ int main(int argc, char* argv[]) {
     SDL_Texture *one_player_texture;
     SDL_Texture *two_player_texture;
     Piece pieces[16] = {0};
+    Paire tableau[4][4];
     
     bg_texture = IMG_LoadTexture(renderer, "../images/nouveaufond.png");
     bgv2_texture = IMG_LoadTexture(renderer, "../images/fondblanc.png");
@@ -328,10 +261,11 @@ int main(int argc, char* argv[]) {
     if (bg_texture == NULL || bgv2_texture == NULL || j1_texture == NULL || j2_texture == NULL) {
         end_sdl(0, "Echec du chargement de l'image dans la texture", window, renderer);
     }
+
+    grille(tableau);
     
     int mode = display_menu(renderer, bgv2_texture, one_player_texture, two_player_texture);
     printf("Mode sélectionné: %d joueur(s)\n", mode);
-
 
     place_pieces_initial(pieces);
     int selected_piece = -1;
@@ -339,16 +273,15 @@ int main(int argc, char* argv[]) {
     while (1) {
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
-            handle_events(&event, pieces, 16, &selected_piece);
+            handle_events(&event, pieces, 16, &selected_piece, tableau);
         }
         display(bgv2_texture, bg_texture, j2_texture, j1_texture, pieces, 16, window, renderer);
-        // display_vic(j1_win,j2_win,renderer);
         SDL_Delay(16); // Approximately 60 FPS
     }
     for (int i = 0; i < 16; i++) {
         if (pieces[i].texture) SDL_DestroyTexture(pieces[i].texture);
     }
-    // grille();
+
     SDL_DestroyTexture(two_player_texture);
     SDL_DestroyTexture(one_player_texture);
     SDL_DestroyTexture(j2_win);
