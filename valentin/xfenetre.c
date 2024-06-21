@@ -6,6 +6,7 @@ int main(int argc, char* argv[]) {
     (void)argc;
     (void)argv;
     // Dimensions des fenêtres
+    SDL_Delay(3000);
     const int windowWidth = 100;
     const int windowHeight = 100;
 
