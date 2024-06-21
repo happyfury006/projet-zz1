@@ -1,120 +1,216 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <math.h>
 #include <stdio.h>
+#include <string.h>
 
-const int WINDOW_LARGEUR = 800;
-const int WINDOW_HAUTEUR = 600;
-const int vit = 5;
+void end_sdl(char ok,                  // fin normale : ok = 0 ; anormale ok = 1
+             char const *msg,          // message à afficher
+             SDL_Window *window,       // fenêtre à fermer
+             SDL_Renderer *renderer) { // renderer à fermer
+  char msg_formated[255];
+  int l;
 
-void render_background(SDL_Texture *bg_texture, SDL_Window *window,
-                       SDL_Renderer *renderer, int offset) {
+  if (!ok) { // Affichage de ce qui ne va pas
+    strncpy(msg_formated, msg, 250);
+    l = strlen(msg_formated);
+    strcpy(msg_formated + l, " : %s\n");
+
+    SDL_Log(msg_formated, SDL_GetError());
+  }
+
+  if (renderer != NULL) { // Destruction si nécessaire du renderer
+    SDL_DestroyRenderer(
+        renderer); // Attention : on suppose que les NULL sont maintenus !!
+    renderer = NULL;
+  }
+  if (window != NULL) { // Destruction si nécessaire de la fenêtre
+    SDL_DestroyWindow(
+        window); // Attention : on suppose que les NULL sont maintenus !!
+    window = NULL;
+  }
+
+  SDL_Quit();
+
+  if (!ok) { // On quitte si cela ne va pas
+    exit(EXIT_FAILURE);
+  }
+}
+
+void displaySprite(SDL_Texture *texture, SDL_Window *window,
+                   SDL_Renderer *renderer, int frame) {
   SDL_Rect source =
                {0}, // Rectangle définissant la zone de la texture à récupérer
       window_dimensions = {0}, // Rectangle définissant la fenêtre, on
                                // n'utilisera que largeur et hauteur
-      destination = {0}; // Rectangle définissant où la zone_source doit être
-                         // déposée dans le renderer
+      destination = {0}, state = {0};
+  SDL_GetWindowSize(window, &window_dimensions.w, &window_dimensions.h);
+  SDL_QueryTexture(texture, NULL, NULL, &source.w, &source.h);
+
+  int nb_images = 8;
+  float zoom = 2;
+  int offset_x = source.w / nb_images;
+  int offset_y = source.h;
+
+  state.x = 0;
+  state.y = offset_y * 0;
+  state.w = offset_x;
+  state.h = offset_y;
+
+  destination.w = offset_x * zoom;
+  destination.h = offset_y * zoom;
+
+  destination.x = window_dimensions.w * 0.4;
+  destination.y = window_dimensions.h * 0.85;
+
+  state.x += frame * offset_x;
+  state.x %= source.w;
+  SDL_RenderCopy(renderer, texture, &state, &destination);
+}
+
+void displaybackground(SDL_Texture *my_texture, SDL_Window *window,
+                       SDL_Renderer *renderer) {
+  SDL_Rect source =
+               {0}, // Rectangle définissant la zone de la texture à récupérer
+      window_dimensions = {0}, // Rectangle définissant la fenêtre, on
+                               // n'utilisera que largeur et hauteur
+      destination = {0};
 
   SDL_GetWindowSize(
       window, &window_dimensions.w,
       &window_dimensions.h); // Récupération des dimensions de la fenêtre
-  SDL_QueryTexture(bg_texture, NULL, NULL, &source.w,
+
+  SDL_QueryTexture(my_texture, NULL, NULL, &source.w,
                    &source.h); // Récupération des dimensions de l'image
 
   destination = window_dimensions; // On fixe les dimensions de l'affichage à
                                    // celles de la fenêtre
 
-  destination.x =
-      -offset; // Appliquer l'offset pour créer l'effet de défilement
+  /* On veut afficher la texture de façon à ce que l'image occupe la totalité de
+   * la fenêtre */
 
-  SDL_RenderCopy(renderer, bg_texture, &source,
-                 &destination); // Création de l'élément à afficher
-
-  // Si l'arrière-plan sort de l'écran, dessiner une deuxième copie pour boucler
-  if (destination.x + destination.w < window_dimensions.w) {
-    destination.x += destination.w;
-    SDL_RenderCopy(renderer, bg_texture, &source, &destination);
-  }
+  SDL_RenderCopy(renderer, my_texture, &source, &destination);
 }
 
-void play_with_texture_4(SDL_Texture *bg_texture, SDL_Texture *my_texture,
-                         SDL_Window *window, SDL_Renderer *renderer) {
-  SDL_Rect source = {0}, // Rectangle définissant la zone totale de la planche
-      window_dimensions = {0}, // Rectangle définissant la fenêtre, on
-                               // n'utilisera que largeur et hauteur
-      destination = {0}; // Rectangle définissant où la zone_source doit être
-                         // déposée dans le renderer
+void displaymoving(SDL_Texture *my_texture, SDL_Window *window,
+                   SDL_Renderer *renderer, int vitesse) {
+  SDL_Rect source = {0}, window_dimensions = {0}, destination = {0};
 
-  SDL_GetWindowSize(window, // Récupération des dimensions de la fenêtre
-                    &window_dimensions.w, &window_dimensions.h);
-  SDL_QueryTexture(my_texture, // Récupération des dimensions de l'image
-                   NULL, NULL, &source.w, &source.h);
+  SDL_GetWindowSize(window, &window_dimensions.w, &window_dimensions.h);
+  SDL_QueryTexture(my_texture, NULL, NULL, &source.w, &source.h);
 
-  int nb_images =
-      8; // Il y a 8 vignettes dans la ligne de l'image qui nous intéresse
-  float zoom = 1.0; // zoom, car ces images sont un peu petites
-  int offset_x = source.w / nb_images, // La largeur d'une vignette de l'image,
-                                       // marche car la planche est bien réglée
-      offset_y = source.h / 4; // La hauteur d'une vignette de l'image, marche
-                               // car la planche est bien réglée
+  destination.w = window_dimensions.w;
+  destination.h = window_dimensions.h;
+  destination.x = 0;
+  destination.y = 0;
 
-  destination.w = offset_x * zoom; // Largeur du sprite à l'écran
-  destination.h = offset_y * zoom; // Hauteur du sprite à l'écran
+  float speed = vitesse;
 
-  destination.y = // La course se fait en milieu d'écran (en vertical)
-      (window_dimensions.h - destination.h) / 2;
-
-  int speed = 9;
-  int bg_offset = 0;       // Pour l'animation de l'arrière-plan
-  int frame_duration = 80; // Durée de chaque frame en ms
-
-  for (int x = 0; x < window_dimensions.w - destination.w; x += speed) {
-    destination.x = x; // Position en x pour l'affichage du sprite
-    SDL_RenderClear(
-        renderer); // Effacer l'image précédente avant de dessiner la nouvelle
-    render_background(bg_texture, window, renderer, bg_offset);
-    SDL_RenderCopy(renderer, my_texture, // Préparation de l'affichage
-                   NULL, &destination);
-    SDL_RenderPresent(renderer); // Affichage
-    SDL_Delay(frame_duration);   // Pause en ms
-
-    // Mettre à jour l'offset de l'arrière-plan pour créer l'effet de défilement
-    bg_offset = (bg_offset + vit) % window_dimensions.w;
+  destination.x += speed;
+  if (destination.x > destination.w) {
+    destination.x = 0;
   }
-  SDL_RenderClear(renderer); // Effacer la fenêtre avant de rendre la main
+
+  SDL_RenderCopy(renderer, my_texture, &source, &destination);
+
+  SDL_Delay(30);
 }
 
-int main(int argc, char *argv[]) {
+int main(int argc, char **argv) {
   (void)argc;
   (void)argv;
-  if (SDL_Init(SDL_INIT_VIDEO) != 0) {
-    printf("Erreur d'initialisation de la SDL: %s\n", SDL_GetError());
-    return 1;
-  }
-  SDL_Window *window = SDL_CreateWindow(
-      "Sprite avec SDL2", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-      WINDOW_LARGEUR, WINDOW_HAUTEUR, 0);
-  SDL_Renderer *renderer =
-      SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-  SDL_Texture *bg_texture;
-  SDL_Texture *my_texture2;
-  bg_texture = IMG_LoadTexture(renderer, "../valentin/fondv2.jpg");
-  my_texture2 = IMG_LoadTexture(renderer, "../valentin/marioyoshi.png");
-  if (bg_texture == NULL) {
-    printf("Echec du chargement de l'image dans la texture: %s\n",
-           SDL_GetError());
-    SDL_Quit();
-    return 1;
+
+  SDL_Window *window = NULL;
+  SDL_Renderer *renderer = NULL;
+  SDL_Texture *bg = NULL;
+  SDL_Texture *perso = NULL;
+  SDL_Texture *route = NULL;
+  SDL_Texture *route2 = NULL;
+
+  SDL_RendererFlip flip = SDL_FLIP_NONE;
+
+  SDL_DisplayMode screen;
+
+  /*********************************************************************************************************************/
+  /*                         Initialisation de la SDL  + gestion de l'échec
+   * possible                                   */
+  /*********************************************************************************************************************/
+  if (SDL_Init(SDL_INIT_VIDEO) != 0)
+    end_sdl(0, "ERROR SDL INIT", window, renderer);
+
+  SDL_GetCurrentDisplayMode(0, &screen);
+  printf("Résolution écran\n\tw : %d\n\th : %d\n", screen.w, screen.h);
+
+  /* Création de la fenêtre */
+  window = SDL_CreateWindow("Premier dessin", SDL_WINDOWPOS_CENTERED,
+                            SDL_WINDOWPOS_CENTERED, screen.w * 0.7,
+                            screen.h * 0.7, SDL_WINDOW_OPENGL);
+  if (window == NULL)
+    end_sdl(0, "ERROR WINDOW CREATION", window, renderer);
+
+  /* Création du renderer */
+  renderer = SDL_CreateRenderer(
+      window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+  if (renderer == NULL)
+    end_sdl(0, "ERROR RENDERER CREATION", window, renderer);
+
+  /* Création du renderer */
+  bg = IMG_LoadTexture(renderer, "../valentin/fond.png");
+  route = IMG_LoadTexture(renderer, "../valentin/fond.png");
+  route2 = IMG_LoadTexture(renderer, "../valentin/fond.png");
+  perso = IMG_LoadTexture(renderer, "../valentin/run.png");
+  if (bg == NULL || perso == NULL || route == NULL)
+  {
+    end_sdl(0, "Echec du chargement de l'image 1 dans la texture", window,
+            renderer);
   }
 
-  play_with_texture_4(bg_texture, my_texture2, window, renderer);
 
-  SDL_Delay(1000);
-  SDL_DestroyTexture(my_texture2);
-  SDL_DestroyTexture(bg_texture);
-  SDL_DestroyRenderer(renderer);
-  SDL_DestroyWindow(window);
-  SDL_Quit();
+  SDL_Rect source = {0}, window_dimensions = {0}, destination = {0};
+
+  SDL_GetWindowSize(window, &window_dimensions.w, &window_dimensions.h);
+  SDL_QueryTexture(route, NULL, NULL, &source.w, &source.h);
+
+  destination.w = window_dimensions.w;
+  destination.h = window_dimensions.h;
+  destination.x = 0;
+  destination.y = 0;
+
+  SDL_Rect source3 = {0}, destination3 = {0};
+
+  SDL_QueryTexture(route2, NULL, NULL, &source3.w, &source3.h);
+
+  destination3.w = window_dimensions.w;
+  destination3.h = window_dimensions.h;
+  destination3.x = window_dimensions.w;
+  destination3.y = 0;
+
+  flip = SDL_FLIP_HORIZONTAL;
+
+  for (int frame = 0; frame < 100; frame++) 
+  {
+    displaybackground(bg, window, renderer);
+
+    destination.x -= 5;
+    if (destination.x < -window_dimensions.w) {
+      destination.x = window_dimensions.w - 5;
+    }
+    SDL_RenderCopy(renderer, route, &source, &destination);
+
+    destination3.x -= 5;
+    if (destination3.x < -window_dimensions.w) {
+      destination3.x = window_dimensions.w - 5;
+    }
+    SDL_RenderCopyEx(renderer, route2, &source3, &destination3, 0, NULL, flip);
+    displaySprite(perso, window, renderer, frame);
+    SDL_RenderPresent(renderer);
+    SDL_Delay(50);
+    SDL_RenderClear(renderer);
+  }
+
   IMG_Quit();
-  return 0;
+
+  /* on referme proprement la SDL */
+  end_sdl(1, "Normal ending", window, renderer);
+  return EXIT_SUCCESS;
 }
