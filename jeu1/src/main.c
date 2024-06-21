@@ -1,4 +1,4 @@
-// #include "IA.h"
+#include "IA.h"
 #include "jeu.h"
 #include "utils.h"
 // #include "SDL.h"

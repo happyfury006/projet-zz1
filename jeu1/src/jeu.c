@@ -1,5 +1,6 @@
 #include "jeu.h"
 #include "utils.h"
+#include "IA.h"
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -256,12 +257,12 @@ grille *demandepiece(grille *plateau, joueur *joueur) {
   return plateau;
 }
 
-void jeuencours1VSIA() {
+bool jeuencours1VSIA() {
   bool running = false;
   grille *plateau = creationplateau();
   grille *newplateau = plateau;
   joueur *joueur1 = creerjoueur(1, 0);
-  joueur *joueurIA = creerjoueur(2, 6);
+  joueur *joueurIA = creerjoueur(2, 2);
   affichageplateau(plateau);
 
   while (running == false) {
@@ -276,13 +277,16 @@ void jeuencours1VSIA() {
       return true;
       break;
     }
-    // Joueur2 joue
+    // IA joue
     plateau = newplateau;
-    newplateau = demandepiece(plateau, joueurIA->numJoueur);
+    arbre *arb = generecoup(joueurIA, joueur1, plateau, 0, joueurIA->ia);
+    coups coup = trouver_meilleur_coup(arb, joueurIA->ia);
+    plateau = ajoutpiece(plateau, coup.forme, joueurIA, x, y);
     affichageplateau(newplateau);
+    
     bool victoryIA = victoire(newplateau, x, y);
 
-    if (victoryJ2 == true) {
+    if (victoryIA == true) {
       printf("L'IA gagne!\n");
       return true;
     }
@@ -317,7 +321,7 @@ void jeuencours1VSIA() {
 
       // Joueur2 joue
       plateau = newplateau;
-      printf("Joueur2 c'est a vous de jouez\n");
+      //printf("Joueur2 c'est a vous de jouez\n");
       newplateau = demandepiece(plateau, joueur2);
       affichageplateau(newplateau);
       bool victoryJ2 = victoire(newplateau, x, y);
@@ -326,18 +330,16 @@ void jeuencours1VSIA() {
         printf("Bravo Joueur2 vous avez gagne!\n");
         return true;
       }
-
-      if (plateau == newplateau) {
-      }
-
       plateau = newplateau;
     }
+    return false;
   }
+}
 
-  // grille mainjeu(int x, int y, piece){;
-  // 	grille plateau = creationplateau();
-  // 	// coupjouer();
-  // 	// victoire(plateau);
-  // 	return plateau;
+// grille mainjeu(int x, int y, piece){;
+// 	grille plateau = creationplateau();
+// 	// coupjouer();
+// 	// victoire(plateau);
+// 	return plateau;
 
-  // }
+// }
