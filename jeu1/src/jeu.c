@@ -107,20 +107,7 @@ bool valideregion(int x, int y, int numJoueur,int forme, grille* plateau){
 bool valide(int forme, int numJoueur, int x, int y, grille* plateau) {
 	if (plateau->grid[x][y] != NULL)
 	{
-<<<<<<< HEAD
-		possible = true;
-	}
-	return possible;
-}
-
-grille ajoutpiece(grille plateau, int forme,int joueur, int x, int y){
-	if (valide(forme,joueur,x,y,plateau) == true)
-	{
-		plateau.grid[x][y] = &pieceajoutee;
-		return plateau;
-=======
 		return false;
->>>>>>> jeu1julen
 	}
 	else{
 		return valideligne(x, numJoueur, forme, plateau) && validecolonne(y, numJoueur, forme, plateau) && valideregion(x, y, numJoueur, forme, plateau);
