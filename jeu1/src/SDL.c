@@ -131,28 +131,19 @@ void snap_to_grid(piece *piece, Paire tableau[4][4]) {
             }
         }
     }
-
-    // Si la pièce n'est pas assez proche, revenir à la position initiale
-    // piece->rect.x = piece->initial_x;
-    // piece->rect.y = piece->initial_y;
 }
 
 
 
 
 void handle_events(SDL_Event *event, piece pieces[], int piece_count, int *selected_piece, Paire tableau[4][4]) {
-    int compteur_coup = 0;
     switch (event->type) {
-        // if(compteurcoup %2 == 0)
-            // {
-                        
-            // }
         case SDL_MOUSEBUTTONDOWN:
             if (event->button.button == SDL_BUTTON_LEFT) {
                 int x = event->button.x;
                 int y = event->button.y;
                 if (*selected_piece == -1) {
-                    // Check if we clicked on any piece
+                    // Test si on a cliqué sur une piéce 
                     for (int i = 0; i < piece_count; i++) {
                         if (SDL_PointInRect(&(SDL_Point){x, y}, &pieces[i].rect)) {
                             *selected_piece = i;
@@ -166,9 +157,9 @@ void handle_events(SDL_Event *event, piece pieces[], int piece_count, int *selec
        case SDL_MOUSEBUTTONUP:
             if (event->button.button == SDL_BUTTON_LEFT) {
                 if (*selected_piece != -1) {
-                    int x = event->button.x;
-                    int y = event->button.y;
-                    // Release the selected piece
+                    // int x = event->button.x;
+                    // int y = event->button.y;
+                    // Relâche la piéce sélectionnée 
                     pieces[*selected_piece].selected = 0;
                     snap_to_grid(&pieces[*selected_piece], tableau);
                     *selected_piece = -1;
@@ -179,7 +170,7 @@ void handle_events(SDL_Event *event, piece pieces[], int piece_count, int *selec
             if (*selected_piece != -1) {
                 int x = event->motion.x;
                 int y = event->motion.y;
-                // Update the position of the selected piece
+                // Met à jour la position de la piéce sélectionné 
                 pieces[*selected_piece].rect.x = x - pieces[*selected_piece].rect.w / 2;
                 pieces[*selected_piece].rect.y = y - pieces[*selected_piece].rect.h / 2;
             }
@@ -190,7 +181,7 @@ void handle_events(SDL_Event *event, piece pieces[], int piece_count, int *selec
     }
 }
 
-void display(SDL_Texture* bgv2_texture, SDL_Texture* bg_texture, SDL_Texture* extra_texture1, SDL_Texture* extra_texture2, piece pieces[], int piece_count, SDL_Window* window, SDL_Renderer* renderer) {
+void display(SDL_Texture* bgv2_texture, SDL_Texture* bg_texture, SDL_Texture* extra_texture1, SDL_Texture* extra_texture2, piece pieces[], int piece_count, SDL_Renderer* renderer) {
     SDL_RenderClear(renderer);
     render_texture_fullscreen(bgv2_texture, renderer);
     render_texture_centered(bg_texture, renderer);
@@ -244,6 +235,7 @@ int main(int argc, char* argv[]) {
     SDL_Texture *bgv2_texture;
     SDL_Texture *j1_texture;
     SDL_Texture *j2_texture;
+    SDL_Texture *ia_texture;
     SDL_Texture *j1_win;
     SDL_Texture *j2_win;
     SDL_Texture *one_player_texture;
@@ -255,6 +247,7 @@ int main(int argc, char* argv[]) {
     bgv2_texture = IMG_LoadTexture(renderer, "../images/fondblanc.png");
     j1_texture = IMG_LoadTexture(renderer, "../images/joueur1.png");
     j2_texture = IMG_LoadTexture(renderer, "../images/joueur2.png");
+    ia_texture = IMG_LoadTexture(renderer,"../images/IA2.png");
     j1_win = IMG_LoadTexture(renderer, "../images/j1win.png");
     j2_win = IMG_LoadTexture(renderer,"../images/j2win.png");
     one_player_texture = IMG_LoadTexture(renderer,"../images/1j.png");
@@ -297,8 +290,15 @@ int main(int argc, char* argv[]) {
         while (SDL_PollEvent(&event)) {
             handle_events(&event, pieces, 16, &selected_piece, tableau);
         }
-        display(bgv2_texture, bg_texture, j2_texture, j1_texture, pieces, 16, window, renderer);
-        SDL_Delay(16); // Approximately 60 FPS
+        if(mode == 1)
+        {
+            display(bgv2_texture, bg_texture, ia_texture, j1_texture, pieces, 16, renderer);
+            SDL_Delay(16); // Pour avoir environs 60 FPS
+        }
+        else
+        {
+            display(bgv2_texture,bg_texture,j2_texture,j1_texture,pieces,16,renderer);
+        }
     }
     for (int i = 0; i < 16; i++) {
         if (pieces[i].texture) SDL_DestroyTexture(pieces[i].texture);
@@ -308,6 +308,7 @@ int main(int argc, char* argv[]) {
     SDL_DestroyTexture(one_player_texture);
     SDL_DestroyTexture(j2_win);
     SDL_DestroyTexture(j1_win);
+    SDL_DestroyTexture(ia_texture);
     SDL_DestroyTexture(j1_texture);
     SDL_DestroyTexture(j2_texture);
     SDL_DestroyTexture(bgv2_texture);
