@@ -10,7 +10,7 @@ bool victoiretouteligne(grille*plat)
 {
     for(int x=0; x<4; x++)
     {
-        if(victoireligne(x,*plat))
+        if(victoireligne(x,plat))
             return true;
     }
     return false;
@@ -20,7 +20,7 @@ bool victoiretoutecolonne(grille*plat)
 {
     for(int y=0; y<4; y++)
     {
-        if(victoirecolonne(y,*plat))
+        if(victoirecolonne(y,plat))
             return true;
     }
     return false;
@@ -29,12 +29,174 @@ bool victoiretoutecolonne(grille*plat)
 
 bool victoiretouteregion(grille*plat)
 {
-    if(victoireregion(0,0,*plat)||victoireregion(3,0,*plat)||victoireregion(0,3,*plat)||victoireregion(3,3,*plat))
+    if(victoireregion(0,0,plat)||victoireregion(3,0,plat)||victoireregion(0,3,plat)||victoireregion(3,3,plat))
         return true;
     
     return false;
 }
 
+
+
+int aligneligne(int x,grille* plateau,int n){
+	list * lparcouru = malloc(sizeof(list));
+	if (lparcouru == NULL)
+	{
+		return false;
+	}
+	lparcouru->piece = NULL;
+	lparcouru->next = NULL;
+	
+	int scoreligne = 0;
+	int i=0;
+	int compteur = 0;
+	while (i < 4 && victoire == false)
+	{
+		if (plateau->grid[x][i] != NULL && estdanslaliste(plateau->grid[x][i],lparcouru) == 0)
+		{
+			ajoutliste(plateau->grid[x][i],lparcouru);
+			compteur++;
+		}
+		
+		i++;
+		
+	}
+    
+	if (compteur == n)
+    switch (n)
+    {
+    case 1:
+        scoreligne = 1;
+        break;
+    case 2:
+        scoreligne = 40;
+        break;
+    case 3:
+        scoreligne = 1000;
+        break;    
+    default:
+        break;
+    }
+	return scoreligne;
+}
+
+int alignecolonne(int y, grille* plateau,int n){
+	list * lparcouru = malloc(sizeof(list));
+	if (lparcouru == NULL)
+	{
+		return false;
+	}
+	lparcouru->piece = NULL;
+	lparcouru->next = NULL;
+	int scorecolonne = 0;
+	int j=0;
+	int compteur = 0;
+	 while (j < 4 && victoire == false)
+	 {
+		if (plateau->grid[j][y] !=NULL &&estdanslaliste(plateau->grid[j][y],lparcouru) == 0)
+		{
+			ajoutliste(plateau->grid[j][y],lparcouru);
+			compteur++;
+		}
+		j++;
+	 }
+	 if (compteur == n)
+    switch (n)
+    {
+    case 1:
+        scorecolonne = 1;
+        break;
+    case 2:
+        scorecolonne = 40;
+        break;
+    case 3:
+        scorecolonne = 1000;
+        break;    
+    default:
+        break;
+    }
+	return scorecolonne;
+}
+
+int cherchealingeregion(int x,int y,grille* plateau, list * lparcouru,int n){
+	int scoreregion = 0;
+	int sectionx = x/2;
+	int sectiony = y/2;
+	int subsectionx = x%2;
+	int subsectiony = y%2;
+	int compteur = 0;
+	for (int i = 2*sectionx; i <subsectionx+(sectionx*2) ; i++)
+	{
+		for (int j = 2*sectiony; j < subsectiony+(sectiony*2); j++)
+		{
+			if (plateau->grid[i][j] !=NULL && estdanslaliste(plateau->grid[i][j],lparcouru) == 0)
+			{
+				ajoutliste(plateau->grid[i][j],lparcouru);
+				compteur++;
+			} 
+		}  
+	}
+	if (compteur == n)
+    switch (n)
+    {
+    case 1:
+        scoreregion = 1;
+        break;
+    case 2:
+        scoreregion = 40;
+        break;
+    case 3:
+        scoreregion = 1000;
+        break;    
+    default:
+        break;
+    }
+	return scoreregion;
+}
+
+int aligneregion(int x, int y, grille* plateau,int n){
+	int scoreregion = 0;
+	
+	list * lparcouru = malloc(sizeof(list));
+	if (lparcouru == NULL)
+	{
+		return false;
+	}
+	lparcouru->piece = NULL;
+	lparcouru->next = NULL;
+	ajoutliste(plateau->grid[x][y],lparcouru);
+
+	scoreregion = cherchealingeregion(x,y,plateau,lparcouru,n);
+	return scoreregion;
+		
+}
+
+int aligne(grille* plateau, int n){
+	int score = 0;
+    for (int x = 0; x < 4; x++)
+    {
+        for (int y = 0; y < 4; y++)
+        {
+            score+=aligneregion(x,y,plateau,n)+aligneligne(x,plateau,n)+alignecolonne(y,plateau,n);
+        }
+    }
+	return score;
+}
+
+int aligne3(grille*plat)
+{
+    int score = aligne(plat,3);
+    return score;
+}
+int aligne2(grille*plat)
+{
+    int score = aligne(plat,2);
+    return score;
+}
+int aligne1(grille*plat)
+{
+    int score = aligne(plat,1);
+    return score;
+}
 
 int evaluation(grille*plat, int profondeur)
 {
