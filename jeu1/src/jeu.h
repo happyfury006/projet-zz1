@@ -29,7 +29,7 @@ bool chercheregion(int x, int y, grille *plateau, list *lparcouru);
 bool victoireregion(int x, int y, grille *plateau);
 bool victoire(grille *plateau, int x, int y);
 grille *demandepiece(grille *plateau, joueur *joueur);
-void jeuencours1VSIA();
+bool jeuencours1VSIA();
 bool jeuencours1VS1();
 
 #endif

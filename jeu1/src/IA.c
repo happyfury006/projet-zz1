@@ -218,7 +218,7 @@ arbre *generecoup(joueur *jo1, joueur *jo2, grille *plat, int profondeur,
           if (valide(i, jo1->numJoueur, j, k, plat)) {
             grille *platcopie = grillecopie(plat);
             platcopie = ajoutpiece(platcopie, jo1->piecerestante[i][0],
-                                   jo1->numJoueur, j, k);
+                                   jo1, j, k);
             if (profondeur < profondeurmax) {
               profondeur -= 1;
               arbre *sousarb = arb->fils[0];
