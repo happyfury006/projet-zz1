@@ -236,7 +236,7 @@ grille* grillecopie(grille* acopier) {
 }
 
 
-arbre* generecoup(joueur jo1,joueur jo2,grille* plat,int profondeur,int profondeurmax){
+arbre* generecoup(joueur* jo1,joueur* jo2,grille* plat,int profondeur,int profondeurmax){
     arbre* arb= (arbre*)malloc(sizeof(arbre));
     arb->plateau=plat;
     for(int i=0; i<4; i++)
