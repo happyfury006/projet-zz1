@@ -10,7 +10,7 @@ bool victoiretouteligne(grille*plat)
 {
     for(int x=0; x<4; x++)
     {
-        if(victoireligne(x,plat))
+        if(victoireligne(x,*plat))
             return true;
     }
     return false;
@@ -20,7 +20,7 @@ bool victoiretoutecolonne(grille*plat)
 {
     for(int y=0; y<4; y++)
     {
-        if(victoirecolonne(y,plat))
+        if(victoirecolonne(y,*plat))
             return true;
     }
     return false;
@@ -29,7 +29,7 @@ bool victoiretoutecolonne(grille*plat)
 
 bool victoiretouteregion(grille*plat)
 {
-    if(victoireregion(0,0,plat)||victoireregion(3,0,plat)||victoireregion(0,3,plat)||victoireregion(3,3,plat))
+    if(victoireregion(0,0,*plat)||victoireregion(3,0,*plat)||victoireregion(0,3,*plat)||victoireregion(3,3,*plat))
         return true;
     
     return false;
@@ -39,7 +39,7 @@ bool victoiretouteregion(grille*plat)
 int evaluation(grille*plat, int profondeur)
 {
     int score = 0;
-    int paire = profondeur % 2 
+    int paire = profondeur % 2;
     if(victoiretouteligne(plat) || victoiretoutecolonne(plat) || victoiretouteregion(plat))
     {
         if (paire)
@@ -48,9 +48,9 @@ int evaluation(grille*plat, int profondeur)
             return -100000;
     }
 
-    score3=aligne3(plat);
-    score2=aligne2(plat);
-    score1=aligne1(plat);
+    int score3=aligne3(plat);
+    int score2=aligne2(plat);
+    int score1=aligne1(plat);
 
     if(paire)
     {
@@ -103,7 +103,7 @@ arbre* generecoup(joueur jo,grille* plat,int profondeur){
                     if(valide(i, jo.numJoueur, j, k, plat->grid))
                     {
                         grille* platcopie=grillecopie(plat);
-                        platcopie=ajoutpiece(platcopie,jo.piecerestante[i][0],j,k);
+                        platcopie=ajoutpiece(*platcopie,jo.piecerestante[i][0],jo.numJoueur,j,k);
                         if (index<profondeur)
                         {
                             index+=1;
@@ -152,6 +152,45 @@ int minmax(arbre* noeud, int profondeur, int maximizingPlayer) {
             if (eval < minEval) 
             {
                 minEval = eval;
+            }
+        }
+        return minEval;
+    }
+}
+
+
+int minmaxalphabeta(arbre* noeud, int profondeur, int maximizingPlayer, int alpha, int beta) {
+    if (profondeur == 0) {
+        return evaluer_plateau(noeud->plateau);
+    }
+
+    if (maximizingPlayer) {
+        int maxEval = INT_MIN;
+        for (int i = 0; i < N && noeud->fils[i] != NULL; i++) {
+            int eval = minmax(noeud->fils[i], profondeur - 1, 0, alpha, beta);
+            if (eval > maxEval) {
+                maxEval = eval;
+            }
+            if (eval > alpha) {
+                alpha = eval;
+            }
+            if (beta <= alpha) {
+                break;
+            }
+        }
+        return maxEval;
+    } else {
+        int minEval = INT_MAX;
+        for (int i = 0; i < N && noeud->fils[i] != NULL; i++) {
+            int eval = minmax(noeud->fils[i], profondeur - 1, 1, alpha, beta);
+            if (eval < minEval) {
+                minEval = eval;
+            }
+            if (eval < beta) {
+                beta = eval;
+            }
+            if (beta <= alpha) {
+                break;
             }
         }
         return minEval;
