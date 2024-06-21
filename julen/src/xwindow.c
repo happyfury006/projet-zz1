@@ -1,8 +1,7 @@
-#include <SDL2/SDL.h>
-#include <stdio.h>
 #include "xwindow.h"
 #include "sdl.h"
-
+#include <SDL2/SDL.h>
+#include <stdio.h>
 
 #include <stdlib.h>
 
@@ -40,52 +39,52 @@
 // }
 
 int mainxwindow(int argc, char **argv) {
-    (void)argc;
-    (void)argv;
+  (void)argc;
+  (void)argv;
 
-    char title[12];
-    SDL_Window *window[I];
+  char title[12];
+  SDL_Window *window[I];
 
-    for (int i = 0; i < I; i++) {
-        sprintf(title, "Window %d", i);
-        if (i < I / 2) {
-            window[i] = creationwindow(title, i * 400, 0, 300, 300);
-        } else {
-            window[i] = creationwindow(title, (i - I / 2) * 400, 800, 300, 300);
-        }
+  for (int i = 0; i < I; i++) {
+    sprintf(title, "Window %d", i);
+    if (i < I / 2) {
+      window[i] = creationwindow(title, i * 400, 0, 300, 300);
+    } else {
+      window[i] = creationwindow(title, (i - I / 2) * 400, 800, 300, 300);
+    }
+  }
+
+  /* Deplacement des fenetres */
+  SDL_DisplayMode screen;
+  SDL_GetCurrentDisplayMode(0, &screen);
+  printf("Screen resolution: %dx%d\n", screen.w, screen.h);
+
+  int step = screen.h / N;
+
+  for (int i = 0; i < I; i++) {
+    int xpos, ypos;
+
+    SDL_GetWindowPosition(window[i], &xpos, &ypos);
+    printf("Fenêtre %d: position avant déplacement: (%d, %d)\n", i, xpos, ypos);
+
+    if (i < I / 2) {
+      SDL_SetWindowPosition(window[i], xpos, ypos + step * i);
+    } else {
+      SDL_SetWindowPosition(window[i], xpos, ypos - step * (i - I / 2));
     }
 
-    /* Deplacement des fenetres */
-    SDL_DisplayMode screen;
-    SDL_GetCurrentDisplayMode(0, &screen);
-    printf("Screen resolution: %dx%d\n", screen.w, screen.h);
+    SDL_GetWindowPosition(window[i], &xpos, &ypos);
+    printf("Fenêtre %d: position après déplacement: (%d, %d)\n", i, xpos, ypos);
+  }
 
-    int step = screen.h / N;
+  SDL_Delay(5000);
 
-    for (int i = 0; i < I; i++) {
-        int xpos, ypos;
+  /* Fermetures des fenetres */
+  for (int i = 0; i < I; i++) {
+    SDL_DestroyWindow(window[i]);
+  }
 
-        SDL_GetWindowPosition(window[i], &xpos, &ypos);
-        printf("Fenêtre %d: position avant déplacement: (%d, %d)\n", i, xpos, ypos);
+  SDL_Quit();
 
-        if (i < I / 2) {
-            SDL_SetWindowPosition(window[i], xpos, ypos + step*i);
-        } else {
-            SDL_SetWindowPosition(window[i], xpos, ypos - step*( i-I/2));
-        }
-
-        SDL_GetWindowPosition(window[i], &xpos, &ypos);
-        printf("Fenêtre %d: position après déplacement: (%d, %d)\n", i, xpos, ypos);
-    }
-
-    SDL_Delay(5000);
-
-    /* Fermetures des fenetres */
-    for (int i = 0; i < I; i++) {
-        SDL_DestroyWindow(window[i]);
-    }
-
-    SDL_Quit();
-
-    return 0;
+  return 0;
 }
