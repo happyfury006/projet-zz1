@@ -241,24 +241,24 @@ arbre* generecoup(joueur* jo1,joueur* jo2,grille* plat,int profondeur,int profon
     arb->plateau=plat;
     for(int i=0; i<4; i++)
     {
-        if (jo1.piecerestante[i][1]>0)
+        if (jo1->piecerestante[i][1]>0)
         {
             for(int j=0; j<4; j++)
             {
                 for(int k=0; k<4; k++)
                 {
-                    if(valide(i, jo1.numJoueur, j, k, plat))
+                    if(valide(i, jo1->numJoueur, j, k, plat))
                     {
                         grille* platcopie=grillecopie(plat);
-                        platcopie=ajoutpiece(platcopie,jo1.piecerestante[i][0],jo1,j,k);
+                        platcopie=ajoutpiece(platcopie,jo1->piecerestante[i][0],jo1->numJoueur,j,k);
                         if (profondeur<profondeurmax)
                         {
                             profondeur-=1;
                             arbre* sousarb = arb->fils[0];
                             sousarb->derniercoup.x = j;
                             sousarb->derniercoup.y = k;
-                            sousarb->derniercoup.joueur = jo1.numJoueur;
-                            sousarb->derniercoup.forme = jo1.piecerestante[i][0];
+                            sousarb->derniercoup.joueur = jo1->numJoueur;
+                            sousarb->derniercoup.forme = jo1->piecerestante[i][0];
                             sousarb=generecoup(jo2,jo1,platcopie,profondeur,profondeurmax);
                         }
                         profondeur+=1;
