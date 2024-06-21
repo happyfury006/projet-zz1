@@ -1,12 +1,13 @@
 #include "IA.h"
 #include "jeu.h"
+#include "utils.h"
 #include <limits.h>
 #include <math.h>
 #include <stdlib.h>
 #include <stdbool.h>
 
 
-bool victoiretouteligne(grille*plat)
+bool victoiretouteligne(grille* plat)
 {
     for(int x=0; x<4; x++)
     {
@@ -182,21 +183,6 @@ int aligne(grille* plateau, int n){
 	return score;
 }
 
-int aligne3(grille*plat)
-{
-    int score = aligne(plat,3);
-    return score;
-}
-int aligne2(grille*plat)
-{
-    int score = aligne(plat,2);
-    return score;
-}
-int aligne1(grille*plat)
-{
-    int score = aligne(plat,1);
-    return score;
-}
 
 int evaluation(grille*plat, int profondeur)
 {
@@ -210,9 +196,9 @@ int evaluation(grille*plat, int profondeur)
             return -100000;
     }
 
-    int score3=aligne3(plat);
-    int score2=aligne2(plat);
-    int score1=aligne1(plat);
+    int score3=aligne(plat,3);
+    int score2=aligne(plat,2);
+    int score1=aligne(plat,1);
 
     if(paire)
     {
@@ -250,33 +236,32 @@ grille* grillecopie(grille* acopier) {
 }
 
 
-arbre* generecoup(joueur jo,grille* plat,int profondeur){
-    int index=0;
+arbre* generecoup(joueur jo1,joueur jo2,grille* plat,int profondeur,int profondeurmax){
     arbre* arb= (arbre*)malloc(sizeof(arbre));
     arb->plateau=plat;
     for(int i=0; i<4; i++)
     {
-        if (jo.piecerestante[i][1]>0)
+        if (jo1.piecerestante[i][1]>0)
         {
             for(int j=0; j<4; j++)
             {
                 for(int k=0; k<4; k++)
                 {
-                    if(valide(i, jo.numJoueur, j, k, plat->grid))
+                    if(valide(i, jo1.numJoueur, j, k, plat->grid))
                     {
                         grille* platcopie=grillecopie(plat);
-                        platcopie=ajoutpiece(*platcopie,jo.piecerestante[i][0],jo.numJoueur,j,k);
-                        if (index<profondeur)
+                        platcopie=ajoutpiece(platcopie,jo1.piecerestante[i][0],jo1.numJoueur,j,k);
+                        if (profondeur<profondeurmax)
                         {
-                            index+=1;
+                            profondeur-=1;
                             arbre* sousarb = arb->fils[0];
                             sousarb->derniercoup.x = j;
                             sousarb->derniercoup.y = k;
-                            sousarb->derniercoup.joueur = jo.numJoueur;
-                            sousarb->derniercoup.forme = jo.piecerestante[i][0];
-                            sousarb=generecoup(abs(jo.numJoueur-1),platcopie);
+                            sousarb->derniercoup.joueur = jo1.numJoueur;
+                            sousarb->derniercoup.forme = jo1.piecerestante[i][0];
+                            sousarb=generecoup(jo2,jo1,platcopie,profondeur,profondeurmax);
                         }
-                        prof-=1;
+                        profondeur+=1;
                     }
                 }
             }
@@ -329,7 +314,7 @@ int minmaxalphabeta(arbre* noeud, int profondeur, int maximizingPlayer, int alph
     if (maximizingPlayer) {
         int maxEval = INT_MIN;
         for (int i = 0; i < N && noeud->fils[i] != NULL; i++) {
-            int eval = minmax(noeud->fils[i], profondeur - 1, 0, alpha, beta);
+            int eval = minmaxalphabeta(noeud->fils[i], profondeur - 1, 0, alpha, beta);
             if (eval > maxEval) {
                 maxEval = eval;
             }
@@ -344,7 +329,7 @@ int minmaxalphabeta(arbre* noeud, int profondeur, int maximizingPlayer, int alph
     } else {
         int minEval = INT_MAX;
         for (int i = 0; i < N && noeud->fils[i] != NULL; i++) {
-            int eval = minmax(noeud->fils[i], profondeur - 1, 1, alpha, beta);
+            int eval = minmaxalphabeta(noeud->fils[i], profondeur - 1, 1, alpha, beta);
             if (eval < minEval) {
                 minEval = eval;
             }
