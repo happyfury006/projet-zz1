@@ -159,6 +159,45 @@ int minmax(arbre* noeud, int profondeur, int maximizingPlayer) {
 }
 
 
+int minmaxalphabeta(arbre* noeud, int profondeur, int maximizingPlayer, int alpha, int beta) {
+    if (profondeur == 0) {
+        return evaluer_plateau(noeud->plateau);
+    }
+
+    if (maximizingPlayer) {
+        int maxEval = INT_MIN;
+        for (int i = 0; i < N && noeud->fils[i] != NULL; i++) {
+            int eval = minmax(noeud->fils[i], profondeur - 1, 0, alpha, beta);
+            if (eval > maxEval) {
+                maxEval = eval;
+            }
+            if (eval > alpha) {
+                alpha = eval;
+            }
+            if (beta <= alpha) {
+                break;
+            }
+        }
+        return maxEval;
+    } else {
+        int minEval = INT_MAX;
+        for (int i = 0; i < N && noeud->fils[i] != NULL; i++) {
+            int eval = minmax(noeud->fils[i], profondeur - 1, 1, alpha, beta);
+            if (eval < minEval) {
+                minEval = eval;
+            }
+            if (eval < beta) {
+                beta = eval;
+            }
+            if (beta <= alpha) {
+                break;
+            }
+        }
+        return minEval;
+    }
+}
+
+
 coups trouver_meilleur_coup(arbre* racine, int profondeur) {
     int meilleur_valeur = INT_MIN;
     coups meilleur_coup;
