@@ -16,10 +16,10 @@ typedef struct {
     int selected;
 } Piece;
 
-struct Paire {
+typedef struct Paire {
     int premier;
     int deuxieme;
-};
+} Paire;
 
 
 // fichier d'entete classique ou l'on declare les types necessaires,            
