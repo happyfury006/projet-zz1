@@ -222,13 +222,13 @@ arbre *generecoup(joueur *jo1, joueur *jo2, grille *plat, int profondeur,
                                    jo1, j, k);
             if (profondeur < profondeurmax) {
               profondeur += 1;
-              arbre *sousarb = arb->fils[0];
+              arbre* sousarb;
+              sousarb = arb->fils[0];
+              sousarb = generecoup(jo2, jo1, platcopie, profondeur, profondeurmax);
               sousarb->derniercoup->x = j;
               sousarb->derniercoup->y = k;
               sousarb->derniercoup->joueur = jo1->numJoueur;
               sousarb->derniercoup->forme = jo1->piecerestante[i][0];
-              sousarb =
-                  generecoup(jo2, jo1, platcopie, profondeur, profondeurmax);
             }
             profondeur -= 1;
           }
