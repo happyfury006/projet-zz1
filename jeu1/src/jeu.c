@@ -103,8 +103,8 @@ bool valide(int forme,int joueur,int x, int y, grille plateau){
 	return possible;
 }
 
-grille ajoutpiece(grille plateau, piece pieceajoutee, int x, int y){
-	if (valide(pieceajoutee.formes,pieceajoutee.joueur,x,y,plateau) == true)
+grille ajoutpiece(grille plateau, int forme,int joueur, int x, int y){
+	if (valide(forme,joueur,x,y,plateau) == true)
 	{
 		plateau.grid[x][y] = &pieceajoutee;
 		return plateau;
