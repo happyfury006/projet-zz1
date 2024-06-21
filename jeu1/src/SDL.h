@@ -10,11 +10,11 @@ void play_with_texture_4(SDL_Texture* bg_texture, SDL_Texture* my_texture,
       SDL_Window* window,
       SDL_Renderer* renderer);
 
-typedef struct {
-    SDL_Texture *texture;
-    SDL_Rect rect;
-    int selected;
-} Piece;
+// typedef struct {
+//     SDL_Texture *texture;
+//     SDL_Rect rect;
+//     int selected;
+// } Piece;
 
 typedef struct Paire {
     int premier;
