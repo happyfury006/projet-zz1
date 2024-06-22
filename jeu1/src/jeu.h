@@ -17,6 +17,9 @@ typedef struct grille {
 joueur *creerjoueur(int numJoueur, int ia);
 piece *creerPiece(int forme, joueur *player);
 grille *creationplateau();
+void detruirejoueur(joueur *joueur);
+void detruirepiece(piece *piece);
+void detruireplateau(grille *plateau);
 bool valideligne(int x, int joueur, int forme, grille *plateau);
 bool validecolonne(int y, int joueur, int forme, grille *plateau);
 bool valideregion(int x, int y, int joueur, int forme, grille *plateau);

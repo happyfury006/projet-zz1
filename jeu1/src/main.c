@@ -15,10 +15,10 @@ int main() {
   printf("Le but est d'aligner 4 formes différentes soit en ligne, soit en "
          "colonne, soit en carré\n");
   printf("Voulez vous jouez seul en 1VSIA ou a 2 en 1VS1\n");
-  printf("(1,1VSIA), (2,1VS1):");
+  printf("(Tapez 1 pour 1VSIA), (Tapez 2 pour 1VS1):");
   int choix;
   scanf("%d", &choix);
-  grille *plateau = creationplateau();
+  
 
   if (choix == 1) {
     return jeuencours1VSIA();
