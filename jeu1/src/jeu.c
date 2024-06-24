@@ -176,8 +176,7 @@ bool victoireligne(int x, grille *plateau) {
   int i = 0;
   int compteur = 0;
   while (i < 4 && victoire == false) {
-    if (plateau->grid[x][i] != NULL &&
-        estdanslaliste(plateau->grid[x][i], lparcouru) == 0) {
+    if (plateau->grid[x][i] != NULL && estdanslaliste(plateau->grid[x][i], lparcouru) == 0) {
       ajoutliste(plateau->grid[x][i], lparcouru);
       compteur++;
     }
@@ -271,7 +270,7 @@ bool victoire(grille *plateau, int x, int y) {
 
 grille *demandepiece(grille *plateau, joueur *joueur) {
   // On demande au joueur ce qu'il veut jouer
-
+  printf("Joueur%d c'est a vous de jouez\n", joueur->numJoueur);
   printf("Entrez la forme de la piece que vous voulez jouer\n");
   scanf("%d", &forme);
   piece *pieceajoutee = creerPiece(forme, joueur);
@@ -320,6 +319,7 @@ bool jeuencours1VSIA() {
     }
     // IA joue
     plateau = newplateau;
+    printf("L'IA joue\n");
     arbre *arb = generecoup(joueurIA, joueur1, plateau, 0, joueurIA->ia);
     coups* coup = trouver_meilleur_coup(arb, joueurIA->ia);
     plateau = ajoutpiece(plateau, coup->forme, joueurIA, coup->x, coup->y);
@@ -345,7 +345,7 @@ bool jeuencours1VS1() {
 
     while (running == false) {
       // Joueur1 joue
-      printf("Joueur1 c'est a vous de jouez\n");
+      // printf("Joueur1 c'est a vous de jouez\n");
       newplateau = demandepiece(plateau, joueur1);
       affichageplateau(newplateau);
 
