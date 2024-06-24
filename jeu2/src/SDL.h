@@ -1,0 +1,5 @@
+#ifndef GARDIEN_UNIQUE_SDL_H
+#define GARDIEN_UNIQUE_SDL_H
+
+
+#endif
