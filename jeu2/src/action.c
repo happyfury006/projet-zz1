@@ -79,8 +79,9 @@ void echanger_pioche(sitjoueur* joueur1,sitjoueur* joueur2, int num_ressources, 
 
 void construction(sitjoueur* joueur1, int construction)
 {
-    // if()
-    // {
+    if()
+    {
         
-    // }
+    
+    }
 }  
