@@ -6,6 +6,13 @@
 #define NB_CONSTRUCTION 5
 #define TAILLE_MARCHER 5
 
+typedef struct carte{
+    int type;                 //0 = route | 1 = chevalier | ...
+    int nbr_points;          //nbr_points face 
+    SDL_texture *texture;
+    SDL_Rect rect;
+}carte;
+
 enum construction {ROUTE = 0, CHEVALIER = 1,COLONIE = 2, VILLE = 3, CARTE_DEVELOPPEMENT = 4};
 enum ressource {BOIS = 0, ARGILE = 1, MOUTON = 2, MINERAI = 3, BLE = 4};
 
