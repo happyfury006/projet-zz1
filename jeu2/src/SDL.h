@@ -7,5 +7,9 @@
 #include <math.h>
 #include "utils.h"
 
+typedef struct emplacement_carte{
+    int x;
+    int y;
+} emplacement_carte;
 
 #endif
