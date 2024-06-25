@@ -9,7 +9,7 @@
 int random(int N);
 int nbr_carte_liste(int liste[], int N);
 
-void deplacement(int joueur);
+//void deplacement(int joueur);
 void construction(sitjoueur* joueur1, int construction);  
 
 void defausse(sitjoueur* joueur1,sitjoueur* joueur2, int ressource1);
