@@ -13,8 +13,8 @@ void construction(sitjoueur* joueur1, int construction);
 
 void defausser(sitjoueur* joueur1,sitjoueur* joueur2, int ressource1);
 void piocher(sitjoueur* joueur1,sitjoueur* joueur2, int nombre_carte);
-void initialisation_marche(sitjoueur* joueur1,sitjoueur* joueur2);
-void echanger_marche(sitjoueur* joueur1,sitjoueur* joueur2);
+void initialisation_marchee(sitjoueur* joueur1,sitjoueur* joueur2);
+void echanger_marchee(sitjoueur* joueur1,sitjoueur* joueur2);
 void echanger_pioche(sitjoueur* joueur1,sitjoueur* joueur2, int num_ressources, ...);
 
 

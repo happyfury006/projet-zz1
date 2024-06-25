@@ -17,4 +17,5 @@ int nbr_carte_liste(int liste[], int N)
     {
         compteur+=liste[i];
     }
+    return compteur;
 }
