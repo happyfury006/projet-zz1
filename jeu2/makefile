@@ -1,6 +1,6 @@
 CXX=gcc
-CXXFLAGS=-g -Wall -Wextra -Wfloat-equal # -Wshadow -Werror
-LDFLAGS=-lm -lSDL2 -lSDL2_image #-fsanitize=address -fsanitize=undefined
+CXXFLAGS=-g -Wall -Wextra -Wfloat-equal -fsanitize=address -fsanitize=undefined # -Wshadow -Werror
+LDFLAGS=-lm -lSDL2 -lSDL2_image -fsanitize=address -fsanitize=undefined
 
 SRC_DIR=./src
 BUILD_DIR=./build
@@ -19,6 +19,7 @@ valgrind: $(EXEC)
 	valgrind --leak-check=full $(BUILD_DIR)/$(EXEC)
 
 $(BUILD_DIR)/%.o : $(SRC_DIR)/%.c
+	@mkdir -p build
 	$(CXX) $(CXXFLAGS) -o $@ -c $< $(LDFLAGS)
 
 $(EXEC) : $(OBJS)
