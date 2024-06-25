@@ -13,7 +13,7 @@
 void defausser(sitjoueur* joueur1,sitjoueur* joueur2, int ressource1);
 void piocher(sitjoueur* joueur1,sitjoueur* joueur2, int nombre_carte);
 void initialisation_marchee(sitjoueur* joueur1,sitjoueur* joueur2);
-void echanger_marchee(sitjoueur* joueur1,sitjoueur* joueur2);
+void echanger_marchee(sitjoueur* joueur1,sitjoueur* joueur2,int ressourcemain, int ressource);
 void echanger_pioche(sitjoueur* joueur1,sitjoueur* joueur2, int num_ressources, ...);
 
 
