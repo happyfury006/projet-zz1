@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include "situation.h"
 #include "victoire.h"
-
+#include "utils.h"
 
 
 bool victoire_point_obj(sitjoueur* joueur)
@@ -18,7 +18,7 @@ bool victoire_point_obj(sitjoueur* joueur)
 
 bool victoire_point_pioche(sitjoueur* joueur)
 {
-  if (joueur->nb_cartes_pioche == 0)
+  if (nbr_carte_liste(joueur->pioche,5 )== 0)
   {
     return true;
   }
