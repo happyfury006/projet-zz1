@@ -187,7 +187,7 @@ int main(int argc, char **argv) {
 
   flip = SDL_FLIP_HORIZONTAL;
 
-  for (int frame = 0; frame < 100; frame++) 
+  for (int frame = 0; frame < 300; frame++) 
   {
     displaybackground(bg, window, renderer);
 
