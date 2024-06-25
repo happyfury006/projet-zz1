@@ -22,7 +22,7 @@ typedef struct tab_carte_construction {
   struct carte* tab_carte_construction[NB_CONSTRUCTION+2];
 } tab_carte_construction;
 
-//Enumeration
+//E
 enum construction {ROUTE = 0, CHEVALIER = 1,COLONIE = 2, VILLE = 3, CARTE_DEVELOPPEMENT = 4};
 enum ressource {BOIS = 0, ARGILE = 1, MOUTON = 2, MINERAI = 3, BLE = 4};
 

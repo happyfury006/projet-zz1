@@ -42,9 +42,15 @@ bool valide_construction(sitjoueur* joueur,int construction) {
     tabconstruction tab = guide_construction();
     
     for (int i = 0; i < NB_RESSOURCE; i++) {
-      if (joueur->mainjoueur[i] < tab.tabconstruction[construction].tabressource[i]) {
-        return false;
-      }
+        if (joueur->mainjoueur[i] < tab.tabconstruction[construction].tabressource[i]) {
+            return false;
+        }
+        if (construction== VILLE){
+            if (joueur->tab_constru_joueur[construction-1] - joueur->tab_constru_joueur[construction] == 0)
+            {
+            return false;
+            } 
+        }  
     }  
     return true;
 }
