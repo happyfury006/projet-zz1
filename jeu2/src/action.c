@@ -67,12 +67,12 @@ void echanger_pioche(sitjoueur* joueur1,sitjoueur* joueur2, int num_ressources, 
         for (int i = 0; i < num_ressources; i++) 
         {
             int ressource = va_arg(args, int);
-            defausse(joueur1,joueur2,ressource);
+            defausser(joueur1,joueur2,ressource);
         }
 
         va_end(args);
 
-        pioche(joueur1,joueur2,num_ressources);
+        piocher(joueur1,joueur2,num_ressources);
     }
 }
 
