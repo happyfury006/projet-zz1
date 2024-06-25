@@ -22,7 +22,7 @@ int nbr_carte_liste(int liste[], int N)
 }
 
 
-void defausse(sitjoueur* joueur1,sitjoueur* joueur2, int ressource1)
+void defausser(sitjoueur* joueur1,sitjoueur* joueur2, int ressource1)
 {
     if (joueur1->mainjoueur[ressource1] > 0) 
     {
@@ -33,7 +33,7 @@ void defausse(sitjoueur* joueur1,sitjoueur* joueur2, int ressource1)
 }
 
 
-void pioche(sitjoueur* joueur1,sitjoueur* joueur2, int nombre_carte)
+void piocher(sitjoueur* joueur1,sitjoueur* joueur2, int nombre_carte)
 {
     for (int i = 0; i < nombre_carte; i++) 
     {
@@ -46,7 +46,7 @@ void pioche(sitjoueur* joueur1,sitjoueur* joueur2, int nombre_carte)
 
 
 
-void echange_marchee(sitjoueur* joueur1,sitjoueur* joueur2,int ressourcemain, int ressource)
+void echanger_marchee(sitjoueur* joueur1,sitjoueur* joueur2,int ressourcemain, int ressource)
 {
     if (joueur1->mainjoueur[ressourcemain]>0 || joueur1->marchee[ressource]>0)
     {
@@ -61,7 +61,7 @@ void echange_marchee(sitjoueur* joueur1,sitjoueur* joueur2,int ressourcemain, in
 
 
 
-void echange_pioche(sitjoueur* joueur1,sitjoueur* joueur2, int num_ressources, ...)
+void echanger_pioche(sitjoueur* joueur1,sitjoueur* joueur2, int num_ressources, ...)
 {
     if(num_ressources<=joueur1->nb_echanges_marchee || num_ressources<= nbr_carte_liste(joueur1->pioche))
     {
