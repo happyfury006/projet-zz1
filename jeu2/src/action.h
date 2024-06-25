@@ -13,11 +13,11 @@ int nbr_carte_liste(int liste[], int N);
 //void deplacement(int joueur);
 void construction(sitjoueur* joueur1, int construction);  
 
-void defausse(sitjoueur* joueur1,sitjoueur* joueur2, int ressource1);
-void pioche(sitjoueur* joueur1,sitjoueur* joueur2);
+void defausser(sitjoueur* joueur1,sitjoueur* joueur2, int ressource1);
+void piocher(sitjoueur* joueur1,sitjoueur* joueur2);
 
-void echange_marche(sitjoueur* joueur1,sitjoueur* joueur2);
-void echange_pioche(sitjoueur* joueur1,sitjoueur* joueur2, int num_ressources, ...);
+void echanger_marche(sitjoueur* joueur1,sitjoueur* joueur2);
+void echanger_pioche(sitjoueur* joueur1,sitjoueur* joueur2, int num_ressources, ...);
 
 
 #endif // GARDIEN_UNIQUE_ACTION_H
