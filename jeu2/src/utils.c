@@ -4,6 +4,8 @@
 #include <time.h>
 #include "utils.h"
 
+
+
 carte* creation_carte(int carte_construction)
 {
     carte* carte1 = malloc(sizeof(carte));
@@ -56,7 +58,7 @@ tab_carte_construction creation_tab_carte_construction()
 
 int randomiser(int N) 
 {
-    srand(time(NULL));
+    
     return rand() % N;
 }
 

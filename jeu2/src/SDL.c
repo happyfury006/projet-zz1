@@ -108,7 +108,7 @@ void cleanup(SDL_Window* window, SDL_Renderer* renderer, tab_carte_construction*
     SDL_Quit();
 }
 
-int main(int argc, char* argv[]) {
+int mainSDL(int argc, char* argv[]) {
     (void)argc;
     (void)argv;
     SDL_Window *window = NULL;

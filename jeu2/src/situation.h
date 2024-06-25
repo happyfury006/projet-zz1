@@ -22,6 +22,6 @@ typedef struct situation {
 
 //Fonctions
 sitjoueur* creation_situation(int joueur);
-sitjoueur* initilisation_depart();
+sitjoueur* initilisation_depart(sitjoueur* joueur1,sitjoueur* joueur2);
 void destruction_situation(sitjoueur* s);
 #endif // GARDIEN_UNIQUE_SITUATION_H
