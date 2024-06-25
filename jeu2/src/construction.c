@@ -9,9 +9,9 @@
 
 void actualiser_board(sitjoueur* joueur1,sitjoueur* joueur2, int construc)
 {
-    joueur1->tab_constru_board[construct]--;   //on enleve la carte de sa pile
-    joueur2->tab_constru_board[construct]--;
-    joueur1->tab_constru_joueur[construct]++;  //on ajoute la carte sur le board du joueur
+    joueur1->tab_constru_board[construc]--;   //on enleve la carte de sa pile
+    joueur2->tab_constru_board[construc]--;
+    joueur1->tab_constru_joueur[construc]++;  //on ajoute la carte sur le board du joueur
 }
 
 
@@ -20,7 +20,7 @@ void construction_route(sitjoueur* joueur1,sitjoueur* joueur2, int construc)
     joueur1->mainjoueur[0]--;  //on enleve 1 bois
     joueur1->mainjoueur[1]--;  //1 argile
     actualiser_board(joueur1,joueur2,construc);
-    if(joueur1->tab_constru_joueur[construct]%2=1)
+    if(joueur1->tab_constru_joueur[construc]%2 == 1)
     {
         joueur1->nb_echanges_marchee+=1;
     }
@@ -28,7 +28,6 @@ void construction_route(sitjoueur* joueur1,sitjoueur* joueur2, int construc)
     {
         joueur1->compteur_points_joueur+=1;
     }
-    break;
 }
 
 
@@ -38,7 +37,7 @@ void construction_chevalier(sitjoueur* joueur1,sitjoueur* joueur2, int construc)
     joueur1->mainjoueur[3]--;  //1 minerai
     joueur1->mainjoueur[4]--;  //1 blé
     actualiser_board(joueur1,joueur2,construc);
-    if(joueur1->tab_constru_joueur[construct]%2=1)
+    if(joueur1->tab_constru_joueur[construc]%2 == 1)
     {
         joueur1->nb_cartes_mainjoueur+=1;
     }
@@ -80,7 +79,7 @@ void construction_developpement(sitjoueur* joueur1,sitjoueur* joueur2, int const
 
 void construction(sitjoueur* joueur1,sitjoueur* joueur2, carte* carte_construction)
 {
-    int construc = carte_construction
+    int construc = carte_construction;
     switch (construc){
         case 0 :  //route
             construction_route(joueur1,joueur2,construc);
