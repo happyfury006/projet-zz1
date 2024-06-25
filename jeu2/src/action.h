@@ -1,10 +1,11 @@
 #ifndef GARDIEN_UNIQUE_ACTION_H
 #define GARDIEN_UNIQUE_ACTION_H
 
-#include <stdio.h>
-#include <stdarg.h>
-#include <stdlib.h>
-#include <time.h>
+// #include <stdio.h>
+// #include <stdarg.h>
+// #include <stdlib.h>
+// #include <time.h>
+#include "situation.h"
 
 int random(int N);
 int nbr_carte_liste(int liste[], int N);
