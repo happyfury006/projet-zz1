@@ -1,3 +1,5 @@
+
+
 #include "SDL.h"
 #include <SDL2/SDL.h>
 #include <stdio.h>
@@ -51,20 +53,20 @@ void initialisation()
     SDL_Texture *mouton_texture;
     SDL_Texture *paille_texture;
     SDL_Texture *dos_carte_texture;
-    bg_texture = IMG_LoadTexture(renderer, "../images/fondblanc.png");
-    chevalier_recto_texture = IMG_LoadTexture(renderer, "../images/chevalier_recto.png");
-    chevalier_verso_texture = IMG_LoadTexture(renderer, "../images/chevalier_verso.png");
-    route_recto_texture = IMG_LoadTexture(renderer, "../images/route_recto.png");
-    route_verso_texture = IMG_LoadTexture(renderer, "../images/route_verso.png");
-    colonie_texture = IMG_LoadTexture(renderer, "../images/colonie.png");
-    ville_texture = IMG_LoadTexture(renderer, "../images/ville.png");
-    developpement_texture = IMG_LoadTexture(renderer, "../images/developpement.png");
-    bois_texture = IMG_LoadTexture(renderer, "../images/bois.png");
-    argile_texture = IMG_LoadTexture(renderer, "../images/argile.png");
-    pierre_texture = IMG_LoadTexture(renderer, "../images/pierre.png");
-    mouton_texture = IMG_LoadTexture(renderer, "../images/mouton.png");
-    paille_texture = IMG_LoadTexture(renderer, "../images/paille.png");
-    dos_carte_texture = IMG_LoadTexture(renderer, "../images/dos_carte.png");
+    bg_texture = IMG_LoadTexture(renderer, "../Images/fondblanc.png");
+    chevalier_recto_texture = IMG_LoadTexture(renderer, "../Images/chevalier_recto.png");
+    chevalier_verso_texture = IMG_LoadTexture(renderer, "../Images/chevalier_verso.png");
+    route_recto_texture = IMG_LoadTexture(renderer, "../Images/route_recto.png");
+    route_verso_texture = IMG_LoadTexture(renderer, "../Images/route_verso.png");
+    colonie_texture = IMG_LoadTexture(renderer, "../Images/colonie.png");
+    ville_texture = IMG_LoadTexture(renderer, "../Images/ville.png");
+    developpement_texture = IMG_LoadTexture(renderer, "../Images/developpement.png");
+    bois_texture = IMG_LoadTexture(renderer, "../Images/bois.png");
+    argile_texture = IMG_LoadTexture(renderer, "../Images/argile.png");
+    pierre_texture = IMG_LoadTexture(renderer, "../Images/pierre.png");
+    mouton_texture = IMG_LoadTexture(renderer, "../Images/mouton.png");
+    paille_texture = IMG_LoadTexture(renderer, "../Images/paille.png");
+    dos_carte_texture = IMG_LoadTexture(renderer, "../Images/dos_carte.png");
 }
 
 void destruction(SDL_Texture* texture,SDL_Window* window,SDL_Renderer* renderer)
