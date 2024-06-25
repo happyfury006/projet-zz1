@@ -4,8 +4,7 @@
 #include <string.h>
 //#include <time.h>
 #include "utils.h"
-
-
+#include "action.h"
 
 
 
@@ -47,8 +46,17 @@ sitjoueur* creation_situation(int joueur)
   return s;
 }
 
-sitjoueur* initilisation_depart(sitjoueur* joueur){
+sitjoueur* initilisation_depart(){
+  sitjoueur* joueur1 = creation_situation(1);
+  sitjoueur* joueur2 = creation_situation(2);
+  //Initialisation des cartes ressources du joueur, du marcher après la premiere pioche de début de partie
+
+  piocher(joueur1,joueur2,3);
+  piocher(joueur2,joueur1,3);
   
+  
+  
+
 }
 
 void destruction_situation(sitjoueur* s)
