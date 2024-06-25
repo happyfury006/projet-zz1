@@ -1,31 +1,57 @@
+#include "situation.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 //#include <time.h>
-#include "situation.h"
+#include "utils.h"
 
 
 
-situation* creation_situation(int joueur, int mainjoueur[5], int compteur_points_joueur, int nb_echanges, int nb_cartes_mainjoueur, int pioche[5], int nb_cartes_pioche, int defausse[5], int tab_constru_joueur[4], int tab_constru_advers[4], int tab_constru_board[4], int marcher[5])
+
+
+sitjoueur* creation_situation(int joueur)
 {
-  situation* s = malloc(sizeof(situation));
+  sitjoueur* s = malloc(sizeof(sitjoueur));
   s->joueur = joueur;
-  for (int i = 0; i < 5; i++)
+  //Initialisation des cartes ressources du joueur, de la defausse, du marcher, des constructions du joueur et de l'adversaire
+  for (int i = 0; i < NB_RESSOURCE; i++)
   {
-    s->mainjoueur[i] = mainjoueur[i];
-    s->pioche[i] = pioche[i];
-    s->defausse[i] = defausse[i];
-    s->marcher[i] = marcher[i];
+    s->mainjoueur[i] = 0;
+    s->defausse[i] = 0;
+    s->marchee[i] = 0;
+    s->tab_constru_joueur[i] = 0;
+    s->tab_constru_advers[i] = 0;
+    
   }
-  s->compteur_points_joueur = compteur_points_joueur;
-  s->nb_echanges = nb_echanges;
-  s->nb_cartes_mainjoueur = nb_cartes_mainjoueur;
-  s->nb_cartes_pioche = nb_cartes_pioche;
-  for (int i = 0; i < 4; i++)
-  {
-    s->tab_constru_joueur[i] = tab_constru_joueur[i];
-    s->tab_constru_advers[i] = tab_constru_advers[i];
-    s->tab_constru_board[i] = tab_constru_board[i];
-  }
+  //Initialisation des cartes ressources de la pioche
+  s->pioche[BOIS] = 11;
+  s->pioche[ARGILE] = 11;
+  s->pioche[MOUTON] = 15;
+  s->pioche[BLE] = 14;
+  s->pioche[MINERAI] = 11;
+
+  //Initialisation des cartes du board construction
+  s->tab_constru_board[ROUTE] = 9;
+  s->tab_constru_board[CHEVALIER] = 14;
+  s->tab_constru_board[COLONIE] = 15;
+  s->tab_constru_board[VILLE] = 15;
+  s->tab_constru_board[CARTE_DEVELOPPEMENT] = 9;
+
+
+  s->compteur_points_joueur = 0;
+  s->nb_echanges_marchee = 0;
+  s->nb_cartes_mainjoueur = 3;
+ 
+  
+  
   return s;
+}
+
+sitjoueur* initilisation_depart(sitjoueur* joueur){
+  
+}
+
+void destruction_situation(sitjoueur* s)
+{
+  free(s);
 }
