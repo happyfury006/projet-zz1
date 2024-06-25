@@ -1,6 +1,9 @@
-#ifdef GARDIEN_UNIQUE_VICTOIRE_H
+#ifndef GARDIEN_UNIQUE_VICTOIRE_H
 #define GARDIEN_UNIQUE_VICTOIRE_H
+#include "situation.h"
 
-void victoire(int joueur, int *tab_constru_joueur, int *tab_constru_advers, int *tab_constru_board, int *compteur_points_joueur);
+bool victoire_point_obj(sitjoueur* joueur);
+bool victoire_point_pioche(sitjoueur* joueur);
+int victoire(sitjoueur* joueur1,sitjoueur* joueur2);
 
 #endif // GARDIEN_UNIQUE_VICTOIRE_H
