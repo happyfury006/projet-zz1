@@ -12,6 +12,7 @@ typedef struct tabconstruction {
   struct ressources tabconstruction[NB_CONSTRUCTION];
 } tabconstruction;
 
+//fonctions
 tabconstruction creation_guide_construction();
 tabconstruction guide_construction();
 void destruction_guide_construction(tabconstruction* tab);

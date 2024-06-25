@@ -10,7 +10,6 @@
 
 //void deplacement(int joueur);
 void construction(sitjoueur* joueur1, int construction);  
-
 void defausser(sitjoueur* joueur1,sitjoueur* joueur2, int ressource1);
 void piocher(sitjoueur* joueur1,sitjoueur* joueur2, int nombre_carte);
 void initialisation_marchee(sitjoueur* joueur1,sitjoueur* joueur2);

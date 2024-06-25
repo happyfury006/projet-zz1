@@ -20,6 +20,7 @@ typedef struct situation {
 
 } sitjoueur;
 
+//Fonctions
 sitjoueur* creation_situation(int joueur);
 sitjoueur* initilisation_depart();
 void destruction_situation(sitjoueur* s);
