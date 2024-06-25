@@ -8,8 +8,7 @@
 #include "situation.h"
 
 
-//void deplacement(int joueur);
-void construction(sitjoueur* joueur1, int construction);  
+//void deplacement(int joueur); 
 
 void defausser(sitjoueur* joueur1,sitjoueur* joueur2, int ressource1);
 void piocher(sitjoueur* joueur1,sitjoueur* joueur2, int nombre_carte);
