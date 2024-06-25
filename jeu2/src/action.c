@@ -6,9 +6,6 @@
 #include "utils.h"
 
 
-
-
-
 void defausser(sitjoueur* joueur1,sitjoueur* joueur2, int ressource1)
 {
     if (joueur1->mainjoueur[ressource1] > 0) 
@@ -76,12 +73,3 @@ void echanger_pioche(sitjoueur* joueur1,sitjoueur* joueur2, int num_ressources, 
     }
 }
 
-
-void construction(sitjoueur* joueur1, int construction)
-{
-    if()
-    {
-        
-    
-    }
-}  
