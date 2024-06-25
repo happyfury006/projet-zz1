@@ -15,6 +15,6 @@ typedef struct tabconstruction {
 tabconstruction creation_guide_construction();
 tabconstruction guide_construction();
 void destruction_guide_construction(tabconstruction* tab);
-bool valide_construction(sitjoueur* joueur);
+bool valide_construction(sitjoueur* joueurn,int construction);
 
 #endif
