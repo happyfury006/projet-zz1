@@ -3,23 +3,10 @@
 #include <stdarg.h>
 #include <time.h>
 #include "action.h"
+#include "utils.h"
 
 
-int random(int N) 
-{
-    srand(time(NULL));
-    return rand() % N;
-}
 
-
-int nbr_carte_liste(int liste[], int N)
-{
-    int compteur=0;
-    for (int i=0; i<N; i++)
-    {
-        compteur+=liste[i];
-    }
-}
 
 
 void defausser(sitjoueur* joueur1,sitjoueur* joueur2, int ressource1)
@@ -63,7 +50,7 @@ void echanger_marchee(sitjoueur* joueur1,sitjoueur* joueur2,int ressourcemain, i
 
 void echanger_pioche(sitjoueur* joueur1,sitjoueur* joueur2, int num_ressources, ...)
 {
-    if(num_ressources<=joueur1->nb_echanges_marchee || num_ressources<= nbr_carte_liste(joueur1->pioche))
+    if(num_ressources<=joueur1->nb_echanges_marchee || num_ressources<= nbr_carte_liste(joueur1->pioche,5))
     {
         va_list args;
         va_start(args, num_ressources);
