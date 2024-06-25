@@ -9,7 +9,7 @@
 enum construction {ROUTE = 0, CHEVALIER = 1,COLONIE = 2, VILLE = 3, CARTE_DEVELOPPEMENT = 4};
 enum ressource {BOIS = 0, ARGILE = 1, MOUTON = 2, MINERAI = 3, BLE = 4};
 
-int random(int N);
+int nbr_randomiser(int N);
 int nbr_carte_liste(int liste[], int N);
 
 #endif

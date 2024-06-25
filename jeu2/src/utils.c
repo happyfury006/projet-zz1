@@ -3,7 +3,7 @@
 #include <stdbool.h>
 #include "utils.h"
 
-int random(int N) 
+int randomiser(int N) 
 {
     srand(time(NULL));
     return rand() % N;
