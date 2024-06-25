@@ -24,13 +24,22 @@ void piocher(sitjoueur* joueur1,sitjoueur* joueur2, int nombre_carte)
 {
     for (int i = 0; i < nombre_carte; i++) 
     {
-        int nbr_random=random(5);
+        int nbr_random=randomiser(5);
         joueur1->pioche[nbr_random]--;
         joueur2->pioche[nbr_random]--;
         joueur1->mainjoueur[nbr_random]++;
     }
 }
-
+void initialisation_marchee(sitjoueur* joueur1,sitjoueur* joueur2)
+{
+    for (int i = 0; i < TAILLE_MARCHER; i++)
+    {
+        int nbr_random=randomiser(5);
+        joueur1->marchee[nbr_random]++;
+        joueur2->marchee[nbr_random]++;
+    }
+    
+}
 
 
 void echanger_marchee(sitjoueur* joueur1,sitjoueur* joueur2,int ressourcemain, int ressource)

@@ -53,10 +53,8 @@ sitjoueur* initilisation_depart(){
 
   piocher(joueur1,joueur2,3);
   piocher(joueur2,joueur1,3);
+  initialisation_marchee(joueur1,joueur2);
   
-  
-  
-
 }
 
 void destruction_situation(sitjoueur* s)
