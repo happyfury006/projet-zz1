@@ -36,13 +36,21 @@ void phase_echange(sitjoueur* joueur1,sitjoueur* joueur2){
     else
     {
         for (int i = 0; i < nb_echange; i++){ 
+          
         printf("Quel carte de votre main voulez vous echanger avec le marche ?\n");
         int choix_main=0;
         scanf("%d",&choix_main);
+        if (joueur1->mainjoueur[choix_main]>0)
+        {
         printf("Quel carte du marche voulez vous echanger  ?\n");
         int choix_marche=0;
         scanf("%d",&choix_marche);
         echanger_marchee(joueur1,joueur2,choix_main,choix_marche);
+        }
+        else
+        {
+          printf("Echange impossible\n");
+        }
       }      
     }
   }
@@ -71,7 +79,7 @@ void phase_construction(sitjoueur* joueur1,sitjoueur* joueur2){
 void partie(sitjoueur* joueur1,sitjoueur* joueur2 ){
   int tour=1;
   initilisation_depart(joueur1,joueur2);
-  affichage(joueur1,joueur2);
+  // affichage(joueur1,joueur2);
   while(1){
     //Debut du tour
     printf("=============\n ");
@@ -79,32 +87,42 @@ void partie(sitjoueur* joueur1,sitjoueur* joueur2 ){
     printf("=============\n ");
     printf("\n");
     //joueur1
-    printf("Joueur 1\n");
-    phase_pioche(joueur1,joueur2);
     affichage(joueur1,joueur2);
-    
+    printf("----------------\n");
+    printf("Tour Joueur 1\n");
+    phase_pioche(joueur1,joueur2);
+    affichage_joueur(joueur1);
+    affichage_board(joueur1);
     printf("Action joueur 1\n");
     phase_echange(joueur1,joueur2);
-    affichage(joueur1,joueur2);
+    affichage_joueur(joueur1);
+    affichage_board(joueur1);
     phase_construction(joueur1,joueur2);
-    affichage(joueur1,joueur2);
-    //Joueur 2
-    printf("Joueur 2\n");
-    phase_pioche(joueur2,joueur1);
-    affichage(joueur1,joueur2);
-    
-    printf("Action joueur 2\n");
-    phase_echange(joueur2,joueur1);
-    affichage(joueur1,joueur2);
-    phase_construction(joueur2,joueur1);
-    affichage(joueur1,joueur2);
-
-    tour++;
+    affichage_joueur(joueur1);
+    affichage_board(joueur1);
 
     if(victoire(joueur1,joueur2)==1){
       printf("Victoire joueur 1\n");
       break;
     }
+    //Joueur 2
+    printf("----------------\n");
+    printf("Tour Joueur 2\n");
+    phase_pioche(joueur2,joueur1);
+    affichage_joueur(joueur2);
+    affichage_board(joueur2);
+    
+    printf("Action joueur 2\n");
+    phase_echange(joueur2,joueur1);
+    affichage_joueur(joueur2);
+    affichage_board(joueur2);
+    phase_construction(joueur2,joueur1);
+    affichage_joueur(joueur2);
+    affichage_board(joueur2);
+
+    tour++;
+
+    
     if(victoire(joueur1,joueur2)==2){
       printf("Victoire joueur 2\n");
       break;
