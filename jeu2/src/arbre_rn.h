@@ -1,6 +1,10 @@
 #ifndef GARDIEN_UNIQUE_ARBRE_RN_H
 #define GARDIEN_UNIQUE_ARBRE_RN_H
 
+#include "situation.h"
+#include "coups.h"
+
+
 typedef enum { RED, BLACK } Color;
 
 typedef struct Node {
@@ -9,6 +13,11 @@ typedef struct Node {
     struct Node* left;
     struct Node* right;
     struct Node* parent;
+    struct situation* joueur1;
+    struct coups* coup_possible;
+    int visite;
+    int victoire;
+    float esperance;
 } Node;
 
 typedef struct RBTree {
