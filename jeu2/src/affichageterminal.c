@@ -19,6 +19,12 @@ void affichagepioche(sitjoueur* joueur){
     }
   printf("\n"); 
 }
+void affichagedefausse(sitjoueur* joueur){
+  for(int i=0; i<NB_RESSOURCE; i++){
+    printf(" [%d] ",joueur->defausse[i]);      
+    }
+  printf("\n"); 
+}
 void affichagemarchee(sitjoueur* joueur){
   for(int i=0; i<NB_RESSOURCE; i++){
     printf(" [%d] ",joueur->marchee[i]);      
@@ -39,23 +45,36 @@ void affichagetab_constru_joueur(sitjoueur* joueur){
 }
 
 void affichage(sitjoueur* joueur1, sitjoueur* joueur2){
-  printf("Joueur 1\n");
   printf("----------------\n");
+  printf("\n");
+  printf("Joueur 1\n");
+  printf("================\n");
   printf("Main joueur 1\n");
   affichagemainjoueur(joueur1);
   printf("Tab constru joueur 1\n");
   affichagetab_constru_joueur(joueur1);
+  printf("\n");
+  printf("----------------\n");
+  printf("\n");
+  printf("Situation Board\n");
+  printf("================\n");
   printf("Tab constru board\n");
   affichagetab_constru_board(joueur1);
-  printf("Joueur 2\n");
+  printf("Pioche \n");
+  affichagepioche(joueur2);
+  printf("Defausse \n");
+  affichagedefausse(joueur2);
+  printf("Marchee \n");
+  affichagemarchee(joueur2);
+  printf("\n");
   printf("----------------\n");
+  printf("\n");
+  printf("Joueur 2\n");
+  printf("================\n");
   printf("Main joueur 2\n");
   affichagemainjoueur(joueur2);
-  printf("Pioche joueur 2\n");
-  affichagepioche(joueur2);
-  printf("Marchee joueur 2\n");
-  affichagemarchee(joueur2);
   printf("Tab constru joueur 2\n");
   affichagetab_constru_joueur(joueur2);
+  printf("\n");
 
 }

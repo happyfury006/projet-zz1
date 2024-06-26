@@ -1,6 +1,6 @@
 CXX=gcc
-CXXFLAGS=-g -Wall -Wextra -Wfloat-equal -fsanitize=address -fsanitize=undefined # -Wshadow -Werror
-LDFLAGS=-lm -lSDL2 -lSDL2_image -fsanitize=address -fsanitize=undefined
+CXXFLAGS=-g -Wall -Wextra -Wfloat-equal -fsanitize=address -fsanitize=undefined -fno-omit-frame-pointer# -Wshadow -Werror
+LDFLAGS=-lm -lSDL2 -lSDL2_image -fsanitize=address -fsanitize=undefined -fno-omit-frame-pointer
 
 SRC_DIR=./src
 BUILD_DIR=./build

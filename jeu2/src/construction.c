@@ -77,9 +77,9 @@ void construction_developpement(sitjoueur* joueur1,sitjoueur* joueur2, int const
 }
 
 
-void construction(sitjoueur* joueur1,sitjoueur* joueur2, carte* carte_construction)
+void construction(sitjoueur* joueur1,sitjoueur* joueur2, int construc)
 {
-    int construc = carte_construction;
+    // int construc = carte_construction;
     switch (construc){
         case 0 :  //route
             construction_route(joueur1,joueur2,construc);
