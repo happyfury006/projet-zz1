@@ -71,3 +71,30 @@ int nbr_carte_liste(int liste[], int N)
     }
     return compteur;
 }
+
+
+unsigned long hash(int echange_pioche[5], int construction, int carte_donnee_marche[5], int carte_recu_marche[5]) {
+    unsigned long hash = 5381;
+    int i;
+
+    // Hash the echange_pioche array
+    for (i = 0; i < 5; i++) {
+        hash = ((hash << 5) + hash) + echange_pioche[i]; // hash * 33 + echange_pioche[i]
+    }
+
+    // Hash the construction integer
+    hash = ((hash << 5) + hash) + construction;
+
+    // Hash the carte_donnee_marche array
+    for (i = 0; i < 5; i++) {
+        hash = ((hash << 5) + hash) + carte_donnee_marche[i]; // hash * 33 + carte_donnee_marche[i]
+    }
+
+    // Hash the carte_recu_marche array
+    for (i = 0; i < 5; i++) {
+        hash = ((hash << 5) + hash) + carte_recu_marche[i]; // hash * 33 + carte_recu_marche[i]
+    }
+
+    return hash;
+}
+
