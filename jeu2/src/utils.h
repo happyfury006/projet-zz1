@@ -31,5 +31,6 @@ carte* creation_carte(int type);
 tab_carte_construction creation_tab_carte_construction();
 int randomiser(int N);
 int nbr_carte_liste(int liste[], int N);
+unsigned long hash(int echange_pioche[5], int construction, int carte_donnee_marche[5], int carte_recu_marche[5]);
 
 #endif
