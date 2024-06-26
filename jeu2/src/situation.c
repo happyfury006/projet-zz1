@@ -51,8 +51,8 @@ sitjoueur* initilisation_depart(sitjoueur* joueur1,sitjoueur* joueur2){
   // sitjoueur* joueur2 = creation_situation(2);
   //Initialisation des cartes ressources du joueur, du marcher après la premiere pioche de début de partie
 
-  piocher(joueur1,joueur2,3);
-  piocher(joueur2,joueur1,3);
+  // piocher(joueur1,joueur2,3);
+  // piocher(joueur2,joueur1,3);
   initialisation_marchee(joueur1,joueur2);
   
 }
