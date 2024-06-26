@@ -27,13 +27,25 @@ void defausser(sitjoueur* joueur1,sitjoueur* joueur2, int ressource1)
 
 void piocher(sitjoueur* joueur1,sitjoueur* joueur2, int nombre_carte)
 {
-    for (int i = 0; i < nombre_carte; i++) 
+    // for (int i = 0; i < nombre_carte; i++) 
+    // {
+    //     int nbr_random=randomiser(5);
+    //     joueur1->pioche[nbr_random]--;
+    //     joueur2->pioche[nbr_random]--;
+    //     joueur1->mainjoueur[nbr_random]++;
+    // }
+    while (nombre_carte>0)
     {
         int nbr_random=randomiser(5);
-        joueur1->pioche[nbr_random]--;
-        joueur2->pioche[nbr_random]--;
-        joueur1->mainjoueur[nbr_random]++;
+        if (joueur1->pioche[nbr_random]>0)
+        {
+            joueur1->pioche[nbr_random]--;
+            joueur2->pioche[nbr_random]--;
+            joueur1->mainjoueur[nbr_random]++;
+            nombre_carte--;
+        }
     }
+    
 }
 void initialisation_marchee(sitjoueur* joueur1,sitjoueur* joueur2)
 {

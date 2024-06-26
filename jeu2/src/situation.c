@@ -18,9 +18,16 @@ sitjoueur* creation_situation(int joueur)
     s->mainjoueur[i] = 0;
     s->defausse[i] = 0;
     s->marchee[i] = 0;
-    s->tab_constru_joueur[i] = 0;
+    if (i==0 || i==1)
+    {
+      s->tab_constru_joueur[i] = 1;
+      s->tab_constru_advers[i] = 1;
+    }
+    else
+    {
+      s->tab_constru_joueur[i] = 0;
     s->tab_constru_advers[i] = 0;
-    
+    }
   }
   //Initialisation des cartes ressources de la pioche
   s->pioche[BOIS] = 11;
@@ -30,16 +37,16 @@ sitjoueur* creation_situation(int joueur)
   s->pioche[MINERAI] = 11;
 
   //Initialisation des cartes du board construction
-  s->tab_constru_board[ROUTE] = 9;
-  s->tab_constru_board[CHEVALIER] = 14;
+  s->tab_constru_board[ROUTE] = 9-s->tab_constru_joueur[ROUTE]-s->tab_constru_advers[ROUTE];
+  s->tab_constru_board[CHEVALIER] = 14-s->tab_constru_joueur[CHEVALIER]-s->tab_constru_advers[CHEVALIER];
   s->tab_constru_board[COLONIE] = 15;
   s->tab_constru_board[VILLE] = 15;
   s->tab_constru_board[CARTE_DEVELOPPEMENT] = 9;
 
 
   s->compteur_points_joueur = 0;
-  s->nb_echanges_marchee = 0;
-  s->nb_cartes_mainjoueur = 3;
+  s->nb_echanges_marchee = 0+s->tab_constru_joueur[ROUTE];
+  s->nb_cartes_mainjoueur = 3+s->tab_constru_joueur[CHEVALIER];
  
   
   
