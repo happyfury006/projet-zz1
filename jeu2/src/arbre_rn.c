@@ -11,6 +11,11 @@ Node* createNode(int key, Color color, Node* nil) {
     node->left = nil;
     node->right = nil;
     node->parent = nil;
+    node->situation = NULL;
+    node->coup_possible = NULL;
+    node->esperance = 0;
+    node->victoire = 0;
+    node->visite = 0;
     return node;
 }
 
