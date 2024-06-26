@@ -13,7 +13,7 @@ typedef struct Node {
     struct Node* left;
     struct Node* right;
     struct Node* parent;
-    struct situation* joueur1;
+    struct situation* situation;
     struct coups* coup_possible;
     int visite;
     int victoire;
