@@ -18,9 +18,9 @@ typedef struct carte{
     int posee;
 }carte;
 
-typedef struct tab_carte_construction {
-  struct carte* tab_carte_construction[NB_CONSTRUCTION+2];
-} tab_carte_construction;
+typedef struct tab_carte {
+  struct carte* tab_carte[NB_CONSTRUCTION+2+NB_RESSOURCE+2];
+} tab_carte;
 
 //E
 enum construction {ROUTE = 0, CHEVALIER = 1,COLONIE = 2, VILLE = 3, CARTE_DEVELOPPEMENT = 4};
@@ -28,7 +28,7 @@ enum ressource {BOIS = 0, ARGILE = 1, MOUTON = 2, MINERAI = 3, BLE = 4};
 
 //Fonctions
 carte* creation_carte(int type);
-tab_carte_construction creation_tab_carte_construction();
+tab_carte creation_tab_carte();
 int randomiser(int N);
 int nbr_carte_liste(int liste[], int N);
 unsigned long hash(int echange_pioche[5], int construction, int carte_donnee_marche[5], int carte_recu_marche[5]);
