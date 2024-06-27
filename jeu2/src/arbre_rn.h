@@ -19,8 +19,8 @@ typedef struct Node {
     int victoire;
     float esperance;
     struct liste_chainee L_defausse;
-    struct liste_chainee L_echange;
-    struct liste_chainee L_construction;
+    struct liste_chainee_2 L_echange;
+    int L_construction[5];
     bool defausse;
     bool echange;
     bool construction;
@@ -32,12 +32,12 @@ typedef struct RBTree {
 } RBTree;
 
 
-Node* createNode(int key, Color color, Node* nil, situation* joueur1);
-RBTree* createRBTree();
+Node* createNode(int key, Color color, Node* nil, sitjoueur* joueur1);
+RBTree* createRBTree(sitjoueur* joueur1);
 void leftRotate(RBTree* tree, Node* x);
 void rightRotate(RBTree* tree, Node* y);
 void insertFixUp(RBTree* tree, Node* z);
-void insert(RBTree* tree, int key);
+void insert(RBTree* tree, int key,sitjoueur* joueur1);
 Node* search(RBTree* tree, int key);
 void inOrderTraversal(Node* node, Node* nil);
 void displayTree(Node* root, Node* nil);
