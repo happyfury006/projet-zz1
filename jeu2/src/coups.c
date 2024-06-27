@@ -27,17 +27,39 @@ void generer_combinaisons_main(int *main, int taille, liste_chainee* liste) {
             insert_tete(liste, combinaison, 1);
         }
     }
-
-    int combinaison[1] = { -1 };
-    insert_tete(liste, combinaison, 1);
 }
+
 
 
 liste_chainee* init_defausse(sitjoueur* sit){
     liste_chainee* L_defausse=creerListe();
     generer_combinaisons_main(sit->mainjoueur, 5, L_defausse);
+    int combinaison[1] = { -1 };
+    insert_tete(L_defausse, combinaison, 1);
 
     return L_defausse;  
 }
 
 
+int* init_construction(sitjoueur* sit){
+    int* L_construction = malloc(5*sizeof(int));
+    int compteur =0;
+    for (int i=0;i<5;i++)
+    {
+        if (valide_construction(sit,i))
+        {
+            L_construction[compteur]=i;
+            compteur++;
+        }
+    } 
+    return L_construction;
+}
+
+
+tab* init_defausse(sitjoueur* sit){
+    tab* L_echange=creertab();
+    generer_combinaisons_main(sit->mainjoueur, 5, L_echange->main);
+    generer_combinaisons_main(sit->marchee, 5, L_echange->marche);
+
+    return L_echange;  
+}
