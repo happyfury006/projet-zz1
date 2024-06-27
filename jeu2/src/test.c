@@ -38,7 +38,10 @@ void deplacer_texture(SDL_Renderer* renderer, SDL_Texture* background_texture, S
     SDL_RenderPresent(renderer);
 }
 
-
+void echanger_positions_sans_clique(SDL_Renderer* renderer,SDL_Texture* background_texture,SDL_Texture* textures[],SDL_Rect rectangles[],int nb_textures)
+{
+    
+}
 
 
 void echanger_positions(SDL_Renderer* renderer, SDL_Texture* background_texture, SDL_Texture* textures[], SDL_Rect rectangles[], int nb_textures) {
@@ -99,7 +102,7 @@ void echanger_positions(SDL_Renderer* renderer, SDL_Texture* background_texture,
     rectangles[index_texture2] = rect1;
 }
 
-/*void echanger_pioche(SDL_Renderer* renderer, SDL_Texture* background_texture, SDL_Texture* textures[], SDL_Rect rectangles[], int nb_textures) {
+void echanger_pioche(SDL_Renderer* renderer, SDL_Texture* background_texture, SDL_Texture* textures[], SDL_Rect rectangles[], int nb_textures) {
     SDL_Event event;
     bool clicked = false;
     int index_texture1 = -1;
@@ -156,7 +159,7 @@ void echanger_positions(SDL_Renderer* renderer, SDL_Texture* background_texture,
     // Mettre à jour les rectangles avec les nouvelles positions
     rectangles[index_texture1] = rect3;
     rectangles[index_texture2] = rect1;
-}*/
+}
 
 
 int main(int argc, char* argv[]) {
@@ -184,7 +187,7 @@ int main(int argc, char* argv[]) {
                 quit = true;
             } else if (event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT) {
                 echanger_positions(renderer, background_texture, textures, rectangles, 2);
-                // echanger_pioche(renderer,background_texture,textures,rectangles,3);
+                echanger_pioche(renderer,background_texture,textures,rectangles,3);
             }
         }
         SDL_RenderClear(renderer);
