@@ -1,26 +1,12 @@
 #include "SDL.h"
-#include <SDL2/SDL_image.h>
-#include <SDL2/SDL_ttf.h>
-#include <stdio.h>
-#include <stdbool.h>
-#include <math.h>
-#include "utils.h"
-
-#define GRID_WIDTH 4
-#define GRID_HEIGHT 4
-#define GRID1_WIDTH 6
-#define GRID1_HEIGHT 1
-#define NB_CARTES 22 // Mise à jour du nombre total de cartes
-#define WINDOW_HAUTEUR 1200
-#define WINDOW_LARGEUR 1600
 
 
-void init_grille(emplacement_carte grille[GRID_HEIGHT][GRID_WIDTH]) {
-    emplacement_carte temp[GRID_HEIGHT][GRID_WIDTH] = {
-        { {500, 230}, {600, 230}, {700, 230}, {800, 230} },
-        { {500, 380}, {600, 380}, {700, 380}, {800, 380} },
-        { {500, 530}, {600, 530}, {700, 530}, {800, 530} },
-        { {500, 680}, {600, 680}, {700, 680}, {800, 680} }
+void init_grille(SDL_Rect grille[GRID_HEIGHT][GRID_WIDTH]) {
+    SDL_Rect temp[GRID_HEIGHT][GRID_WIDTH] = {
+        { {500, 230, TAILLE_CARTE_W, TAILLE_CARTE_H}, {600, 230, TAILLE_CARTE_W, TAILLE_CARTE_H}, {700, 230, TAILLE_CARTE_W, TAILLE_CARTE_H}, {800, 230, TAILLE_CARTE_W, TAILLE_CARTE_H} },
+        { {500, 380, TAILLE_CARTE_W, TAILLE_CARTE_H}, {600, 380, TAILLE_CARTE_W, TAILLE_CARTE_H}, {700, 380, TAILLE_CARTE_W, TAILLE_CARTE_H}, {800, 380, TAILLE_CARTE_W, TAILLE_CARTE_H} },
+        { {500, 530, TAILLE_CARTE_W, TAILLE_CARTE_H}, {600, 530, TAILLE_CARTE_W, TAILLE_CARTE_H}, {700, 530, TAILLE_CARTE_W, TAILLE_CARTE_H}, {800, 530, TAILLE_CARTE_W, TAILLE_CARTE_H} },
+        { {500, 680, TAILLE_CARTE_W, TAILLE_CARTE_H}, {600, 680, TAILLE_CARTE_W, TAILLE_CARTE_H}, {700, 680, TAILLE_CARTE_W, TAILLE_CARTE_H}, {800, 680, TAILLE_CARTE_W, TAILLE_CARTE_H} }
     };
 
     for (int i = 0; i < GRID_HEIGHT; ++i) {
@@ -30,122 +16,317 @@ void init_grille(emplacement_carte grille[GRID_HEIGHT][GRID_WIDTH]) {
     }
 }
 
-void init_main_ia(emplacement_carte grille_ia[GRID1_HEIGHT][GRID1_WIDTH]) {
-    emplacement_carte temp[GRID1_HEIGHT][GRID1_WIDTH] = {
-        { {350, 10}, {450, 10}, {550, 10}, {650, 10}, {750, 10}, {850, 10} }
+void init_main_ia(SDL_Rect grille_ia[GRID1_HEIGHT][GRID1_WIDTH]) {
+    SDL_Rect temp[GRID1_HEIGHT][GRID1_WIDTH] = {
+        { {350, 10, TAILLE_CARTE_W, TAILLE_CARTE_H}, {450, 10, TAILLE_CARTE_W, TAILLE_CARTE_H}, {550, 10, TAILLE_CARTE_W, TAILLE_CARTE_H}, {650, 10, TAILLE_CARTE_W, TAILLE_CARTE_H}, {750, 10, TAILLE_CARTE_W, TAILLE_CARTE_H}, {850, 10, TAILLE_CARTE_W, TAILLE_CARTE_H} }
     };
 
     for (int i = 0; i < GRID1_WIDTH; ++i) {
         grille_ia[0][i] = temp[0][i];
     }
 }
+void init_main_joueur(SDL_Rect grille_joueur[GRID1_HEIGHT][GRID1_WIDTH]) {
+    SDL_Rect temp[GRID1_HEIGHT][GRID1_WIDTH] = {
+        { {350, 1090, TAILLE_CARTE_W, TAILLE_CARTE_H}, {450, 1090, TAILLE_CARTE_W, TAILLE_CARTE_H}, {550, 1090, TAILLE_CARTE_W, TAILLE_CARTE_H}, {650, 1090, TAILLE_CARTE_W, TAILLE_CARTE_H}, {750, 1090, TAILLE_CARTE_W, TAILLE_CARTE_H}, {850, 1090, TAILLE_CARTE_W, TAILLE_CARTE_H} }
+    };
 
-int init_cartes(tab_carte_construction* cartes, SDL_Renderer* renderer, const char* image_paths[], emplacement_carte grille[GRID_HEIGHT][GRID_WIDTH], emplacement_carte grille1[GRID1_HEIGHT][GRID1_WIDTH]) {
-    SDL_Texture* texture_routeA = IMG_LoadTexture(renderer, image_paths[9]);
+    for (int i = 0; i < GRID1_WIDTH; ++i) {
+        grille_joueur[0][i] = temp[0][i];
+    }
+}
+
+void cadrillage_carte(cadrillage cadri) {
+    SDL_Rect temp[GRID_CARTE_HEIGHT][GRID_CARTE_WIDTH] = {
+        { {150,10,TAILLE_CARTE_W,TAILLE_CARTE_H}, {250,10,TAILLE_CARTE_W,TAILLE_CARTE_H}, {350, 10, TAILLE_CARTE_W, TAILLE_CARTE_H}, {450, 10, TAILLE_CARTE_W, TAILLE_CARTE_H}, {550, 10, TAILLE_CARTE_W, TAILLE_CARTE_H}, {650, 10, TAILLE_CARTE_W, TAILLE_CARTE_H}, {750, 10, TAILLE_CARTE_W, TAILLE_CARTE_H}, {850, 10, TAILLE_CARTE_W, TAILLE_CARTE_H} },
+        { {0,0,0,0}, {0,0,0,0}, {500, 230, TAILLE_CARTE_W, TAILLE_CARTE_H}, {600, 230, TAILLE_CARTE_W, TAILLE_CARTE_H}, {700, 230, TAILLE_CARTE_W, TAILLE_CARTE_H}, {800, 230, TAILLE_CARTE_W, TAILLE_CARTE_H} },
+        { {200,380,TAILLE_CARTE_W,TAILLE_CARTE_H}, {350,380,TAILLE_CARTE_W,TAILLE_CARTE_H}, {500, 380, TAILLE_CARTE_W, TAILLE_CARTE_H}, {600, 380, TAILLE_CARTE_W, TAILLE_CARTE_H}, {700, 380, TAILLE_CARTE_W, TAILLE_CARTE_H}, {800, 380, TAILLE_CARTE_W, TAILLE_CARTE_H} },
+        { {0,0,0,0}, {400,530,TAILLE_CARTE_W,TAILLE_CARTE_H}, {500, 530, TAILLE_CARTE_W, TAILLE_CARTE_H}, {600, 530, TAILLE_CARTE_W, TAILLE_CARTE_H}, {700, 530, TAILLE_CARTE_W, TAILLE_CARTE_H}, {800, 530, TAILLE_CARTE_W, TAILLE_CARTE_H} },
+        { {0,0,0,0}, {0,0,0,0}, {500, 680, TAILLE_CARTE_W, TAILLE_CARTE_H}, {600, 680, TAILLE_CARTE_W, TAILLE_CARTE_H}, {700, 680, TAILLE_CARTE_W, TAILLE_CARTE_H}, {800, 680, TAILLE_CARTE_W, TAILLE_CARTE_H} },
+        { {150,1090,TAILLE_CARTE_W,TAILLE_CARTE_H},{250,1090,TAILLE_CARTE_W,TAILLE_CARTE_H}, {350, 1090, TAILLE_CARTE_W, TAILLE_CARTE_H}, {450, 1090, TAILLE_CARTE_W, TAILLE_CARTE_H}, {550, 1090, TAILLE_CARTE_W, TAILLE_CARTE_H}, {650, 1090, TAILLE_CARTE_W, TAILLE_CARTE_H}, {750, 1090, TAILLE_CARTE_W, TAILLE_CARTE_H}, {850, 1090, TAILLE_CARTE_W, TAILLE_CARTE_H} }
+        
+    };
+    for (int i = 0; i < GRID_CARTE_HEIGHT; ++i) {
+        for (int j = 0; j < GRID_CARTE_WIDTH; j++)
+        {
+            carte* newCarte= creation_carte(-1) ;
+            newCarte->rect = temp[j][i];
+            cadri.emplacement[j][i] = newCarte;
+        }
+    }
+}
+
+int init_cartes(tab_carte* cartes, SDL_Renderer* renderer, const char* image_paths[]) {
+    SDL_Texture* texture_routeA = IMG_LoadTexture(renderer, image_paths[0]);
     if (!texture_routeA) {
         printf("Erreur IMG_LoadTexture pour routeA: %s\n", IMG_GetError());
         return 0;
     }
 
-    SDL_Texture* texture_chevalierA = IMG_LoadTexture(renderer, image_paths[2]);
+    SDL_Texture* texture_chevalierA = IMG_LoadTexture(renderer, image_paths[1]);
     if (!texture_chevalierA) {
         printf("Erreur IMG_LoadTexture pour chevalierA: %s\n", IMG_GetError());
         SDL_DestroyTexture(texture_routeA);
         return 0;
     }
+SDL_Texture* texture_colonie = IMG_LoadTexture(renderer, image_paths[2]);
+    if (!texture_colonie) {
+        printf("Erreur IMG_LoadTexture pour colonie: %s\n", IMG_GetError());
+        SDL_DestroyTexture(texture_routeA);
+        SDL_DestroyTexture(texture_chevalierA);
+        return 0;
+    }
 
-    SDL_Texture* texture_ville = IMG_LoadTexture(renderer, image_paths[7]);
+    SDL_Texture* texture_ville = IMG_LoadTexture(renderer, image_paths[3]);
     if (!texture_ville) {
         printf("Erreur IMG_LoadTexture pour ville: %s\n", IMG_GetError());
         SDL_DestroyTexture(texture_routeA);
         SDL_DestroyTexture(texture_chevalierA);
+        SDL_DestroyTexture(texture_colonie);
         return 0;
     }
 
-    SDL_Texture* texture_developpement = IMG_LoadTexture(renderer, image_paths[10]);
+    SDL_Texture* texture_developpement = IMG_LoadTexture(renderer, image_paths[4]);
     if (!texture_developpement) {
         printf("Erreur IMG_LoadTexture pour développement: %s\n", IMG_GetError());
         SDL_DestroyTexture(texture_routeA);
         SDL_DestroyTexture(texture_chevalierA);
+        SLD_DestroyTexture(texture_colonie);
         SDL_DestroyTexture(texture_ville);
         return 0;
     }
+    SDL_Texture* texture_routeB = IMG_LoadTexture(renderer, image_paths[5]);
+    if (!texture_routeB) {
+        printf("Erreur IMG_LoadTexture pour routeB: %s\n", IMG_GetError());
+        SDL_DestroyTexture(texture_routeA);
+        SDL_DestroyTexture(texture_chevalierA);
+        SLD_DestroyTexture(texture_colonie);
+        SDL_DestroyTexture(texture_ville);
+        SDL_DestroyTexture(texture_developpement);
 
-    SDL_Texture* texture_emp_carte = IMG_LoadTexture(renderer, image_paths[11]);
+        return 0;
+    }
+    SDL_Texture* texture_chevalierB = IMG_LoadTexture(renderer, image_paths[6]);
+    if (!texture_chevalierB) {
+        printf("Erreur IMG_LoadTexture pour chevalierB: %s\n", IMG_GetError());
+        SDL_DestroyTexture(texture_routeA);
+        SDL_DestroyTexture(texture_chevalierA);
+        SLD_DestroyTexture(texture_colonie);
+        SDL_DestroyTexture(texture_ville);
+        SDL_DestroyTexture(texture_developpement);
+        SDL_DestroyTexture(texture_routeB);
+        return 0;
+    }
+    SDL_Texture* texture_ressource_bois = IMG_LoadTexture(renderer, image_paths[7]);
+    if (!texture_ressource_bois) {
+        printf("Erreur IMG_LoadTexture pour ressource_bois: %s\n", IMG_GetError());
+        SDL_DestroyTexture(texture_routeA);
+        SDL_DestroyTexture(texture_chevalierA);
+        SLD_DestroyTexture(texture_colonie);
+        SDL_DestroyTexture(texture_ville);
+        SDL_DestroyTexture(texture_developpement);
+        SDL_DestroyTexture(texture_routeB);
+        SDL_DestroyTexture(texture_chevalierB);
+        return 0;
+    }
+    SDL_Texture* texture_ressource_argile = IMG_LoadTexture(renderer, image_paths[8]);
+    if (!texture_ressource_argile) {
+        printf("Erreur IMG_LoadTexture pour ressource_argile: %s\n", IMG_GetError());
+        SDL_DestroyTexture(texture_routeA);
+        SDL_DestroyTexture(texture_chevalierA);
+        SLD_DestroyTexture(texture_colonie);
+        SDL_DestroyTexture(texture_ville);
+        SDL_DestroyTexture(texture_developpement);
+        SDL_DestroyTexture(texture_routeB);
+        SDL_DestroyTexture(texture_chevalierB);
+        SDL_DestroyTexture(texture_ressource_bois);
+        return 0;
+    }
+    SDL_Texture* texture_ressource_mouton = IMG_LoadTexture(renderer, image_paths[9]);
+    if (!texture_ressource_mouton) {
+        printf("Erreur IMG_LoadTexture pour ressource_mouton: %s\n", IMG_GetError());
+        SDL_DestroyTexture(texture_routeA);
+        SDL_DestroyTexture(texture_chevalierA);
+        SLD_DestroyTexture(texture_colonie);
+        SDL_DestroyTexture(texture_ville);
+        SDL_DestroyTexture(texture_developpement);
+        SDL_DestroyTexture(texture_routeB);
+        SDL_DestroyTexture(texture_chevalierB);
+        SDL_DestroyTexture(texture_ressource_bois);
+        SDL_DestroyTexture(texture_ressource_argile);
+        return 0;
+    }
+    SDL_Texture* texture_ressource_minerai = IMG_LoadTexture(renderer, image_paths[10]);
+    if (!texture_ressource_minerai) {
+        printf("Erreur IMG_LoadTexture pour ressource_minerai: %s\n", IMG_GetError());
+        SDL_DestroyTexture(texture_routeA);
+        SDL_DestroyTexture(texture_chevalierA);
+        SLD_DestroyTexture(texture_colonie);
+        SDL_DestroyTexture(texture_ville);
+        SDL_DestroyTexture(texture_developpement);
+        SDL_DestroyTexture(texture_routeB);
+        SDL_DestroyTexture(texture_chevalierB);
+        SDL_DestroyTexture(texture_ressource_bois);
+        SDL_DestroyTexture(texture_ressource_argile);
+        SDL_DestroyTexture(texture_ressource_mouton);
+        return 0;
+    }
+
+    SDL_Texture* texture_ressource_ble = IMG_LoadTexture(renderer, image_paths[11]);
+    if (!texture_ressource_ble) {
+        printf("Erreur IMG_LoadTexture pour ressource_ble: %s\n", IMG_GetError());
+        SDL_DestroyTexture(texture_routeA);
+        SDL_DestroyTexture(texture_chevalierA);
+        SLD_DestroyTexture(texture_colonie);
+        SDL_DestroyTexture(texture_ville);
+        SDL_DestroyTexture(texture_developpement);
+        SDL_DestroyTexture(texture_routeB);
+        SDL_DestroyTexture(texture_chevalierB);
+        SDL_DestroyTexture(texture_ressource_bois);
+        SDL_DestroyTexture(texture_ressource_argile);
+        SDL_DestroyTexture(texture_ressource_mouton);
+        SDL_DestroyTexture(texture_ressource_minerai);
+        return 0;
+    }
+    SDL_Texture* texture_dos_carte = IMG_LoadTexture(renderer, image_paths[12]);
+    if (!texture_dos_carte) {
+        printf("Erreur IMG_LoadTexture pour dos_carte: %s\n", IMG_GetError());
+        SDL_DestroyTexture(texture_routeA);
+        SDL_DestroyTexture(texture_chevalierA);
+        SLD_DestroyTexture(texture_colonie);
+        SDL_DestroyTexture(texture_ville);
+        SDL_DestroyTexture(texture_developpement);
+        SDL_DestroyTexture(texture_routeB);
+        SDL_DestroyTexture(texture_chevalierB);
+        SDL_DestroyTexture(texture_ressource_bois);
+        SDL_DestroyTexture(texture_ressource_argile);
+        SDL_DestroyTexture(texture_ressource_mouton);
+        SDL_DestroyTexture(texture_ressource_minerai);
+        SDL_DestroyTexture(texture_ressource_ble);
+
+        return 0;
+    }
+
+    SDL_Texture* texture_emp_carte = IMG_LoadTexture(renderer, image_paths[13]);
     if (!texture_emp_carte) {
         printf("Erreur IMG_LoadTexture pour emp_carte: %s\n", IMG_GetError());
         SDL_DestroyTexture(texture_routeA);
         SDL_DestroyTexture(texture_chevalierA);
         SDL_DestroyTexture(texture_ville);
         SDL_DestroyTexture(texture_developpement);
+        SDL_DestroyTexture(texture_routeB);
+        SDL_DestroyTexture(texture_chevalierB);
+        SDL_DestroyTexture(texture_ressource_bois);
+        SDL_DestroyTexture(texture_ressource_argile);
+        SDL_DestroyTexture(texture_ressource_mouton);
+        SDL_DestroyTexture(texture_ressource_minerai);
+        SDL_DestroyTexture(texture_ressource_ble);
+        SDL_DestroyTexture(texture_dos_carte);
+
         return 0;
     }
 
-    cartes->tab_carte_construction[0] = (carte*)malloc(sizeof(carte));
-    cartes->tab_carte_construction[0]->texture = texture_routeA;
-    cartes->tab_carte_construction[0]->rect.x = grille[1][0].x;
-    cartes->tab_carte_construction[0]->rect.y = grille[1][0].y;
-    cartes->tab_carte_construction[0]->rect.w = 100;
-    cartes->tab_carte_construction[0]->rect.h = 150;
+    //assignation des textures aux cartes 
 
-    cartes->tab_carte_construction[1] = (carte*)malloc(sizeof(carte));
-    cartes->tab_carte_construction[1]->texture = texture_chevalierA;
-    cartes->tab_carte_construction[1]->rect.x = grille[1][1].x;
-    cartes->tab_carte_construction[1]->rect.y = grille[1][1].y;
-    cartes->tab_carte_construction[1]->rect.w = 100;
-    cartes->tab_carte_construction[1]->rect.h = 150;
+    //Carte routeA
+    cartes->tab_carte[0]->texture = texture_routeA;
 
-    cartes->tab_carte_construction[2] = (carte*)malloc(sizeof(carte));
-    cartes->tab_carte_construction[2]->texture = texture_ville;
-    cartes->tab_carte_construction[2]->rect.x = grille[1][2].x;
-    cartes->tab_carte_construction[2]->rect.y = grille[1][2].y;
-    cartes->tab_carte_construction[2]->rect.w = 100;
-    cartes->tab_carte_construction[2]->rect.h = 150;
+    //Carte chevalierA
+    cartes->tab_carte[1]->texture = texture_chevalierA;
 
-    cartes->tab_carte_construction[3] = (carte*)malloc(sizeof(carte));
-    cartes->tab_carte_construction[3]->texture = texture_developpement;
-    cartes->tab_carte_construction[3]->rect.x = grille[1][3].x;
-    cartes->tab_carte_construction[3]->rect.y = grille[1][3].y;
-    cartes->tab_carte_construction[3]->rect.w = 100;
-    cartes->tab_carte_construction[3]->rect.h = 150;
+    //Carte colonie
+    cartes->tab_carte[2]->texture = texture_colonie;
 
-    int index = 4;
-    for (int i = 0; i < GRID_HEIGHT; ++i) {
-        for (int j = 0; j < GRID_WIDTH; ++j) {
-            if (!(i == 1 && j < 4)) {
-                cartes->tab_carte_construction[index] = (carte*)malloc(sizeof(carte));
-                cartes->tab_carte_construction[index]->texture = texture_emp_carte;
-                cartes->tab_carte_construction[index]->rect.x = grille[i][j].x;
-                cartes->tab_carte_construction[index]->rect.y = grille[i][j].y;
-                cartes->tab_carte_construction[index]->rect.w = 100;
-                cartes->tab_carte_construction[index]->rect.h = 150;
-                ++index;
-            }
-        }
-    }
+    //Carte ville
+    cartes->tab_carte[3]->texture = texture_ville;
 
-    for (int i = 0; i < GRID1_HEIGHT; ++i) {
-        for (int j = 0; j < GRID1_WIDTH; ++j) {
-            cartes->tab_carte_construction[index] = (carte*)malloc(sizeof(carte));
-            cartes->tab_carte_construction[index]->texture = texture_emp_carte;
-            cartes->tab_carte_construction[index]->rect.x = grille1[i][j].x;
-            cartes->tab_carte_construction[index]->rect.y = grille1[i][j].y;
-            cartes->tab_carte_construction[index]->rect.w = 100;
-            cartes->tab_carte_construction[index]->rect.h = 150;
-            ++index;
-        }
-    }
+    //Carte développement
+    cartes->tab_carte[4]->texture = texture_developpement;
+
+    //Carte routeB
+    cartes->tab_carte[5]->texture = texture_routeB;
+
+    //Carte chevalierB
+    cartes->tab_carte[6]->texture = texture_chevalierB;
+
+    //asignation des textures des ressources
+
+    //Ressource bois
+    cartes->tab_carte[7]->texture = texture_ressource_bois;
+
+    //Resosurce argile
+    cartes->tab_carte[8]->texture = texture_ressource_argile;
+    
+    //Ressource mouton
+    cartes->tab_carte[9]->texture = texture_ressource_mouton;
+    
+    //Ressource minerai
+    cartes->tab_carte[10]->texture = texture_ressource_minerai;
+    
+    //Ressource ble
+    cartes->tab_carte[11]->texture = texture_ressource_ble;
+    
+    //Dos carte
+    cartes->tab_carte[12]->texture = texture_dos_carte;
+    
+    //Emp_carte
+    cartes->tab_carte[13]->texture = texture_emp_carte;
 
     return 1;
 }
 
-void display(SDL_Texture* bg_texture, tab_carte_construction* cartes, SDL_Renderer* renderer) {
+void init_position_carte_initiale(cadrillage* cadri, tab_carte* cartes) {
+    cadrillage* cadrillage_tmp_reel = cadri;
+    for (int i = 2; i < GRID_CARTE_WIDTH; ++i) {
+        //Carte construction position board
+        if (i-2 != 3)
+        {
+            cadrillage_tmp_reel->emplacement[1][2]->type = cartes->tab_carte[i-2]->type;
+            cadrillage_tmp_reel->emplacement[1][2]->texture = cartes->tab_carte[i-2]->texture;
+        }   
+    }
+    //carte pioche de dos
+    cadrillage_tmp_reel->emplacement[1][2]->type = cartes->tab_carte[12]->type;
+    cadrillage_tmp_reel->emplacement[1][2]->texture = cartes->tab_carte[12]->texture;
+}
+
+void init_position_carte_marche_initiale(cadrillage* cadri, tab_carte* cartes,sitjoueur* joueur1,sitjoueur* joueur2){
+    cadrillage* cadrillage_tmp_reel = cadri;
+    for (int i = 1; i < GRID_CARTE_WIDTH; ++i) {
+        //Carte ressource position marche premier initiale
+        int random_pioche_marche=randomiser(5);
+        cadrillage_tmp_reel->emplacement[i][3]->type = cartes->tab_carte[random_pioche_marche+7]->type;
+        cadrillage_tmp_reel->emplacement[i][3]->texture = cartes->tab_carte[random_pioche_marche+7]->texture;
+        joueur1->marchee[random_pioche_marche]++;
+        joueur2->marchee[random_pioche_marche]++;
+        joueur1->pioche[random_pioche_marche]--;
+        joueur2->pioche[random_pioche_marche]--;
+    }
+}
+
+
+void position_carte_joueur(cadrillage* cadri, tab_carte* cartes, sitjoueur* joueur1, sitjoueur* joueur2) {
+    cadrillage* cadrillage_tmp_reel = cadri;
+    for (int i = 0; i < GRID1_WIDTH; ++i) {
+        //Carte ressource position joueur
+        int random_pioche=randomiser(5);
+        cadrillage_tmp_reel->emplacement[i][0]->type = cartes->tab_carte[random_pioche+7]->type;
+        cadrillage_tmp_reel->emplacement[i][0]->texture = cartes->tab_carte[random_pioche+7]->texture;
+        joueur1->mainjoueur[random_pioche]++;
+        joueur2->mainjoueur[random_pioche]++;
+        joueur1->pioche[random_pioche]--;
+        joueur2->pioche[random_pioche]--;
+    }
+}
+
+
+
+void display(SDL_Texture* bg_texture, tab_carte* cartes, SDL_Renderer* renderer) {
     SDL_RenderCopy(renderer, bg_texture, NULL, NULL);
 
     for (int i = 0; i < NB_CARTES; ++i) {
-        if (cartes->tab_carte_construction[i]) {
-            SDL_RenderCopy(renderer, cartes->tab_carte_construction[i]->texture, NULL, &cartes->tab_carte_construction[i]->rect);
-            printf("Carte %d : x = %d, y = %d, w = %d, h = %d\n", i, cartes->tab_carte_construction[i]->rect.x, cartes->tab_carte_construction[i]->rect.y, cartes->tab_carte_construction[i]->rect.w, cartes->tab_carte_construction[i]->rect.h);
+        if (cartes->tab_carte[i]) {
+            SDL_RenderCopy(renderer, cartes->tab_carte[i]->texture, NULL, &cartes->tab_carte[i]->rect);
+            printf("Carte %d : x = %d, y = %d, w = %d, h = %d\n", i, cartes->tab_carte[i]->rect.x, cartes->tab_carte[i]->rect.y, cartes->tab_carte[i]->rect.w, cartes->tab_carte[i]->rect.h);
         } else {
             printf("Carte %d est NULL\n", i);
         }
@@ -154,13 +335,13 @@ void display(SDL_Texture* bg_texture, tab_carte_construction* cartes, SDL_Render
     SDL_RenderPresent(renderer);
 }
 
-void destroy_cartes(tab_carte_construction* cartes) {
+void destroy_cartes(tab_carte* cartes) {
     for (int i = 0; i < NB_CARTES; ++i) {
-        if (cartes->tab_carte_construction[i]) {
-            if (cartes->tab_carte_construction[i]->texture) {
-                SDL_DestroyTexture(cartes->tab_carte_construction[i]->texture);
+        if (cartes->tab_carte[i]) {
+            if (cartes->tab_carte[i]->texture) {
+                SDL_DestroyTexture(cartes->tab_carte[i]->texture);
             }
-            free(cartes->tab_carte_construction[i]);
+            free(cartes->tab_carte[i]);
         }
     }
 }
@@ -197,7 +378,7 @@ int init(SDL_Window** window, SDL_Renderer** renderer) {
     return 1;
 }
 
-void cleanup(SDL_Window* window, SDL_Renderer* renderer, tab_carte_construction* cartes) {
+void cleanup(SDL_Window* window, SDL_Renderer* renderer, tab_carte* cartes) {
     destroy_cartes(cartes);
     if (renderer) {
         SDL_DestroyRenderer(renderer);
@@ -209,9 +390,45 @@ void cleanup(SDL_Window* window, SDL_Renderer* renderer, tab_carte_construction*
     SDL_Quit();
 }
 
-int main(int argc, char* argv[]) {
-    (void)argc;
-    (void)argv;
+void phase_de_pioche(SDL_Renderer* renderer, tab_carte* cartes, SDL_Rect grille[GRID_HEIGHT][GRID_WIDTH], SDL_Rect grille1[GRID1_HEIGHT][GRID1_WIDTH],SDL_Texture* bg_texture, sitjoueur* joueur1, sitjoueur* joueur2) {
+
+    
+}
+
+void tour_de_jeu(SDL_Renderer* renderer, tab_carte* cartes, SDL_Rect grille[GRID_HEIGHT][GRID_WIDTH], SDL_Rect grille1[GRID1_HEIGHT][GRID1_WIDTH],SDL_Rect grille2[GRID1_HEIGHT][GRID1_WIDTH], SDL_Texture* bg_texture) {
+    //Tab_carte il faut que ca soit vu comme un dictionnaire qu'on vient copier dans le main et dans la grille
+
+    
+    
+    // SDL_Texture* bg_texture = IMG_LoadTexture(renderer, "../Images/routeA.png");
+    // if (!bg_texture) {
+    //     printf("Erreur IMG_LoadTexture pour bg_texture: %s\n", IMG_GetError());
+    //     return;
+    // }
+
+    // if (!init_cartes(cartes, renderer, image_paths, grille, grille1)) {
+    //     SDL_DestroyTexture(bg_texture);
+    //     return;
+    // }
+
+    bool quit = false;
+    SDL_Event event;
+
+    while (!quit) {
+        while (SDL_PollEvent(&event)) {
+            if (event.type == SDL_QUIT) {
+                quit = true;
+            }
+            phase_de_pioche
+        }
+        display(bg_texture, cartes, renderer);
+    }
+
+    SDL_DestroyTexture(bg_texture);
+}
+
+
+void jeu() {
     SDL_Window *window = NULL;
     SDL_Renderer *renderer = NULL;
 
@@ -220,18 +437,23 @@ int main(int argc, char* argv[]) {
     }
 
     const char *image_paths[NB_CARTES] = {
-        "../Images/fondblanc.png",
-        "../Images/ressource_argile.png",
+        "../Images/routeA.png",
         "../Images/chevalierA.png",
         "../Images/colonie.png",
-        "../Images/dos.png",
-        "../Images/ressource_ble.png",
-        "../Images/ressource_bois.png",
         "../Images/ville.png",
-        "../Images/ressource_minerai.png",
-        "../Images/routeA.png",
         "../Images/developpement_eglise.png",
+        "../Images/routeB.png",
+        "../Images/chevalierB.png",
+        
+        "../Images/ressource_bois.png",
+        "../Images/ressource_argile.png",
+        "../Images/ressource_mouton.png",
+        "../Images/ressource_minerai.png",
+         "../Images/ressource_ble.png",
+        
+        "../Images/dos.png",
         "../Images/emp_carte.png",
+        "../Images/fondblanc.png",
     };
 
     emplacement_carte grille[GRID_HEIGHT][GRID_WIDTH];
@@ -240,15 +462,15 @@ int main(int argc, char* argv[]) {
     emplacement_carte grille_ia[GRID1_HEIGHT][GRID1_WIDTH];
     init_main_ia(grille_ia);
 
-    tab_carte_construction cartes;
-    memset(&cartes, 0, sizeof(tab_carte_construction));
+    tab_carte cartes;
+    cartes = creation_tab_carte();
 
     if (!init_cartes(&cartes, renderer, image_paths, grille, grille_ia)) {
         cleanup(window, renderer, &cartes);
         return 1;
     }
 
-    SDL_Texture* bg_texture = IMG_LoadTexture(renderer, image_paths[0]);
+    SDL_Texture* bg_texture = IMG_LoadTexture(renderer, image_paths[14]);
     if (!bg_texture) {
         printf("Erreur IMG_LoadTexture pour bg_texture: %s\n", IMG_GetError());
         cleanup(window, renderer, &cartes);
@@ -264,11 +486,19 @@ int main(int argc, char* argv[]) {
                 quit = true;
             }
         }
+        jeu();
         display(bg_texture, &cartes, renderer);
     }
 
     SDL_DestroyTexture(bg_texture);
     cleanup(window, renderer, &cartes);
 
-    return 0;
+    
+}
+
+int main(int argc, char* argv[]) {
+    (void)argc;
+    (void)argv;
+    jeu();
+    return 1;
 }

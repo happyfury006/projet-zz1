@@ -20,35 +20,35 @@ carte* creation_carte(int carte_construction)
     return carte1;
 }
 
-tab_carte_construction creation_tab_carte_construction()
+tab_carte creation_tab_carte()
 {
-    tab_carte_construction tab;
-    for (int i = 0; i < NB_CONSTRUCTION+2; i++)
+    tab_carte tab;
+    for (int i = 0; i < NB_CONSTRUCTION+2+NB_RESSOURCE+2; i++)
     {
         switch (i)
         {
         case 2:
-            tab.tab_carte_construction[i]=creation_carte(2);
-            tab.tab_carte_construction[i]->nbr_points=1;
+            tab.tab_carte[i]=creation_carte(2);
+            tab.tab_carte[i]->nbr_points=1;
             break;
         case 3:
-            tab.tab_carte_construction[i]=creation_carte(3);
-            tab.tab_carte_construction[i]->nbr_points=2;
+            tab.tab_carte[i]=creation_carte(3);
+            tab.tab_carte[i]->nbr_points=2;
             break;
         case 4:
-            tab.tab_carte_construction[i]=creation_carte(4);
-            tab.tab_carte_construction[i]->nbr_points=3;
+            tab.tab_carte[i]=creation_carte(4);
+            tab.tab_carte[i]->nbr_points=3;
             break;
         case 5://Face B de la carte ROUTE
-            tab.tab_carte_construction[i]=creation_carte(5);
-            tab.tab_carte_construction[i]->nbr_points=1;
+            tab.tab_carte[i]=creation_carte(5);
+            tab.tab_carte[i]->nbr_points=1;
             break;
         case 6://Face B de la carte CHEVALIER
-            tab.tab_carte_construction[i]=creation_carte(6);
-            tab.tab_carte_construction[i]->nbr_points=1;
+            tab.tab_carte[i]=creation_carte(6);
+            tab.tab_carte[i]->nbr_points=1;
             break;
         default:
-        tab.tab_carte_construction[i]=creation_carte(i);
+        tab.tab_carte[i]=creation_carte(i);
             break;
         }
         
