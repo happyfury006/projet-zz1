@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "coups.h"
 #include "situation.h"
+#include "liste_chainee.h"
 
 
 liste_chainee* creerListe() {
@@ -75,4 +76,59 @@ void freeList(struct liste_chainee* list) {
         current = next;
     }
     free(list);
+}
+
+
+
+liste_chainee_2* creerListe2() {
+    struct liste_chainee_2* list = (struct liste_chainee_2*)malloc(sizeof(struct liste_chainee_2));
+    list->head = NULL;
+    return list;
+}
+
+
+noeud2* creer_noeud2(int aechanger[5], int arecevoir[5]) {
+    noeud2* new_node = (noeud2*)malloc(sizeof(noeud2));
+    if (new_node == NULL) {
+        return NULL; // Gestion de l'erreur en cas d'échec de l'allocation
+    }
+    for (int i = 0; i < 5; i++) {
+        new_node->aechanger[i] = aechanger[i];
+        new_node->arecevoir[i] = arecevoir[i];
+    }
+    new_node->next = NULL;
+    return new_node;
+}
+
+
+void inser_tete2(liste_chainee_2* liste, noeud2* new_node) {
+    if (liste == NULL || new_node == NULL) {
+        return; // Gestion de l'erreur si les paramètres sont invalides
+    }
+    new_node->next = liste->head;
+    liste->head = new_node;
+}
+
+
+void suppr_tete2(liste_chainee_2* liste) {
+    if (liste == NULL || liste->head == NULL) {
+        return; // Gestion de l'erreur si la liste est vide ou invalide
+    }
+    noeud2* temp = liste->head;
+    liste->head = liste->head->next;
+    free(temp);
+}
+
+
+void free_liste2(liste_chainee_2* liste) {
+    if (liste == NULL) {
+        return; // Gestion de l'erreur si la liste est invalide
+    }
+    noeud2* current = liste->head;
+    while (current != NULL) {
+        noeud2* next = current->next;
+        free(current);
+        current = next;
+    }
+    liste->head = NULL;
 }
