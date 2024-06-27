@@ -3,6 +3,7 @@
 
 #include "situation.h"
 #include "coups.h"
+#include <stdbool.h>
 
 
 typedef enum { RED, BLACK } Color;
@@ -13,11 +14,16 @@ typedef struct Node {
     struct Node* left;
     struct Node* right;
     struct Node* parent;
-    struct situation* situation;
-    struct coups* coup_possible;
+    struct situation* sit;
     int visite;
     int victoire;
     float esperance;
+    struct liste_chainee L_defausse;
+    struct liste_chainee L_echange;
+    struct liste_chainee L_construction;
+    bool defausse;
+    bool echange;
+    bool construction;
 } Node;
 
 typedef struct RBTree {
@@ -26,7 +32,7 @@ typedef struct RBTree {
 } RBTree;
 
 
-Node* createNode(int key, Color color, Node* nil);
+Node* createNode(int key, Color color, Node* nil, situation* joueur1);
 RBTree* createRBTree();
 void leftRotate(RBTree* tree, Node* x);
 void rightRotate(RBTree* tree, Node* y);
