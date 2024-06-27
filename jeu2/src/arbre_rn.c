@@ -1,21 +1,23 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+
+#include "liste_chainee.h"
 #include "arbre_rn.h"
 
 
-Node* createNode(int key, Color color, Node* nil) {
+Node* createNode(int key, Color color, Node* nil, situation* joueur1) {
     Node* node = (Node*)malloc(sizeof(Node));
     node->key = key;
     node->color = color;
     node->left = nil;
     node->right = nil;
     node->parent = nil;
-    node->situation = NULL;
-    node->coup_possible = NULL;
+    node->sit = joueur1;
     node->esperance = 0;
     node->victoire = 0;
     node->visite = 0;
+    
     return node;
 }
 
