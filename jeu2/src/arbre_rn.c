@@ -1,12 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
-
+#include "situation.h"
 #include "liste_chainee.h"
 #include "arbre_rn.h"
 
 
-Node* createNode(int key, Color color, Node* nil, situation* joueur1) {
+
+Node* createNode(int key, Color color, Node* nil, sitjoueur* joueur1) {
     Node* node = (Node*)malloc(sizeof(Node));
     node->key = key;
     node->color = color;
@@ -17,15 +19,17 @@ Node* createNode(int key, Color color, Node* nil, situation* joueur1) {
     node->esperance = 0;
     node->victoire = 0;
     node->visite = 0;
-    
+    node->defausse=true;
+    node->construction=true;
+    node->echange=true;
     return node;
 }
 
 
 // Initialisation de l'arbre
-RBTree* createRBTree() {
+RBTree* createRBTree(sitjoueur* joueur1) {
     RBTree* tree = (RBTree*)malloc(sizeof(RBTree));
-    tree->nil = createNode(0, BLACK, NULL);  // Créer un nœud nil noir
+    tree->nil = createNode(0, BLACK, NULL,joueur1);  // Créer un nœud nil noir
     tree->root = tree->nil;
     return tree;
 }
@@ -113,8 +117,8 @@ void insertFixUp(RBTree* tree, Node* z) {
 
 
 // Insertion d'un nœud
-void insert(RBTree* tree, int key) {
-    Node* z = createNode(key, RED, tree->nil);
+void insert(RBTree* tree, int key, sitjoueur* joueur1) {
+    Node* z = createNode(key, RED, tree->nil,joueur1);
     Node* y = tree->nil;
     Node* x = tree->root;
     
