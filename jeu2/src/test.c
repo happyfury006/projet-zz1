@@ -4,8 +4,6 @@
 #include <stdbool.h>
 #include <math.h>
 
-
-
 void deplacer_texture(SDL_Renderer* renderer, SDL_Texture* background_texture, SDL_Texture* texture, SDL_Rect rect_init, SDL_Rect rect_final, int speed) {
     int dx = rect_final.x - rect_init.x;
     int dy = rect_final.y - rect_init.y;
@@ -20,29 +18,18 @@ void deplacer_texture(SDL_Renderer* renderer, SDL_Texture* background_texture, S
     for (int i = 0; i < steps; ++i) {
         x += increment_x;
         y += increment_y;
-
         SDL_Rect rect_current = { (int)x, (int)y, rect_init.w, rect_init.h };
-
         SDL_RenderClear(renderer);
-        SDL_RenderCopy(renderer, background_texture, NULL, NULL); // Afficher le background
+        SDL_RenderCopy(renderer, background_texture, NULL, NULL);
         SDL_RenderCopy(renderer, texture, NULL, &rect_current);
         SDL_RenderPresent(renderer);
-
-        SDL_Delay(16); // Pour créer un effet de mouvement fluide (~60 FPS)
+        SDL_Delay(16); 
     }
-
-    // S'assurer que la texture est rendue à la position finale
     SDL_RenderClear(renderer);
-    SDL_RenderCopy(renderer, background_texture, NULL, NULL); // Afficher le background
+    SDL_RenderCopy(renderer, background_texture, NULL, NULL); her le background
     SDL_RenderCopy(renderer, texture, NULL, &rect_final);
     SDL_RenderPresent(renderer);
 }
-
-void echanger_positions_sans_clique(SDL_Renderer* renderer,SDL_Texture* background_texture,SDL_Texture* textures[],SDL_Rect rectangles[],int nb_textures)
-{
-    
-}
-
 
 void echanger_positions(SDL_Renderer* renderer, SDL_Texture* background_texture, SDL_Texture* textures[], SDL_Rect rectangles[], int nb_textures) {
     SDL_Event event;
@@ -90,14 +77,12 @@ void echanger_positions(SDL_Renderer* renderer, SDL_Texture* background_texture,
         }
     }
 
-    // Échanger les positions des textures
     SDL_Rect rect1 = rectangles[index_texture1];
     SDL_Rect rect2 = rectangles[index_texture2];
 
     deplacer_texture(renderer, background_texture, textures[index_texture1], rect1, rect2, 5);
     deplacer_texture(renderer, background_texture, textures[index_texture2], rect2, rect1, 5);
 
-    // Mettre à jour les rectangles avec les nouvelles positions
     rectangles[index_texture1] = rect2;
     rectangles[index_texture2] = rect1;
 }
@@ -106,12 +91,11 @@ void echanger_pioche(SDL_Renderer* renderer, SDL_Texture* background_texture, SD
     SDL_Event event;
     bool clicked = false;
     int index_texture1 = -1;
-
     while (!clicked) {
         SDL_WaitEvent(&event);
         if (event.type == SDL_QUIT) {
             return;
-        } else if (event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT) {
+        } else if (event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_RIGHT) {
             int x = event.button.x;
             int y = event.button.y;
 
@@ -126,41 +110,21 @@ void echanger_pioche(SDL_Renderer* renderer, SDL_Texture* background_texture, SD
         }
     }
 
-    int index_texture2 = -1;
-    clicked = false;
+    int index_texture2 = 1; // index pioche
+    SDL_Rect rect_initial1 = {500, 300, 100, 150}; 
+    SDL_Rect rect_initial3 = {200, 200, 100, 150}; 
 
-    while (!clicked) {
-        SDL_WaitEvent(&event);
-        if (event.type == SDL_QUIT) {
-            return;
-        } else if (event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT) {
-            int x = event.button.x;
-            int y = event.button.y;
-
-            for (int i = 0; i < nb_textures; ++i) {
-                SDL_Rect rect = rectangles[i];
-                if (x >= rect.x && x <= rect.x + rect.w && y >= rect.y && y <= rect.y + rect.h && i != index_texture1) {
-                    index_texture2 = i;
-                    clicked = true;
-                    break;
-                }
-            }
-        }
-    }
-
-    // Échanger les positions des textures
+    
     SDL_Rect rect1 = rectangles[index_texture1];
     SDL_Rect rect2 = rectangles[index_texture2];
-    SDL_Rect rect3 = rectangles[index_texture3];
 
-    deplacer_texture(renderer, background_texture, textures[index_texture1], rect1, rect3, 5);
-    deplacer_texture(renderer, background_texture, textures[index_texture2], rect2, rect1, 5);
+    
+    deplacer_texture(renderer, background_texture, textures[index_texture1], rect1, rect_initial3, 5);
+    deplacer_texture(renderer, background_texture, textures[index_texture2], rect2, rect_initial1, 5);
 
-    // Mettre à jour les rectangles avec les nouvelles positions
-    rectangles[index_texture1] = rect3;
-    rectangles[index_texture2] = rect1;
+    rectangles[index_texture1] = rect_initial3;
+    rectangles[index_texture2] = rect_initial1;
 }
-
 
 int main(int argc, char* argv[]) {
     (void)argc;
@@ -172,26 +136,28 @@ int main(int argc, char* argv[]) {
     SDL_Rect rectangles[3];
     textures[0] = IMG_LoadTexture(renderer, "../Images/ressource_bois.png");
     textures[1] = IMG_LoadTexture(renderer, "../Images/ressource_minerai.png");
-    textures[2] = IMG_LoadTexture(renderer,"../Images/ressources_ble.png");
-    SDL_Rect rect1 = {100, 100, 100, 150};
-    SDL_Rect rect2 = {300, 300, 100, 150};
-    SDL_Rect rect3 = {300,300, 100,150};
+    textures[2] = IMG_LoadTexture(renderer, "../Images/ressource_ble.png");
+    SDL_Rect rect1 = {500, 300, 100, 150};
+    SDL_Rect rect2 = {300, 200, 100, 150};
+    SDL_Rect rect3 = {200, 200, 100, 150}; // Position de la défausse
     rectangles[0] = rect1;
     rectangles[1] = rect2;
     rectangles[2] = rect3;
     bool quit = false;
     SDL_Event event;
+
     while (!quit) {
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT) {
                 quit = true;
             } else if (event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT) {
                 echanger_positions(renderer, background_texture, textures, rectangles, 2);
-                echanger_pioche(renderer,background_texture,textures,rectangles,3);
+            } else if (event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_RIGHT) {
+                echanger_pioche(renderer, background_texture, textures, rectangles, 3);
             }
         }
         SDL_RenderClear(renderer);
-        SDL_RenderCopy(renderer, background_texture, NULL, NULL); // Afficher le background
+        SDL_RenderCopy(renderer, background_texture, NULL, NULL); 
         for (int i = 0; i < 3; ++i) {
             SDL_RenderCopy(renderer, textures[i], NULL, &rectangles[i]);
         }
