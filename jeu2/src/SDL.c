@@ -10,21 +10,19 @@
 #define GRID_HEIGHT 4
 #define GRID1_WIDTH 6
 #define GRID1_HEIGHT 1
-#define NB_CARTES 16
+#define NB_CARTES 22 // Mise à jour du nombre total de cartes
 #define WINDOW_HAUTEUR 1200
 #define WINDOW_LARGEUR 1600
 
 
 void init_grille(emplacement_carte grille[GRID_HEIGHT][GRID_WIDTH]) {
-    emplacement_carte temp[GRID_HEIGHT][GRID_WIDTH] = 
-    {
-        {{500, 230}, {600, 230}, {700, 230}, {800, 230}},
-        {{500, 380}, {600, 380}, {700, 380}, {800, 380}},
-        {{500, 530}, {600, 530}, {700, 530}, {800, 530}},
-        {{500, 680}, {600, 680}, {700, 680}, {800, 680}}
+    emplacement_carte temp[GRID_HEIGHT][GRID_WIDTH] = {
+        { {500, 230}, {600, 230}, {700, 230}, {800, 230} },
+        { {500, 380}, {600, 380}, {700, 380}, {800, 380} },
+        { {500, 530}, {600, 530}, {700, 530}, {800, 530} },
+        { {500, 680}, {600, 680}, {700, 680}, {800, 680} }
     };
 
-    // Copier les valeurs dans le tableau passé en paramètre
     for (int i = 0; i < GRID_HEIGHT; ++i) {
         for (int j = 0; j < GRID_WIDTH; ++j) {
             grille[i][j] = temp[i][j];
@@ -33,20 +31,16 @@ void init_grille(emplacement_carte grille[GRID_HEIGHT][GRID_WIDTH]) {
 }
 
 void init_main_ia(emplacement_carte grille_ia[GRID1_HEIGHT][GRID1_WIDTH]) {
-    emplacement_carte temp[GRID1_HEIGHT][GRID1_WIDTH] =
-    {
-        {{350, 10}, {450, 10}, {550, 10}, {650, 10}, {750, 10}, {850, 10}}
+    emplacement_carte temp[GRID1_HEIGHT][GRID1_WIDTH] = {
+        { {350, 10}, {450, 10}, {550, 10}, {650, 10}, {750, 10}, {850, 10} }
     };
 
     for (int i = 0; i < GRID1_WIDTH; ++i) {
-        for (int j = 0; j < GRID1_HEIGHT; ++j) {
-            grille_ia[j][i] = temp[j][i];
-        }
+        grille_ia[0][i] = temp[0][i];
     }
 }
 
-int init_cartes(tab_carte_construction* cartes, SDL_Renderer* renderer, const char* image_paths[], emplacement_carte grille[GRID_HEIGHT][GRID_WIDTH]) {
-    // Charger les textures
+int init_cartes(tab_carte_construction* cartes, SDL_Renderer* renderer, const char* image_paths[], emplacement_carte grille[GRID_HEIGHT][GRID_WIDTH], emplacement_carte grille1[GRID1_HEIGHT][GRID1_WIDTH]) {
     SDL_Texture* texture_routeA = IMG_LoadTexture(renderer, image_paths[9]);
     if (!texture_routeA) {
         printf("Erreur IMG_LoadTexture pour routeA: %s\n", IMG_GetError());
@@ -87,7 +81,6 @@ int init_cartes(tab_carte_construction* cartes, SDL_Renderer* renderer, const ch
         return 0;
     }
 
-    // Assigner les textures aux positions spécifiées de la grille
     cartes->tab_carte_construction[0] = (carte*)malloc(sizeof(carte));
     cartes->tab_carte_construction[0]->texture = texture_routeA;
     cartes->tab_carte_construction[0]->rect.x = grille[1][0].x;
@@ -119,7 +112,7 @@ int init_cartes(tab_carte_construction* cartes, SDL_Renderer* renderer, const ch
     int index = 4;
     for (int i = 0; i < GRID_HEIGHT; ++i) {
         for (int j = 0; j < GRID_WIDTH; ++j) {
-            if (!((i == 1) && (j >= 0 && j <= 3))) {
+            if (!(i == 1 && j < 4)) {
                 cartes->tab_carte_construction[index] = (carte*)malloc(sizeof(carte));
                 cartes->tab_carte_construction[index]->texture = texture_emp_carte;
                 cartes->tab_carte_construction[index]->rect.x = grille[i][j].x;
@@ -128,6 +121,18 @@ int init_cartes(tab_carte_construction* cartes, SDL_Renderer* renderer, const ch
                 cartes->tab_carte_construction[index]->rect.h = 150;
                 ++index;
             }
+        }
+    }
+
+    for (int i = 0; i < GRID1_HEIGHT; ++i) {
+        for (int j = 0; j < GRID1_WIDTH; ++j) {
+            cartes->tab_carte_construction[index] = (carte*)malloc(sizeof(carte));
+            cartes->tab_carte_construction[index]->texture = texture_emp_carte;
+            cartes->tab_carte_construction[index]->rect.x = grille1[i][j].x;
+            cartes->tab_carte_construction[index]->rect.y = grille1[i][j].y;
+            cartes->tab_carte_construction[index]->rect.w = 100;
+            cartes->tab_carte_construction[index]->rect.h = 150;
+            ++index;
         }
     }
 
@@ -140,6 +145,9 @@ void display(SDL_Texture* bg_texture, tab_carte_construction* cartes, SDL_Render
     for (int i = 0; i < NB_CARTES; ++i) {
         if (cartes->tab_carte_construction[i]) {
             SDL_RenderCopy(renderer, cartes->tab_carte_construction[i]->texture, NULL, &cartes->tab_carte_construction[i]->rect);
+            printf("Carte %d : x = %d, y = %d, w = %d, h = %d\n", i, cartes->tab_carte_construction[i]->rect.x, cartes->tab_carte_construction[i]->rect.y, cartes->tab_carte_construction[i]->rect.w, cartes->tab_carte_construction[i]->rect.h);
+        } else {
+            printf("Carte %d est NULL\n", i);
         }
     }
 
@@ -235,7 +243,7 @@ int main(int argc, char* argv[]) {
     tab_carte_construction cartes;
     memset(&cartes, 0, sizeof(tab_carte_construction));
 
-    if (!init_cartes(&cartes, renderer, image_paths, grille)) {
+    if (!init_cartes(&cartes, renderer, image_paths, grille, grille_ia)) {
         cleanup(window, renderer, &cartes);
         return 1;
     }
