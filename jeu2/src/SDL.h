@@ -7,6 +7,9 @@
 #include <math.h>
 #include "utils.h"
 #include "situation.h"
+#include "regles.h"
+#include "victoire.h"
+#include "action.h"
 
 #define GRID_WIDTH 4
 #define GRID_HEIGHT 4

@@ -55,6 +55,17 @@ tab_carte creation_tab_carte()
     }
     return tab;
 }
+trouple* creer_trouple(int premier, int deuxieme,int troisieme)
+{
+    trouple* c = malloc(sizeof(trouple));
+    if (c != NULL)
+    {
+        c->premier=premier;
+        c->deuxieme=deuxieme;
+        c->troisieme=troisieme;
+    }
+    return c;
+}
 
 int randomiser(int N) 
 {
