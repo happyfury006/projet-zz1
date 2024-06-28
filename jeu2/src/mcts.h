@@ -51,16 +51,24 @@ typedef struct ConteneurCouple{
     TypeValeurCouple type;
 }ConteneurCouple;
 
+
 typedef struct Nodemcts{
     int visite;
     int victoire;
     float esperance;
     bool phase_echange;
     int coup_construction;
-    struct Conteneur coup_defausse;
-    struct ConteneurCouple coup_marche;
+    struct Conteneur* coup_defausse;
+    struct ConteneurCouple* coup_marche;
     struct Nodemcts* next;
 }Nodemcts;
 
+Conteneur initConteneurUnique(int entier);
+Conteneur initConteneurCouple(int premier, int second);
+ConteneurCouple initConteneurCoupleSimple(int premier, int second);
+ConteneurCouple initConteneurCoupleDeCouples(int premier1, int second1, int premier2, int second2);
+Nodemcts* initNodemcts(Conteneur* defausse,ConteneurCouple* marche, int construction);
+void freeNodemcts(Nodemcts* tete);
+Nodemcts* trouverPremierNonVisite(Nodemcts* tete);
 
 #endif
