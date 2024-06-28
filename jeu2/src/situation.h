@@ -1,7 +1,6 @@
 #ifndef GARDIEN_UNIQUE_SITUATION_H
 #define GARDIEN_UNIQUE_SITUATION_H
 
-
 #include "utils.h"
 
 typedef struct situation {
@@ -11,7 +10,7 @@ typedef struct situation {
   int nb_echanges_marchee;
   int nb_cartes_mainjoueur;
   int pioche[NB_RESSOURCE];
-  
+
   int defausse[NB_RESSOURCE];
   int tab_constru_joueur[NB_CONSTRUCTION];
   int tab_constru_advers[NB_CONSTRUCTION];
@@ -20,8 +19,8 @@ typedef struct situation {
 
 } sitjoueur;
 
-//Fonctions
-sitjoueur* creation_situation(int joueur);
-sitjoueur* initilisation_depart(sitjoueur* joueur1,sitjoueur* joueur2);
-void destruction_situation(sitjoueur* s);
+// Fonctions
+sitjoueur *creation_situation(int joueur);
+sitjoueur *initilisation_depart(sitjoueur *joueur1, sitjoueur *joueur2);
+void destruction_situation(sitjoueur *s);
 #endif // GARDIEN_UNIQUE_SITUATION_H

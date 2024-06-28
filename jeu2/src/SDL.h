@@ -1,15 +1,15 @@
 #ifndef GARDIEN_UNIQUE_SDL_H
 #define GARDIEN_UNIQUE_SDL_H
+#include "action.h"
+#include "regles.h"
+#include "situation.h"
+#include "utils.h"
+#include "victoire.h"
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
-#include <stdio.h>
-#include <stdbool.h>
 #include <math.h>
-#include "utils.h"
-#include "situation.h"
-#include "regles.h"
-#include "victoire.h"
-#include "action.h"
+#include <stdbool.h>
+#include <stdio.h>
 
 #define GRID_WIDTH 4
 #define GRID_HEIGHT 4
@@ -23,14 +23,13 @@
 #define GRID_CARTE_WIDTH 6
 #define GRID_CARTE_HEIGHT 6
 
-typedef struct emplacement_carte{
-    int x;
-    int y;
+typedef struct emplacement_carte {
+  int x;
+  int y;
 } emplacement_carte;
 
-typedef struct cadrillage{
-    struct carte* emplacement[GRID_CARTE_WIDTH][GRID_CARTE_HEIGHT];
-}cadrillage;
-
+typedef struct cadrillage {
+  struct carte *emplacement[GRID_CARTE_WIDTH][GRID_CARTE_HEIGHT];
+} cadrillage;
 
 #endif
