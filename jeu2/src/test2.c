@@ -94,18 +94,17 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    int clickCount = 1; // Initialiser le compteur à 0
+    int clickCount = 1; // Initialiser le compteur à 1
     int quit = 0;
     SDL_Event e;
 
-    // Initialiser une structure sitjoueur
+    
     sitjoueur joueur;
     joueur.compteur_points_joueur = 0; // Initialiser les points du joueur à partir de la structure
 
     // Charger la texture à afficher lorsque les points du joueur atteignent 10
     SDL_Texture* victoire_texture = IMG_LoadTexture(renderer, "../Images/victoire.png");
     if (!victoire_texture) {
-        // Gérer l'erreur si la texture n'est pas chargée
         TTF_CloseFont(font);
         SDL_DestroyRenderer(renderer);
         SDL_DestroyWindow(window);
