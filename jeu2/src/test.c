@@ -1,10 +1,11 @@
-
-
-#include "SDL.h"
 #include <SDL2/SDL_image.h>
 #include <stdio.h>
 #include <stdbool.h>
 #include <math.h>
+#define WINDOW_HAUTEUR 600
+#define WINDOW_LARGEUR 800
+#define BUTTON_WIDTH 200
+#define BUTTON_HEIGHT 100
 
 void deplacer_texture(SDL_Renderer* renderer, SDL_Texture* background_texture, SDL_Texture* texture, SDL_Rect rect_init, SDL_Rect rect_final, int speed) {
     int dx = rect_final.x - rect_init.x;
@@ -197,6 +198,12 @@ void mouvement_jouer_carte(SDL_Renderer* renderer, SDL_Texture* background_textu
     rectangles[index_texture2] = rect1;
 }
 
+void display_menu(SDL_Texture* bg_menu_texture, SDL_Texture* button_texture, SDL_Renderer* renderer, SDL_Rect* button_rect) {
+    SDL_RenderCopy(renderer, bg_menu_texture, NULL, NULL);
+    SDL_RenderCopy(renderer, button_texture, NULL, button_rect);
+    SDL_RenderPresent(renderer);
+}
+
 
 
 int main(int argc, char* argv[]) {
@@ -210,6 +217,11 @@ int main(int argc, char* argv[]) {
     textures[0] = IMG_LoadTexture(renderer, "../Images/ressource_bois.png");
     textures[1] = IMG_LoadTexture(renderer, "../Images/ressource_minerai.png");
     textures[2] = IMG_LoadTexture(renderer, "../Images/ressource_ble.png");
+    SDL_Texture* bg_menu_texture = IMG_LoadTexture(renderer, "../Images/background.png");
+
+    SDL_Texture* button_texture = IMG_LoadTexture(renderer, "../Images/Start.png");
+    SDL_Rect button_rect = {WINDOW_LARGEUR / 2 - BUTTON_WIDTH / 2, WINDOW_HAUTEUR / 2 - BUTTON_HEIGHT / 2, BUTTON_WIDTH, BUTTON_HEIGHT};
+    
     SDL_Rect rect1 = {500, 300, 100, 150};
     SDL_Rect rect2 = {300, 200, 100, 150};
     SDL_Rect rect3 = {200, 200, 100, 150}; // Position de la défausse
@@ -218,14 +230,15 @@ int main(int argc, char* argv[]) {
     rectangles[2] = rect3;
     bool quit = false;
     SDL_Event event;
-
+    display_menu(bg_menu_texture,button_texture,renderer,&button_rect);
+    SDL_Delay(10000);
     while (!quit) {
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT) {
                 quit = true;
             } else if (event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT) {
-                echanger_positions(renderer, background_texture, textures, rectangles, 2);
-               // même clique(trouver 1 solution) mouvement_jouer_carte(renderer,background_texture,textures,rectangles, 3);
+                // même clique(trouver 1 solution) echanger_positions(renderer, background_texture, textures, rectangles, 2);
+               mouvement_jouer_carte(renderer,background_texture,textures,rectangles, 3);
             } else if (event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_RIGHT) {
                 echanger_pioche(renderer, background_texture, textures, rectangles, 3);
             }

@@ -17,6 +17,7 @@ void phase_echange(sitjoueur* joueur1,sitjoueur* joueur2){
   int nb_echange=0;
   printf("Combien de carte de votre main voulez vous echanger ?\n");
   scanf("%d",&nb_echange);
+  nb_echange=min(nb_echange,2);
     if (choix==0)
     {
         for (int i = 0; i < nb_echange; i++){ 
