@@ -7,6 +7,7 @@
 #define BUTTON_WIDTH 200
 #define BUTTON_HEIGHT 100
 
+// J'aimerai avoir une fonction qui fait que lorsque je clique sur un SDL rect qui se trouve en x = 0 et y = 0 alors on incrémente un compteur de 1 que l'on initialise à 0 (je veux l'afficher sur la fenêtre)
 void deplacer_texture(SDL_Renderer* renderer, SDL_Texture* background_texture, SDL_Texture* texture, SDL_Rect rect_init, SDL_Rect rect_final, int speed) {
     int dx = rect_final.x - rect_init.x;
     int dy = rect_final.y - rect_init.y;
@@ -231,14 +232,14 @@ int main(int argc, char* argv[]) {
     bool quit = false;
     SDL_Event event;
     display_menu(bg_menu_texture,button_texture,renderer,&button_rect);
-    SDL_Delay(10000);
+    SDL_Delay(1000);
     while (!quit) {
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT) {
                 quit = true;
             } else if (event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT) {
-                // même clique(trouver 1 solution) echanger_positions(renderer, background_texture, textures, rectangles, 2);
-               mouvement_jouer_carte(renderer,background_texture,textures,rectangles, 3);
+                echanger_positions(renderer, background_texture, textures, rectangles, 2);
+                // mouvement_jouer_carte(renderer,background_texture,textures,rectangles, 3);
             } else if (event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_RIGHT) {
                 echanger_pioche(renderer, background_texture, textures, rectangles, 3);
             }
@@ -260,3 +261,5 @@ int main(int argc, char* argv[]) {
     SDL_Quit();
     return 0;
 }
+
+
