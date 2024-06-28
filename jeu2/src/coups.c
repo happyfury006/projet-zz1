@@ -56,7 +56,7 @@ int* init_construction(sitjoueur* sit){
 }
 
 
-tab* init_defausse(sitjoueur* sit){
+tab* init_echange1(sitjoueur* sit){
     tab* L_echange=creertab();
     generer_combinaisons_main(sit->mainjoueur, 5, L_echange->main);
     generer_combinaisons_main(sit->marchee, 5, L_echange->marche);
