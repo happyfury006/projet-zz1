@@ -21,7 +21,6 @@ typedef struct Node {
     struct liste_chainee L_defausse;
     struct liste_chainee_2 L_echange;
     int* L_construction;
-    bool defausse;
     bool echange;
     bool construction;
 } Node;
