@@ -1,893 +1,512 @@
 #include "SDL.h"
 
-// void init_grille(SDL_Rect grille[GRID_HEIGHT][GRID_WIDTH]) {
-//     SDL_Rect temp[GRID_HEIGHT][GRID_WIDTH] = {
-//         { {500, 230, TAILLE_CARTE_W, TAILLE_CARTE_H}, {600, 230,
-//         TAILLE_CARTE_W, TAILLE_CARTE_H}, {700, 230, TAILLE_CARTE_W,
-//         TAILLE_CARTE_H}, {800, 230, TAILLE_CARTE_W, TAILLE_CARTE_H} }, {
-//         {500, 380, TAILLE_CARTE_W, TAILLE_CARTE_H}, {600, 380,
-//         TAILLE_CARTE_W, TAILLE_CARTE_H}, {700, 380, TAILLE_CARTE_W,
-//         TAILLE_CARTE_H}, {800, 380, TAILLE_CARTE_W, TAILLE_CARTE_H} }, {
-//         {500, 530, TAILLE_CARTE_W, TAILLE_CARTE_H}, {600, 530,
-//         TAILLE_CARTE_W, TAILLE_CARTE_H}, {700, 530, TAILLE_CARTE_W,
-//         TAILLE_CARTE_H}, {800, 530, TAILLE_CARTE_W, TAILLE_CARTE_H} }, {
-//         {500, 680, TAILLE_CARTE_W, TAILLE_CARTE_H}, {600, 680,
-//         TAILLE_CARTE_W, TAILLE_CARTE_H}, {700, 680, TAILLE_CARTE_W,
-//         TAILLE_CARTE_H}, {800, 680, TAILLE_CARTE_W, TAILLE_CARTE_H} }
-//     };
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
 
-//     for (int i = 0; i < GRID_HEIGHT; ++i) {
-//         for (int j = 0; j < GRID_WIDTH; ++j) {
-//             grille[i][j] = temp[i][j];
-//         }
-//     }
-// }
+#include "action.h"
+#include "construction.h"
+#include "mcts.h"
+#include "regles.h"
 
-// void init_main_ia(SDL_Rect grille_ia[GRID1_HEIGHT][GRID1_WIDTH]) {
-//     SDL_Rect temp[GRID1_HEIGHT][GRID1_WIDTH] = {
-//         { {350, 10, TAILLE_CARTE_W, TAILLE_CARTE_H}, {450, 10,
-//         TAILLE_CARTE_W, TAILLE_CARTE_H}, {550, 10, TAILLE_CARTE_W,
-//         TAILLE_CARTE_H}, {650, 10, TAILLE_CARTE_W, TAILLE_CARTE_H}, {750, 10,
-//         TAILLE_CARTE_W, TAILLE_CARTE_H}, {850, 10, TAILLE_CARTE_W,
-//         TAILLE_CARTE_H} }
-//     };
+#define WINDOW_LARGEUR 1300
+#define WINDOW_HAUTEUR 900
+#define DELAI_IA 450  // pause entre deux actions de l'IA, en millisecondes
 
-//     for (int i = 0; i < GRID1_WIDTH; ++i) {
-//         grille_ia[0][i] = temp[0][i];
-//     }
-// }
-// void init_main_joueur(SDL_Rect grille_joueur[GRID1_HEIGHT][GRID1_WIDTH]) {
-//     SDL_Rect temp[GRID1_HEIGHT][GRID1_WIDTH] = {
-//         { {350, 1090, TAILLE_CARTE_W, TAILLE_CARTE_H}, {450, 1090,
-//         TAILLE_CARTE_W, TAILLE_CARTE_H}, {550, 1090, TAILLE_CARTE_W,
-//         TAILLE_CARTE_H}, {650, 1090, TAILLE_CARTE_W, TAILLE_CARTE_H}, {750,
-//         1090, TAILLE_CARTE_W, TAILLE_CARTE_H}, {850, 1090, TAILLE_CARTE_W,
-//         TAILLE_CARTE_H} }
-//     };
+// Taille des cartes à l'écran
+#define MAIN_W 110
+#define MAIN_H 170
+#define CARTE_W 95
+#define CARTE_H 147
+#define MINI_W 46
+#define MINI_H 71
 
-//     for (int i = 0; i < GRID1_WIDTH; ++i) {
-//         grille_joueur[0][i] = temp[0][i];
-//     }
-// }
+// Position des zones (coordonnées du jeu, avant mise à l'échelle)
+#define PIOCHE_X 40
+#define PIOCHE_Y 195
+#define MARCHE_X 250
+#define MARCHE_Y 195
+#define CONSTRU_X 250
+#define CONSTRU_Y 405
+#define CONSTRU_PAS 130
+#define MAIN_X 40
+#define MAIN_Y 650
+#define MAIN_PAS 120
+#define PANNEAU_X 960
+#define FIN_X 1030
+#define FIN_Y 535
 
-#include "SDL.h"
+// Phases de l'interface, comme l'automate de la branche jeu2fixSDL
+typedef enum { MENU, REGLES, TRANSITION, PARTIE, FIN } etat_t;
 
-cadrillage cadrillage_carte(cadrillage cadri) {
-  SDL_Rect temp[GRID_CARTE_HEIGHT][GRID_CARTE_WIDTH] = {
-      {{150, 10, TAILLE_CARTE_W, TAILLE_CARTE_H},
-       {250, 10, TAILLE_CARTE_W, TAILLE_CARTE_H},
-       {350, 10, TAILLE_CARTE_W, TAILLE_CARTE_H},
-       {450, 10, TAILLE_CARTE_W, TAILLE_CARTE_H},
-       {550, 10, TAILLE_CARTE_W, TAILLE_CARTE_H},
-       {650, 10, TAILLE_CARTE_W, TAILLE_CARTE_H},
-       {750, 10, TAILLE_CARTE_W, TAILLE_CARTE_H},
-       {850, 10, TAILLE_CARTE_W, TAILLE_CARTE_H}},
-      {{0, 0, 0, 0},
-       {0, 0, 0, 0},
-       {500, 230, TAILLE_CARTE_W, TAILLE_CARTE_H},
-       {600, 230, TAILLE_CARTE_W, TAILLE_CARTE_H},
-       {700, 230, TAILLE_CARTE_W, TAILLE_CARTE_H},
-       {800, 230, TAILLE_CARTE_W, TAILLE_CARTE_H}},
-      {{200, 380, TAILLE_CARTE_W, TAILLE_CARTE_H},
-       {350, 380, TAILLE_CARTE_W, TAILLE_CARTE_H},
-       {500, 380, TAILLE_CARTE_W, TAILLE_CARTE_H},
-       {600, 380, TAILLE_CARTE_W, TAILLE_CARTE_H},
-       {700, 380, TAILLE_CARTE_W, TAILLE_CARTE_H},
-       {800, 380, TAILLE_CARTE_W, TAILLE_CARTE_H}},
-      {{0, 0, 0, 0},
-       {400, 530, TAILLE_CARTE_W, TAILLE_CARTE_H},
-       {500, 530, TAILLE_CARTE_W, TAILLE_CARTE_H},
-       {600, 530, TAILLE_CARTE_W, TAILLE_CARTE_H},
-       {700, 530, TAILLE_CARTE_W, TAILLE_CARTE_H},
-       {800, 530, TAILLE_CARTE_W, TAILLE_CARTE_H}},
-      {{0, 0, 0, 0},
-       {0, 0, 0, 0},
-       {500, 680, TAILLE_CARTE_W, TAILLE_CARTE_H},
-       {600, 680, TAILLE_CARTE_W, TAILLE_CARTE_H},
-       {700, 680, TAILLE_CARTE_W, TAILLE_CARTE_H},
-       {800, 680, TAILLE_CARTE_W, TAILLE_CARTE_H}},
-      {{150, 1090, TAILLE_CARTE_W, TAILLE_CARTE_H},
-       {250, 1090, TAILLE_CARTE_W, TAILLE_CARTE_H},
-       {350, 1090, TAILLE_CARTE_W, TAILLE_CARTE_H},
-       {450, 1090, TAILLE_CARTE_W, TAILLE_CARTE_H},
-       {550, 1090, TAILLE_CARTE_W, TAILLE_CARTE_H},
-       {650, 1090, TAILLE_CARTE_W, TAILLE_CARTE_H},
-       {750, 1090, TAILLE_CARTE_W, TAILLE_CARTE_H},
-       {850, 1090, TAILLE_CARTE_W, TAILLE_CARTE_H}}
+typedef struct textures {
+  SDL_Texture *fond, *titre, *soustitre, *bouton_ia, *bouton_2j, *bouton_fin, *touches, *regles;
+  SDL_Texture *lbl_pioche, *lbl_defausse, *lbl_marche, *lbl_constructions, *lbl_main, *lbl_ia, *lbl_j[2];
+  SDL_Texture *lbl_points, *lbl_ech_pioche, *lbl_ech_marche, *aide, *ia_reflechit, *deja_construit;
+  SDL_Texture *transition[2], *gagne[2], *egalite, *victoire, *defaite, *retour_menu, *chiffres;
+  SDL_Texture *ressources[NB_RESSOURCE], *dos;
+  SDL_Texture *constructions[NB_CONSTRUCTION][2];  // faces A et B (identiques sauf route et chevalier)
+} textures;
 
-  };
-  for (int i = 0; i < GRID_CARTE_HEIGHT; ++i) {
-    for (int j = 0; j < GRID_CARTE_WIDTH; j++) {
-      carte *newCarte = creation_carte(-1);
-      newCarte->rect = temp[j][i];
-      cadri.emplacement[j][i] = newCarte;
-    }
+typedef struct jeu_sdl {
+  etat_t etat;
+  bool contre_ia;
+  situation s;
+  int selection;  // ressource de la carte choisie dans la main, -1 sinon
+} jeu_sdl;
+
+static char chemin_images[1024];
+
+static SDL_Texture *charger(SDL_Renderer *renderer, const char *nom) {
+  char chemin[1200];
+  snprintf(chemin, sizeof chemin, "%s%s", chemin_images, nom);
+  SDL_Texture *t = IMG_LoadTexture(renderer, chemin);
+  if (t == NULL) {
+    fprintf(stderr, "Image introuvable : %s (%s)\n", chemin, IMG_GetError());
+    exit(EXIT_FAILURE);
   }
-  return cadri;
+  return t;
 }
 
-int init_cartes(tab_carte *cartes, SDL_Renderer *renderer,
-                const char *image_paths[]) {
-  SDL_Texture *texture_routeA = IMG_LoadTexture(renderer, image_paths[0]);
-  if (!texture_routeA) {
-    printf("Erreur IMG_LoadTexture pour routeA: %s\n", IMG_GetError());
-    return 0;
-  }
+// ---------- dessin ----------
 
-  SDL_Texture *texture_chevalierA = IMG_LoadTexture(renderer, image_paths[1]);
-  if (!texture_chevalierA) {
-    printf("Erreur IMG_LoadTexture pour chevalierA: %s\n", IMG_GetError());
-    SDL_DestroyTexture(texture_routeA);
-    return 0;
-  }
-  SDL_Texture *texture_colonie = IMG_LoadTexture(renderer, image_paths[2]);
-  if (!texture_colonie) {
-    printf("Erreur IMG_LoadTexture pour colonie: %s\n", IMG_GetError());
-    SDL_DestroyTexture(texture_routeA);
-    SDL_DestroyTexture(texture_chevalierA);
-    return 0;
-  }
-
-  SDL_Texture *texture_ville = IMG_LoadTexture(renderer, image_paths[3]);
-  if (!texture_ville) {
-    printf("Erreur IMG_LoadTexture pour ville: %s\n", IMG_GetError());
-    SDL_DestroyTexture(texture_routeA);
-    SDL_DestroyTexture(texture_chevalierA);
-    SDL_DestroyTexture(texture_colonie);
-    return 0;
-  }
-
-  SDL_Texture *texture_developpement =
-      IMG_LoadTexture(renderer, image_paths[4]);
-  if (!texture_developpement) {
-    printf("Erreur IMG_LoadTexture pour développement: %s\n", IMG_GetError());
-    SDL_DestroyTexture(texture_routeA);
-    SDL_DestroyTexture(texture_chevalierA);
-    SLD_DestroyTexture(texture_colonie);
-    SDL_DestroyTexture(texture_ville);
-    return 0;
-  }
-  SDL_Texture *texture_routeB = IMG_LoadTexture(renderer, image_paths[5]);
-  if (!texture_routeB) {
-    printf("Erreur IMG_LoadTexture pour routeB: %s\n", IMG_GetError());
-    SDL_DestroyTexture(texture_routeA);
-    SDL_DestroyTexture(texture_chevalierA);
-    SLD_DestroyTexture(texture_colonie);
-    SDL_DestroyTexture(texture_ville);
-    SDL_DestroyTexture(texture_developpement);
-
-    return 0;
-  }
-  SDL_Texture *texture_chevalierB = IMG_LoadTexture(renderer, image_paths[6]);
-  if (!texture_chevalierB) {
-    printf("Erreur IMG_LoadTexture pour chevalierB: %s\n", IMG_GetError());
-    SDL_DestroyTexture(texture_routeA);
-    SDL_DestroyTexture(texture_chevalierA);
-    SLD_DestroyTexture(texture_colonie);
-    SDL_DestroyTexture(texture_ville);
-    SDL_DestroyTexture(texture_developpement);
-    SDL_DestroyTexture(texture_routeB);
-    return 0;
-  }
-  SDL_Texture *texture_ressource_bois =
-      IMG_LoadTexture(renderer, image_paths[7]);
-  if (!texture_ressource_bois) {
-    printf("Erreur IMG_LoadTexture pour ressource_bois: %s\n", IMG_GetError());
-    SDL_DestroyTexture(texture_routeA);
-    SDL_DestroyTexture(texture_chevalierA);
-    SLD_DestroyTexture(texture_colonie);
-    SDL_DestroyTexture(texture_ville);
-    SDL_DestroyTexture(texture_developpement);
-    SDL_DestroyTexture(texture_routeB);
-    SDL_DestroyTexture(texture_chevalierB);
-    return 0;
-  }
-  SDL_Texture *texture_ressource_argile =
-      IMG_LoadTexture(renderer, image_paths[8]);
-  if (!texture_ressource_argile) {
-    printf("Erreur IMG_LoadTexture pour ressource_argile: %s\n",
-           IMG_GetError());
-    SDL_DestroyTexture(texture_routeA);
-    SDL_DestroyTexture(texture_chevalierA);
-    SLD_DestroyTexture(texture_colonie);
-    SDL_DestroyTexture(texture_ville);
-    SDL_DestroyTexture(texture_developpement);
-    SDL_DestroyTexture(texture_routeB);
-    SDL_DestroyTexture(texture_chevalierB);
-    SDL_DestroyTexture(texture_ressource_bois);
-    return 0;
-  }
-  SDL_Texture *texture_ressource_mouton =
-      IMG_LoadTexture(renderer, image_paths[9]);
-  if (!texture_ressource_mouton) {
-    printf("Erreur IMG_LoadTexture pour ressource_mouton: %s\n",
-           IMG_GetError());
-    SDL_DestroyTexture(texture_routeA);
-    SDL_DestroyTexture(texture_chevalierA);
-    SLD_DestroyTexture(texture_colonie);
-    SDL_DestroyTexture(texture_ville);
-    SDL_DestroyTexture(texture_developpement);
-    SDL_DestroyTexture(texture_routeB);
-    SDL_DestroyTexture(texture_chevalierB);
-    SDL_DestroyTexture(texture_ressource_bois);
-    SDL_DestroyTexture(texture_ressource_argile);
-    return 0;
-  }
-  SDL_Texture *texture_ressource_minerai =
-      IMG_LoadTexture(renderer, image_paths[10]);
-  if (!texture_ressource_minerai) {
-    printf("Erreur IMG_LoadTexture pour ressource_minerai: %s\n",
-           IMG_GetError());
-    SDL_DestroyTexture(texture_routeA);
-    SDL_DestroyTexture(texture_chevalierA);
-    SLD_DestroyTexture(texture_colonie);
-    SDL_DestroyTexture(texture_ville);
-    SDL_DestroyTexture(texture_developpement);
-    SDL_DestroyTexture(texture_routeB);
-    SDL_DestroyTexture(texture_chevalierB);
-    SDL_DestroyTexture(texture_ressource_bois);
-    SDL_DestroyTexture(texture_ressource_argile);
-    SDL_DestroyTexture(texture_ressource_mouton);
-    return 0;
-  }
-
-  SDL_Texture *texture_ressource_ble =
-      IMG_LoadTexture(renderer, image_paths[11]);
-  if (!texture_ressource_ble) {
-    printf("Erreur IMG_LoadTexture pour ressource_ble: %s\n", IMG_GetError());
-    SDL_DestroyTexture(texture_routeA);
-    SDL_DestroyTexture(texture_chevalierA);
-    SLD_DestroyTexture(texture_colonie);
-    SDL_DestroyTexture(texture_ville);
-    SDL_DestroyTexture(texture_developpement);
-    SDL_DestroyTexture(texture_routeB);
-    SDL_DestroyTexture(texture_chevalierB);
-    SDL_DestroyTexture(texture_ressource_bois);
-    SDL_DestroyTexture(texture_ressource_argile);
-    SDL_DestroyTexture(texture_ressource_mouton);
-    SDL_DestroyTexture(texture_ressource_minerai);
-    return 0;
-  }
-  SDL_Texture *texture_dos_carte = IMG_LoadTexture(renderer, image_paths[12]);
-  if (!texture_dos_carte) {
-    printf("Erreur IMG_LoadTexture pour dos_carte: %s\n", IMG_GetError());
-    SDL_DestroyTexture(texture_routeA);
-    SDL_DestroyTexture(texture_chevalierA);
-    SLD_DestroyTexture(texture_colonie);
-    SDL_DestroyTexture(texture_ville);
-    SDL_DestroyTexture(texture_developpement);
-    SDL_DestroyTexture(texture_routeB);
-    SDL_DestroyTexture(texture_chevalierB);
-    SDL_DestroyTexture(texture_ressource_bois);
-    SDL_DestroyTexture(texture_ressource_argile);
-    SDL_DestroyTexture(texture_ressource_mouton);
-    SDL_DestroyTexture(texture_ressource_minerai);
-    SDL_DestroyTexture(texture_ressource_ble);
-
-    return 0;
-  }
-
-  SDL_Texture *texture_emp_carte = IMG_LoadTexture(renderer, image_paths[13]);
-  if (!texture_emp_carte) {
-    printf("Erreur IMG_LoadTexture pour emp_carte: %s\n", IMG_GetError());
-    SDL_DestroyTexture(texture_routeA);
-    SDL_DestroyTexture(texture_chevalierA);
-    SDL_DestroyTexture(texture_ville);
-    SDL_DestroyTexture(texture_developpement);
-    SDL_DestroyTexture(texture_routeB);
-    SDL_DestroyTexture(texture_chevalierB);
-    SDL_DestroyTexture(texture_ressource_bois);
-    SDL_DestroyTexture(texture_ressource_argile);
-    SDL_DestroyTexture(texture_ressource_mouton);
-    SDL_DestroyTexture(texture_ressource_minerai);
-    SDL_DestroyTexture(texture_ressource_ble);
-    SDL_DestroyTexture(texture_dos_carte);
-
-    return 0;
-  }
-
-  // assignation des textures aux cartes
-
-  // Carte routeA
-  cartes->tab_carte[0]->texture = texture_routeA;
-
-  // Carte chevalierA
-  cartes->tab_carte[1]->texture = texture_chevalierA;
-
-  // Carte colonie
-  cartes->tab_carte[2]->texture = texture_colonie;
-
-  // Carte ville
-  cartes->tab_carte[3]->texture = texture_ville;
-
-  // Carte développement
-  cartes->tab_carte[4]->texture = texture_developpement;
-
-  // Carte routeB
-  cartes->tab_carte[5]->texture = texture_routeB;
-
-  // Carte chevalierB
-  cartes->tab_carte[6]->texture = texture_chevalierB;
-
-  // asignation des textures des ressources
-
-  // Ressource bois
-  cartes->tab_carte[7]->texture = texture_ressource_bois;
-
-  // Resosurce argile
-  cartes->tab_carte[8]->texture = texture_ressource_argile;
-
-  // Ressource mouton
-  cartes->tab_carte[9]->texture = texture_ressource_mouton;
-
-  // Ressource minerai
-  cartes->tab_carte[10]->texture = texture_ressource_minerai;
-
-  // Ressource ble
-  cartes->tab_carte[11]->texture = texture_ressource_ble;
-
-  // Dos carte
-  cartes->tab_carte[12]->texture = texture_dos_carte;
-
-  // Emp_carte
-  cartes->tab_carte[13]->texture = texture_emp_carte;
-
-  return 1;
-  // Add the missing opening brace
+static void dessiner(SDL_Renderer *r, SDL_Texture *t, int x, int y) {
+  SDL_Rect d = {x, y, 0, 0};
+  SDL_QueryTexture(t, NULL, NULL, &d.w, &d.h);
+  SDL_RenderCopy(r, t, NULL, &d);
 }
 
-void init_position_carte_initiale(cadrillage *cadri, tab_carte *cartes) {
-  cadrillage *cadrillage_tmp_reel = cadri;
-  int position = 0;
-  for (int i = 2; i < GRID_CARTE_WIDTH; ++i) {
-    // Carte construction position board
-    if (i - 2 != 3) {
-      cadrillage_tmp_reel->emplacement[position + 2][2]->type =
-          cartes->tab_carte[i - 2]->type;
-      cadrillage_tmp_reel->emplacement[position + 2][2]->texture =
-          cartes->tab_carte[i - 2]->texture;
-      position++;
-    }
-  }
-  // carte pioche de dos
-  cadrillage_tmp_reel->emplacement[1][2]->type = cartes->tab_carte[12]->type;
-  cadrillage_tmp_reel->emplacement[1][2]->texture =
-      cartes->tab_carte[12]->texture;
+static void dessiner_centre(SDL_Renderer *r, SDL_Texture *t, int cx, int cy) {
+  int w, h;
+  SDL_QueryTexture(t, NULL, NULL, &w, &h);
+  dessiner(r, t, cx - w / 2, cy - h / 2);
 }
 
-void init_positioner_carte_marche_initiale(cadrillage *cadri, tab_carte *cartes,
-                                           sitjoueur *joueur1,
-                                           sitjoueur *joueur2) {
-  cadrillage *cadrillage_tmp_reel = cadri;
-  for (int i = 1; i < GRID_CARTE_WIDTH; ++i) {
-    // Carte ressource position marche premier initiale
-    int random_pioche_marche = randomiser(5);
-    cadrillage_tmp_reel->emplacement[i][3]->type =
-        cartes->tab_carte[random_pioche_marche + 7]->type;
-    cadrillage_tmp_reel->emplacement[i][3]->texture =
-        cartes->tab_carte[random_pioche_marche + 7]->texture;
-    joueur1->marchee[random_pioche_marche]++;
-    joueur2->marchee[random_pioche_marche]++;
-    joueur1->pioche[random_pioche_marche]--;
-    joueur2->pioche[random_pioche_marche]--;
+static void carte(SDL_Renderer *r, SDL_Texture *t, SDL_Rect d, Uint8 opacite) {
+  SDL_SetTextureAlphaMod(t, opacite);
+  SDL_RenderCopy(r, t, NULL, &d);
+  SDL_SetTextureAlphaMod(t, 255);
+}
+
+static void cadre(SDL_Renderer *r, SDL_Rect d, Uint8 rouge, Uint8 vert, Uint8 bleu) {
+  SDL_SetRenderDrawColor(r, rouge, vert, bleu, 255);
+  for (int e = 0; e < 4; e++) {
+    SDL_Rect c = {d.x - 2 - e, d.y - 2 - e, d.w + 4 + 2 * e, d.h + 4 + 2 * e};
+    SDL_RenderDrawRect(r, &c);
   }
 }
 
-trouple *get_carte_from_position(cadrillage *cadri, int x, int y) {
-  for (int i = 0; i < GRID_CARTE_HEIGHT; ++i) {
-    for (int j = 0; j < GRID_CARTE_WIDTH; ++j) {
-      if (cadri->emplacement[i][j]) {
-        if (x >= cadri->emplacement[i][j]->rect.x &&
-            x <= cadri->emplacement[i][j]->rect.x +
-                     cadri->emplacement[i][j]->rect.w &&
-            y >= cadri->emplacement[i][j]->rect.y &&
-            y <= cadri->emplacement[i][j]->rect.y +
-                     cadri->emplacement[i][j]->rect.h) {
-          return creer_trouple(cadri->emplacement[i][j]->rect.x,
-                               cadri->emplacement[i][j]->rect.y,
-                               cadri->emplacement[i][j]->type);
-        }
-      }
-    }
-  }
-  return -1;
+// Fond clair semi-transparent : le parchemin est foncé dans les coins
+static void panneau(SDL_Renderer *r, SDL_Rect d, Uint8 opacite) {
+  SDL_SetRenderDrawColor(r, 246, 234, 208, opacite);
+  SDL_RenderFillRect(r, &d);
 }
 
-void positioner_carte_joueur(cadrillage *cadri, tab_carte *cartes,
-                             sitjoueur *joueur1, sitjoueur *joueur2) {
-  cadrillage *cadrillage_tmp_reel = cadri;
-  // Declare the variable 'copie_main_joueur'
-  // for (int i = 0; i < joueur1->nb_cartes_mainjoueur; ++i) {
-  // Carte ressource position joueur
-  int compteur_possition = 0;
-  int indice_ressource = 0;
-  // Assign the value to 'copie_main_joueur'
-  while (indice_ressource != 4 &&
-         compteur_possition <= joueur1->nb_cartes_mainjoueur) {
-    int copie_main_joueur = joueur1->mainjoueur[indice_ressource];
-    while (copie_main_joueur != 0) {
-      copie_main_joueur--;
-      cadrillage_tmp_reel->emplacement[compteur_possition][5]->type =
-          cartes->tab_carte[indice_ressource]->type;
-      cadrillage_tmp_reel->emplacement[compteur_possition][5]->texture =
-          cartes->tab_carte[indice_ressource]->texture;
-    }
-    indice_ressource++;
+// Image mise à l'échelle et centrée en (cx, cy)
+static void dessiner_echelle(SDL_Renderer *r, SDL_Texture *t, int cx, int cy, float echelle) {
+  int w, h;
+  SDL_QueryTexture(t, NULL, NULL, &w, &h);
+  SDL_Rect d = {cx - (int)(w * echelle) / 2, cy - (int)(h * echelle) / 2, (int)(w * echelle), (int)(h * echelle)};
+  SDL_RenderCopy(r, t, NULL, &d);
+}
+
+// Écrit un nombre avec la planche de chiffres (30 x 46 par chiffre), à l'échelle voulue
+static void nombre(SDL_Renderer *r, textures *tx, int n, int x, int y, float echelle) {
+  char texte[12];
+  snprintf(texte, sizeof texte, "%d", n);
+  for (int i = 0; texte[i]; i++) {
+    SDL_Rect src = {(texte[i] - '0') * 30, 0, 30, 46};
+    SDL_Rect dst = {x + (int)(i * 22 * echelle), y, (int)(30 * echelle), (int)(46 * echelle)};
+    SDL_RenderCopy(r, tx->chiffres, &src, &dst);
   }
 }
 
-void postionner_carte_constru_joueur(cadrillage *cadri, tab_carte *cartes,
-                                     sitjoueur *joueur1, sitjoueur *joueur2,
-                                     int choix_construction) {
-  cadrillage *cadrillage_tmp_reel = cadri;
-
-  if (choix_construction == 0 || choix_construction == 1) {
-    if (joueur1->tab_constru_joueur[choix_construction] % 2 == 0) {
-      cadrillage_tmp_reel->emplacement[choix_construction + 2][4]->type =
-          cartes->tab_carte[choix_construction]->type;
-      cadrillage_tmp_reel->emplacement[choix_construction + 2][4]->texture =
-          cartes->tab_carte[choix_construction]->texture;
-    } else {
-      cadrillage_tmp_reel->emplacement[choix_construction + 2][4]->type =
-          cartes->tab_carte[choix_construction + 5]->type;
-      cadrillage_tmp_reel->emplacement[choix_construction + 2][4]->texture =
-          cartes->tab_carte[choix_construction + 5]->texture;
-    }
-  } else {
-    cadrillage_tmp_reel->emplacement[choix_construction + 2][4]->type =
-        cartes->tab_carte[choix_construction]->type;
-    cadrillage_tmp_reel->emplacement[choix_construction + 2][4]->texture =
-        cartes->tab_carte[choix_construction]->texture;
-  }
+// Texture de la prochaine carte construction (face A ou B selon ce que le joueur a déjà)
+static SDL_Texture *texture_construction(textures *tx, const sitjoueur *j, int c, bool prochaine) {
+  int n = j->tab_constru_joueur[c] + (prochaine ? 1 : 0);
+  return tx->constructions[c][(c == ROUTE || c == CHEVALIER) && n % 2 == 0 ? 1 : 0];
 }
 
-void positioner_carte_ia(cadrillage *cadri, tab_carte *cartes,
-                         sitjoueur *joueur1, sitjoueur *joueur2) {
-  cadrillage *cadrillage_tmp_reel = cadri;
-  // Declare the variable 'copie_main_joueur'
-  // for (int i = 0; i < joueur1->nb_cartes_mainjoueur; ++i) {
-  // Carte ressource position joueur
-  int compteur_possition = 0;
-  int indice_ressource = 0;
-  // Assign the value to 'copie_main_joueur'
-  while (indice_ressource != 4 &&
-         compteur_possition <= joueur2->nb_cartes_mainjoueur) {
-    int copie_main_joueur = joueur2->mainjoueur[indice_ressource];
-    while (copie_main_joueur != 0) {
-      copie_main_joueur--;
-      cadrillage_tmp_reel->emplacement[compteur_possition][0]->type =
-          cartes->tab_carte[indice_ressource]->type;
-      cadrillage_tmp_reel->emplacement[compteur_possition][0]->texture =
-          cartes->tab_carte[12]->texture;
-    }
-    indice_ressource++;
+// ---------- zones cliquables ----------
+
+static int joueur_bas(const jeu_sdl *jeu) { return jeu->contre_ia ? 0 : jeu->s.trait; }
+
+static SDL_Rect rect_marche(int i) { return (SDL_Rect){MARCHE_X + i * 105, MARCHE_Y, CARTE_W, CARTE_H}; }
+static SDL_Rect rect_constru(int c) { return (SDL_Rect){CONSTRU_X + c * CONSTRU_PAS, CONSTRU_Y, CARTE_W, CARTE_H}; }
+static SDL_Rect rect_main(int i) { return (SDL_Rect){MAIN_X + i * MAIN_PAS, MAIN_Y, MAIN_W, MAIN_H}; }
+static const SDL_Rect RECT_PIOCHE = {PIOCHE_X, PIOCHE_Y, CARTE_W, CARTE_H};
+static const SDL_Rect RECT_FIN = {FIN_X, FIN_Y, 230, 70};
+
+// Les cartes d'un tas, rangées par ressource : liste[i] = ressource de la i-ème carte
+static int etaler(const int tas[NB_RESSOURCE], int liste[64]) {
+  int n = 0;
+  for (int r = 0; r < NB_RESSOURCE; r++) {
+    for (int k = 0; k < tas[r] && n < 64; k++) liste[n++] = r;
   }
+  return n;
 }
 
-void deplacer_texture(SDL_Renderer *renderer, SDL_Texture *background_texture,
-                      SDL_Texture *texture, SDL_Rect rect_init,
-                      SDL_Rect rect_final, int speed) {
-  int dx = rect_final.x - rect_init.x;
-  int dy = rect_final.y - rect_init.y;
-  int distance = sqrt(dx * dx + dy * dy);
-  int steps = distance / speed;
-  float increment_x = (float)dx / steps;
-  float increment_y = (float)dy / steps;
-
-  float x = rect_init.x;
-  float y = rect_init.y;
-
-  for (int i = 0; i < steps; ++i) {
-    x += increment_x;
-    y += increment_y;
-
-    SDL_Rect rect_current = {(int)x, (int)y, rect_init.w, rect_init.h};
-
-    SDL_RenderClear(renderer);
-    SDL_RenderCopy(renderer, background_texture, NULL,
-                   NULL); // Afficher le background
-    SDL_RenderCopy(renderer, texture, NULL, &rect_current);
-    SDL_RenderPresent(renderer);
-
-    SDL_Delay(16); // Pour créer un effet de mouvement fluide (~60 FPS)
-  }
-
-  // S'assurer que la texture est rendue à la position finale
-  SDL_RenderClear(renderer);
-  SDL_RenderCopy(renderer, background_texture, NULL,
-                 NULL); // Afficher le background
-  SDL_RenderCopy(renderer, texture, NULL, &rect_final);
-  SDL_RenderPresent(renderer);
+static bool est_tour_humain(const jeu_sdl *jeu) {
+  return jeu->etat == PARTIE && !jeu->s.finie && !(jeu->contre_ia && jeu->s.trait == 1);
 }
 
-void echanger_positions(SDL_Renderer *renderer, SDL_Texture *background_texture,
-                        SDL_Texture *textures[], SDL_Rect rectangles[],
-                        int nb_textures) {
-  SDL_Event event;
-  bool clicked = false;
-  int index_texture1 = -1;
+// ---------- affichage ----------
 
-  while (!clicked) {
-    SDL_WaitEvent(&event);
-    if (event.type == SDL_QUIT) {
-      return;
-    } else if (event.type == SDL_MOUSEBUTTONDOWN &&
-               event.button.button == SDL_BUTTON_LEFT) {
-      int x = event.button.x;
-      int y = event.button.y;
+static void afficher_partie(SDL_Renderer *r, textures *tx, jeu_sdl *jeu, bool ia_reflechit) {
+  situation *s = &jeu->s;
+  int bas = joueur_bas(jeu), haut = 1 - bas;
+  const sitjoueur *moi = &s->joueurs[bas], *lui = &s->joueurs[haut];
+  bool a_moi = est_tour_humain(jeu);
 
-      for (int i = 0; i < nb_textures; ++i) {
-        SDL_Rect rect = rectangles[i];
-        if (x >= rect.x && x <= rect.x + rect.w && y >= rect.y &&
-            y <= rect.y + rect.h) {
-          index_texture1 = i;
-          clicked = true;
-          break;
-        }
+  panneau(r, (SDL_Rect){10, 8, 1280, 116}, 110);
+  panneau(r, (SDL_Rect){PANNEAU_X - 14, 150, 345, 345}, 110);
+  panneau(r, (SDL_Rect){20, 150, 150, 340}, 80);
+
+  // adversaire, en haut : nom, points, dos de ses cartes et ses constructions
+  dessiner(r, jeu->contre_ia ? tx->lbl_ia : tx->lbl_j[haut], 20, 12);
+  nombre(r, tx, lui->compteur_points_joueur, 30, 55, 1.0f);
+  dessiner(r, tx->lbl_points, 70, 62);
+  int n_lui = nbr_carte_liste(lui->mainjoueur, NB_RESSOURCE);
+  for (int i = 0; i < n_lui; i++) carte(r, tx->dos, (SDL_Rect){430 + i * 50, 15, 60, 93}, 255);
+  for (int c = 0; c < NB_CONSTRUCTION; c++) {
+    if (lui->tab_constru_joueur[c] == 0) continue;
+    carte(r, texture_construction(tx, lui, c, false), (SDL_Rect){900 + c * 76, 15, MINI_W, MINI_H}, 255);
+    nombre(r, tx, lui->tab_constru_joueur[c], 905 + c * 76, 90, 0.6f);
+  }
+
+  // pioche et défausse
+  dessiner(r, tx->lbl_pioche, PIOCHE_X - 4, 158);
+  carte(r, tx->dos, RECT_PIOCHE, 255);
+  nombre(r, tx, nbr_carte_liste(s->pioche, NB_RESSOURCE), PIOCHE_X + 25, PIOCHE_Y + CARTE_H + 6, 0.8f);
+  dessiner(r, tx->lbl_defausse, PIOCHE_X - 4, 400);
+  nombre(r, tx, nbr_carte_liste(s->defausse, NB_RESSOURCE), PIOCHE_X + 25, 440, 0.8f);
+
+  // marché
+  dessiner(r, tx->lbl_marche, MARCHE_X - 4, 158);
+  int marche[64];
+  int n_marche = etaler(s->marchee, marche);
+  for (int i = 0; i < n_marche; i++) {
+    SDL_Rect d = rect_marche(i);
+    carte(r, tx->ressources[marche[i]], d, 255);
+    if (a_moi && jeu->selection >= 0 && valide_echange_marchee(s, jeu->selection, marche[i])) cadre(r, d, 34, 160, 70);
+  }
+  if (a_moi && jeu->selection >= 0 && valide_echange_pioche(s, jeu->selection)) cadre(r, RECT_PIOCHE, 34, 160, 70);
+
+  // constructions disponibles, avec leur coût en petites cartes ressource
+  dessiner(r, tx->lbl_constructions, CONSTRU_X - 4, 368);
+  for (int c = 0; c < NB_CONSTRUCTION; c++) {
+    SDL_Rect d = rect_constru(c);
+    bool possible = a_moi && valide_construction(s, c);
+    carte(r, texture_construction(tx, moi, c, true), d, s->tab_constru_board[c] > 0 && (possible || !a_moi) ? 255 : 110);
+    if (possible) cadre(r, d, 34, 160, 70);
+    int k = 0;
+    for (int res = 0; res < NB_RESSOURCE; res++) {
+      for (int q = 0; q < GUIDE_CONSTRUCTION[c][res]; q++, k++) {
+        carte(r, tx->ressources[res], (SDL_Rect){d.x - 10 + k * 24, d.y + CARTE_H + 8, 22, 34}, 255);
       }
     }
   }
 
-  int index_texture2 = -1;
-  clicked = false;
-
-  while (!clicked) {
-    SDL_WaitEvent(&event);
-    if (event.type == SDL_QUIT) {
-      return;
-    } else if (event.type == SDL_MOUSEBUTTONDOWN &&
-               event.button.button == SDL_BUTTON_LEFT) {
-      int x = event.button.x;
-      int y = event.button.y;
-
-      for (int i = 0; i < nb_textures; ++i) {
-        SDL_Rect rect = rectangles[i];
-        if (x >= rect.x && x <= rect.x + rect.w && y >= rect.y &&
-            y <= rect.y + rect.h && i != index_texture1) {
-          index_texture2 = i;
-          clicked = true;
-          break;
-        }
-      }
-    }
+  // panneau du joueur du bas
+  dessiner(r, jeu->contre_ia ? tx->lbl_j[0] : tx->lbl_j[bas], PANNEAU_X, 158);
+  nombre(r, tx, moi->compteur_points_joueur, PANNEAU_X + 10, 200, 1.0f);
+  dessiner(r, tx->lbl_points, PANNEAU_X + 50, 207);
+  if (s->trait == bas) {
+    nombre(r, tx, s->echanges_pioche_restants, PANNEAU_X + 10, 255, 0.7f);
+    dessiner(r, tx->lbl_ech_pioche, PANNEAU_X + 40, 252);
+    nombre(r, tx, s->echanges_marchee_restants, PANNEAU_X + 10, 292, 0.7f);
+    dessiner(r, tx->lbl_ech_marche, PANNEAU_X + 40, 289);
+    if (s->a_construit) dessiner(r, tx->deja_construit, PANNEAU_X + 4, 326);
   }
+  if (ia_reflechit) dessiner(r, tx->ia_reflechit, PANNEAU_X, 255);
+  for (int c = 0; c < NB_CONSTRUCTION; c++) {
+    if (moi->tab_constru_joueur[c] == 0) continue;
+    carte(r, texture_construction(tx, moi, c, false), (SDL_Rect){PANNEAU_X + c * 62, 380, MINI_W, MINI_H}, 255);
+    nombre(r, tx, moi->tab_constru_joueur[c], PANNEAU_X + 5 + c * 62, 455, 0.6f);
+  }
+  if (a_moi) dessiner(r, tx->bouton_fin, FIN_X, FIN_Y);
 
-  // Échanger les positions des textures
-  SDL_Rect rect1 = rectangles[index_texture1];
-  SDL_Rect rect2 = rectangles[index_texture2];
-
-  deplacer_texture(renderer, background_texture, textures[index_texture1],
-                   rect1, rect2, 5);
-  deplacer_texture(renderer, background_texture, textures[index_texture2],
-                   rect2, rect1, 5);
-
-  // Mettre à jour les rectangles avec les nouvelles positions
-  rectangles[index_texture1] = rect2;
-  rectangles[index_texture2] = rect1;
+  // main du joueur du bas, la carte choisie est relevée
+  dessiner(r, tx->lbl_main, MAIN_X - 4, 588);
+  int main_bas[64];
+  int n_main = etaler(moi->mainjoueur, main_bas);
+  int choisie = -1;
+  for (int i = 0; i < n_main; i++) {
+    if (choisie < 0 && main_bas[i] == jeu->selection) choisie = i;
+  }
+  for (int i = 0; i < n_main; i++) {
+    SDL_Rect d = rect_main(i);
+    if (i == choisie) d.y -= 20;
+    carte(r, tx->ressources[main_bas[i]], d, 255);
+    if (i == choisie) cadre(r, d, 37, 99, 235);
+  }
+  if (a_moi) {
+    panneau(r, (SDL_Rect){40, 857, 1220, 36}, 150);
+    dessiner_centre(r, tx->aide, WINDOW_LARGEUR / 2, 875);
+  }
 }
 
-void echanger_pioche(SDL_Renderer *renderer, SDL_Texture *background_texture,
-                     SDL_Texture *textures[], SDL_Rect rectangles[],
-                     int nb_textures) {
-  SDL_Event event;
-  bool clicked = false;
-  int index_texture1 = -1;
+static void afficher(SDL_Renderer *r, textures *tx, jeu_sdl *jeu, bool ia_reflechit) {
+  SDL_SetRenderDrawColor(r, 120, 80, 40, 255);
+  SDL_RenderClear(r);
+  SDL_RenderCopy(r, tx->fond, NULL, NULL);
+  SDL_SetRenderDrawBlendMode(r, SDL_BLENDMODE_BLEND);
 
-  // Sélectionner la première texture avec un clic droit
-  while (!clicked) {
-    SDL_WaitEvent(&event);
-    if (event.type == SDL_QUIT) {
-      return;
-    } else if (event.type == SDL_MOUSEBUTTONDOWN &&
-               event.button.button == SDL_BUTTON_RIGHT) {
-      int x = event.button.x;
-      int y = event.button.y;
-
-      for (int i = 0; i < nb_textures; ++i) {
-        SDL_Rect rect = rectangles[i];
-        if (x >= rect.x && x <= rect.x + rect.w && y >= rect.y &&
-            y <= rect.y + rect.h) {
-          index_texture1 = i;
-          clicked = true;
-          break;
-        }
-      }
-    }
-  }
-
-  int index_texture2 = 2; // L'index de la pioche est fixe
-  SDL_Rect rect_initial1 = {500, 300, 100, 150};
-  SDL_Rect rect_initial3 = {200, 200, 100, 150};
-
-  SDL_Rect rect1 = rectangles[index_texture1];
-  SDL_Rect rect2 = rectangles[index_texture2];
-
-  deplacer_texture(renderer, background_texture, textures[index_texture1],
-                   rect1, rect_initial3, 5);
-
-  deplacer_texture(renderer, background_texture, textures[index_texture2],
-                   rect2, rect_initial1, 5);
-
-  rectangles[index_texture1] = rect_initial3;
-  rectangles[index_texture2] = rect_initial1;
-}
-
-void display(SDL_Texture *bg_texture, cadrillage *cadri,
-             SDL_Renderer *renderer) {
-  SDL_RenderCopy(renderer, bg_texture, NULL, NULL);
-
-  for (int i = 0; i < GRID_CARTE_WIDTH; ++i) {
-    for (int j = 0; j < GRID_CARTE_HEIGHT; i++) {
-      if (cadri->emplacement[i][j]) {
-        SDL_RenderCopy(renderer, cadri->emplacement[i][j]->texture, NULL,
-                       &cadri->emplacement[i][j]->rect);
-        printf(
-            "Carte %d : x = %d, y = %d, w = %d, h = %d\n", i,
-            cadri->emplacement[i][j]->rect.x, cadri->emplacement[i][j]->rect.y,
-            cadri->emplacement[i][j]->rect.w, cadri->emplacement[i][j]->rect.h);
+  switch (jeu->etat) {
+    case MENU:
+      dessiner_centre(r, tx->titre, WINDOW_LARGEUR / 2, 200);
+      dessiner_centre(r, tx->soustitre, WINDOW_LARGEUR / 2, 300);
+      dessiner_centre(r, tx->bouton_ia, WINDOW_LARGEUR / 2, 470);
+      dessiner_centre(r, tx->bouton_2j, WINDOW_LARGEUR / 2, 620);
+      dessiner_centre(r, tx->touches, WINDOW_LARGEUR / 2, 830);
+      break;
+    case REGLES:
+      dessiner_centre(r, tx->regles, WINDOW_LARGEUR / 2, WINDOW_HAUTEUR / 2 - 15);
+      dessiner_centre(r, tx->touches, WINDOW_LARGEUR / 2, WINDOW_HAUTEUR - 40);
+      break;
+    case TRANSITION:  // à deux joueurs, on cache la main du joueur précédent
+      dessiner_centre(r, tx->transition[jeu->s.trait], WINDOW_LARGEUR / 2, WINDOW_HAUTEUR / 2);
+      break;
+    case PARTIE:
+      afficher_partie(r, tx, jeu, ia_reflechit);
+      break;
+    case FIN: {
+      afficher_partie(r, tx, jeu, false);
+      SDL_SetRenderDrawColor(r, 40, 25, 10, 150);
+      SDL_RenderFillRect(r, NULL);
+      // résultat et score final dans un panneau clair
+      int g = jeu->s.gagnant, cx = WINDOW_LARGEUR / 2, cy = WINDOW_HAUTEUR / 2;
+      panneau(r, (SDL_Rect){cx - 330, cy - 200, 660, 390}, 240);
+      cadre(r, (SDL_Rect){cx - 330, cy - 200, 660, 390}, 59, 36, 18);
+      if (jeu->contre_ia && g >= 0) {
+        dessiner_echelle(r, g == 0 ? tx->victoire : tx->defaite, cx, cy - 70, g == 0 ? 0.36f : 1.4f);
       } else {
-        printf("Carte %d est NULL\n", i);
+        dessiner_centre(r, g < 0 ? tx->egalite : tx->gagne[g], cx, cy - 70);
       }
+      SDL_Texture *noms[2] = {tx->lbl_j[0], jeu->contre_ia ? tx->lbl_ia : tx->lbl_j[1]};
+      for (int j = 0; j < 2; j++) {
+        dessiner(r, noms[j], cx - 230 + j * 270, cy + 55);
+        nombre(r, tx, jeu->s.joueurs[j].compteur_points_joueur, cx - 230 + j * 270, cy + 92, 1.0f);
+        dessiner(r, tx->lbl_points, cx - 190 + j * 270, cy + 99);
+      }
+      dessiner_centre(r, tx->retour_menu, cx, cy + 165);
+      break;
     }
   }
-
-  SDL_RenderPresent(renderer);
+  SDL_RenderPresent(r);
 }
 
-void destroy_cartes(tab_carte *cartes) {
-  for (int i = 0; i < NB_CARTES; ++i) {
-    if (cartes->tab_carte[i]) {
-      if (cartes->tab_carte[i]->texture) {
-        SDL_DestroyTexture(cartes->tab_carte[i]->texture);
-      }
-      free(cartes->tab_carte[i]);
+// ---------- actions ----------
+
+static void apres_action(jeu_sdl *jeu, int trait_avant) {
+  if (jeu->s.finie) {
+    jeu->etat = FIN;
+  } else if (jeu->s.trait != trait_avant && !jeu->contre_ia) {
+    jeu->etat = TRANSITION;
+  }
+  // la carte choisie n'est plus dans la main
+  if (jeu->selection >= 0 && jeu->s.joueurs[jeu->s.trait].mainjoueur[jeu->selection] == 0) jeu->selection = -1;
+}
+
+static void jouer(jeu_sdl *jeu, action a) {
+  int trait = jeu->s.trait;
+  appliquer_action(&jeu->s, a);
+  if (a.type != CONSTRUIRE) jeu->selection = -1;
+  apres_action(jeu, trait);
+}
+
+static void tour_ia(SDL_Renderer *r, textures *tx, jeu_sdl *jeu) {
+  while (jeu->etat == PARTIE && !jeu->s.finie && jeu->s.trait == 1) {
+    afficher(r, tx, jeu, true);
+    action a = choisir_action_mcts(&jeu->s, ITERATIONS_IA);
+    jouer(jeu, a);
+    afficher(r, tx, jeu, a.type != FIN_TOUR);
+    SDL_Delay(DELAI_IA);
+  }
+  SDL_FlushEvent(SDL_MOUSEBUTTONDOWN);  // les clics pendant le tour de l'IA sont ignorés
+}
+
+static void clic_partie(jeu_sdl *jeu, SDL_Point souris) {
+  situation *s = &jeu->s;
+  if (SDL_PointInRect(&souris, &RECT_FIN)) {
+    jouer(jeu, (action){FIN_TOUR, 0, 0});
+    return;
+  }
+  for (int c = 0; c < NB_CONSTRUCTION; c++) {
+    SDL_Rect d = rect_constru(c);
+    if (SDL_PointInRect(&souris, &d)) {
+      if (valide_construction(s, c)) jouer(jeu, (action){CONSTRUIRE, c, 0});
+      return;
+    }
+  }
+  int liste[64];
+  int n = etaler(s->joueurs[s->trait].mainjoueur, liste);
+  for (int i = n - 1; i >= 0; i--) {  // de droite à gauche : les cartes se chevauchent légèrement
+    SDL_Rect d = rect_main(i);
+    if (SDL_PointInRect(&souris, &d)) {
+      jeu->selection = jeu->selection == liste[i] ? -1 : liste[i];
+      return;
+    }
+  }
+  if (jeu->selection < 0) return;
+  if (SDL_PointInRect(&souris, &RECT_PIOCHE)) {
+    if (valide_echange_pioche(s, jeu->selection)) jouer(jeu, (action){ECHANGE_PIOCHE, jeu->selection, 0});
+    return;
+  }
+  n = etaler(s->marchee, liste);
+  for (int i = 0; i < n; i++) {
+    SDL_Rect d = rect_marche(i);
+    if (SDL_PointInRect(&souris, &d) && valide_echange_marchee(s, jeu->selection, liste[i])) {
+      jouer(jeu, (action){ECHANGE_MARCHEE, jeu->selection, liste[i]});
+      return;
     }
   }
 }
 
-int init(SDL_Window **window, SDL_Renderer **renderer) {
+static void clic_menu(jeu_sdl *jeu, textures *tx, SDL_Point souris) {
+  SDL_Texture *boutons[2] = {tx->bouton_ia, tx->bouton_2j};
+  int centres[2] = {470, 620};
+  for (int b = 0; b < 2; b++) {
+    SDL_Rect d;
+    SDL_QueryTexture(boutons[b], NULL, NULL, &d.w, &d.h);
+    d.x = WINDOW_LARGEUR / 2 - d.w / 2;
+    d.y = centres[b] - d.h / 2;
+    if (SDL_PointInRect(&souris, &d)) {
+      jeu->contre_ia = b == 0;
+      creation_situation(&jeu->s);
+      jeu->selection = -1;
+      jeu->etat = REGLES;
+    }
+  }
+}
+
+// Traite un événement clavier ou souris ; renvoie faux pour quitter le jeu
+static bool traiter_evenement(SDL_Window *window, jeu_sdl *jeu, textures *tx, const SDL_Event *e) {
+  switch (e->type) {
+    case SDL_QUIT:
+      return false;
+    case SDL_WINDOWEVENT:
+      // fenêtre redimensionnée : on recalcule la mise à l'échelle
+      if (e->window.event == SDL_WINDOWEVENT_SIZE_CHANGED) {
+        SDL_RenderSetLogicalSize(SDL_GetRenderer(window), WINDOW_LARGEUR, WINDOW_HAUTEUR);
+      }
+      break;
+    case SDL_KEYDOWN: {
+      bool plein_ecran = SDL_GetWindowFlags(window) & SDL_WINDOW_FULLSCREEN_DESKTOP;
+      if (e->key.keysym.sym == SDLK_f) {
+        SDL_SetWindowFullscreen(window, plein_ecran ? 0 : SDL_WINDOW_FULLSCREEN_DESKTOP);
+      } else if (e->key.keysym.sym == SDLK_ESCAPE) {
+        if (plein_ecran) SDL_SetWindowFullscreen(window, 0);
+        else jeu->etat = MENU;
+      }
+      break;
+    }
+    case SDL_MOUSEBUTTONDOWN: {
+      if (e->button.button != SDL_BUTTON_LEFT) break;
+      SDL_Point souris = {e->button.x, e->button.y};
+      switch (jeu->etat) {
+        case MENU: clic_menu(jeu, tx, souris); break;
+        case REGLES:
+        case TRANSITION: jeu->etat = PARTIE; break;
+        case FIN: jeu->etat = MENU; break;
+        case PARTIE:
+          if (est_tour_humain(jeu)) clic_partie(jeu, souris);
+          break;
+      }
+      break;
+    }
+  }
+  return true;
+}
+
+// ---------- chargement et boucle principale ----------
+
+static void charger_textures(SDL_Renderer *r, textures *tx) {
+  *tx = (textures){
+      .fond = charger(r, "background.png"),
+      .titre = charger(r, "titre.png"),
+      .soustitre = charger(r, "soustitre.png"),
+      .bouton_ia = charger(r, "bouton_ia.png"),
+      .bouton_2j = charger(r, "bouton_2j.png"),
+      .bouton_fin = charger(r, "bouton_fin.png"),
+      .touches = charger(r, "touches.png"),
+      .regles = charger(r, "regles_detail.png"),
+      .lbl_pioche = charger(r, "lbl_pioche.png"),
+      .lbl_defausse = charger(r, "lbl_defausse.png"),
+      .lbl_marche = charger(r, "lbl_marche.png"),
+      .lbl_constructions = charger(r, "lbl_constructions.png"),
+      .lbl_main = charger(r, "lbl_main.png"),
+      .lbl_ia = charger(r, "lbl_ia.png"),
+      .lbl_j = {charger(r, "lbl_j1.png"), charger(r, "lbl_j2.png")},
+      .lbl_points = charger(r, "lbl_points.png"),
+      .lbl_ech_pioche = charger(r, "lbl_ech_pioche.png"),
+      .lbl_ech_marche = charger(r, "lbl_ech_marche.png"),
+      .aide = charger(r, "aide.png"),
+      .ia_reflechit = charger(r, "ia_reflechit.png"),
+      .deja_construit = charger(r, "deja_construit.png"),
+      .transition = {charger(r, "transition1.png"), charger(r, "transition2.png")},
+      .gagne = {charger(r, "gagne_j1.png"), charger(r, "gagne_j2.png")},
+      .egalite = charger(r, "egalite.png"),
+      .victoire = charger(r, "victoire.png"),
+      .defaite = charger(r, "defaite.png"),
+      .retour_menu = charger(r, "retour_menu.png"),
+      .chiffres = charger(r, "chiffres.png"),
+      .dos = charger(r, "dos.png"),
+      .ressources = {charger(r, "ressource_bois.png"), charger(r, "ressource_argile.png"),
+                     charger(r, "ressource_mouton.png"), charger(r, "ressource_minerai.png"),
+                     charger(r, "ressource_ble.png")},
+  };
+  tx->constructions[ROUTE][0] = charger(r, "routeA.png");
+  tx->constructions[ROUTE][1] = charger(r, "routeB.png");
+  tx->constructions[CHEVALIER][0] = charger(r, "chevalierA.png");
+  tx->constructions[CHEVALIER][1] = charger(r, "chevalierB.png");
+  tx->constructions[COLONIE][0] = tx->constructions[COLONIE][1] = charger(r, "colonie.png");
+  tx->constructions[VILLE][0] = tx->constructions[VILLE][1] = charger(r, "ville.png");
+  tx->constructions[CARTE_DEVELOPPEMENT][0] = tx->constructions[CARTE_DEVELOPPEMENT][1] =
+      charger(r, "developpement_eglise.png");
+}
+
+int lancer_sdl(void) {
   if (SDL_Init(SDL_INIT_VIDEO) != 0) {
-    printf("Erreur SDL_Init: %s\n", SDL_GetError());
-    return 0;
+    fprintf(stderr, "Erreur d'initialisation de la SDL : %s\n", SDL_GetError());
+    return 1;
+  }
+  IMG_Init(IMG_INIT_PNG);
+  // les images sont dans jeu2/Images, l'exécutable dans jeu2/build
+  char *base = SDL_GetBasePath();
+  snprintf(chemin_images, sizeof chemin_images, "%s../Images/", base ? base : "./");
+  SDL_free(base);
+
+  // fenêtre adaptée à l'écran : le jeu est dessiné en 1300 x 900 puis mis à l'échelle
+  SDL_Rect ecran = {0, 0, WINDOW_LARGEUR, WINDOW_HAUTEUR};
+  SDL_GetDisplayUsableBounds(0, &ecran);
+  float echelle = SDL_min(1.0f, SDL_min(0.92f * ecran.w / WINDOW_LARGEUR, 0.92f * ecran.h / WINDOW_HAUTEUR));
+  SDL_Window *window = SDL_CreateWindow("Catane", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+                                        (int)(WINDOW_LARGEUR * echelle), (int)(WINDOW_HAUTEUR * echelle),
+                                        SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_RESIZABLE);
+  SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
+  SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+  SDL_RenderSetLogicalSize(renderer, WINDOW_LARGEUR, WINDOW_HAUTEUR);
+
+  textures tx;
+  charger_textures(renderer, &tx);
+  jeu_sdl jeu = {.etat = MENU, .selection = -1};
+
+  bool continuer = true;
+  while (continuer) {
+    SDL_Event e;
+    while (SDL_PollEvent(&e)) {
+      if (!traiter_evenement(window, &jeu, &tx, &e)) continuer = false;
+    }
+    if (jeu.contre_ia && jeu.etat == PARTIE && !jeu.s.finie && jeu.s.trait == 1) tour_ia(renderer, &tx, &jeu);
+    afficher(renderer, &tx, &jeu, false);
   }
 
-  if (!(IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG)) {
-    printf("Erreur IMG_Init: %s\n", IMG_GetError());
-    SDL_Quit();
-    return 0;
-  }
-
-  *window = SDL_CreateWindow("Cartes SDL2", SDL_WINDOWPOS_UNDEFINED,
-                             SDL_WINDOWPOS_UNDEFINED, 1600, 1200, 0);
-  if (!*window) {
-    printf("Erreur SDL_CreateWindow: %s\n", SDL_GetError());
-    IMG_Quit();
-    SDL_Quit();
-    return 0;
-  }
-
-  *renderer = SDL_CreateRenderer(
-      *window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-  if (!*renderer) {
-    printf("Erreur SDL_CreateRenderer: %s\n", SDL_GetError());
-    SDL_DestroyWindow(*window);
-    IMG_Quit();
-    SDL_Quit();
-    return 0;
-  }
-
-  return 1;
-}
-
-int cleanup(SDL_Window *window, SDL_Renderer *renderer, tab_carte *cartes) {
-  destroy_cartes(cartes);
-  if (renderer) {
-    SDL_DestroyRenderer(renderer);
-  }
-  if (window) {
-    SDL_DestroyWindow(window);
-  }
+  SDL_DestroyRenderer(renderer);  // détruit aussi les textures
+  SDL_DestroyWindow(window);
   IMG_Quit();
   SDL_Quit();
-}
-
-void phase_de_pioche(SDL_Renderer *renderer, tab_carte *cartes,
-                     cadrillage *cadri, SDL_Texture *bg_texture,
-                     sitjoueur *joueur1, sitjoueur *joueur2) {
-  bool quit = false;
-  SDL_Event event;
-  while (!quit) {
-    while (SDL_PollEvent(&event)) {
-      if (event.type == SDL_QUIT) {
-        quit = true;
-      }
-    }
-    while (nbr_carte_liste(joueur1->mainjoueur, 5) <=
-           joueur1->nb_cartes_mainjoueur) {
-      piocher(joueur1, joueur2, 1);
-      deplacer_texture(renderer, bg_texture, cartes->tab_carte[12]->texture,
-                       cartes->tab_carte[12]->rect,
-                       cadri->emplacement[1][2]->rect, 10);
-      positioner_carte_joueur(cadri, cartes, joueur1, joueur2);
-    }
-    display(bg_texture, cadri, renderer);
-  }
-}
-
-void phase_de_construction(SDL_Renderer *renderer, tab_carte *cartes,
-                           cadrillage *cadri, SDL_Texture *bg_texture,
-                           sitjoueur *joueur1, sitjoueur *joueur2) {
-  bool quit = false;
-  SDL_Event event;
-  while (!quit) {
-    while (SDL_PollEvent(&event)) {
-      if (event.type == SDL_QUIT) {
-        quit = true;
-      } else if (event.type == SDL_MOUSEBUTTONDOWN &&
-                 event.button.button == SDL_BUTTON_LEFT) {
-        int x = event.button.x;
-        int y = event.button.y;
-        trouple *carte_info = get_carte_from_position(cadri, x, y);
-        if (carte_info->troisieme != -1) {
-          if (valide_construction(joueur1, carte_info->troisieme)) {
-            deplacer_texture(
-                renderer, bg_texture,
-                cartes->tab_carte[carte_info->troisieme]->texture,
-                cadri->emplacement[carte_info->premier][carte_info->deuxieme]
-                    ->rect,
-                cadri->emplacement[carte_info->premier][4]->rect, 10);
-            positioner_carte_constru_joueur(cadri, cartes, joueur1, joueur2,
-                                            carte_info->troisieme);
-            construction(joueur1, carte_info->troisieme);
-          }
-        }
-      }
-      display(bg_texture, cadri, renderer);
-    }
-  }
-}
-
-void phase_de_echange(SDL_Renderer *renderer, tab_carte *cartes,
-                      cadrillage *cadri, SDL_Texture *bg_texture,
-                      sitjoueur *joueur1, sitjoueur *joueur2) {
-  bool quit = false;
-  SDL_Event event;
-  int compteur_echange = 0;
-
-  SDL_Rect rectangles[GRID_CARTE_WIDTH][GRID_CARTE_HEIGHT];
-  for (int i = 0; i < GRID_CARTE_WIDTH; i++) {
-    for (int j = 0; j < GRID_CARTE_HEIGHT; j++) {
-      rectangles[i][j] = cadri->emplacement[i][j]->rect;
-    }
-  }
-
-  SDL_Texture *textures[GRID_CARTE_WIDTH][GRID_CARTE_HEIGHT];
-  for (int i = 0; i < GRID_CARTE_WIDTH; i++) {
-    for (int j = 0; j < GRID_CARTE_HEIGHT; j++) {
-      textures[i][j] = cadri->emplacement[i][j]->texture;
-    }
-  }
-
-  while (!quit) {
-    while (SDL_PollEvent(&event)) {
-      if (event.type == SDL_QUIT) {
-        quit = true;
-      }
-
-      else if (event.type == SDL_MOUSEBUTTONDOWN &&
-               event.button.button == SDL_BUTTON_LEFT) {
-        echanger_positions(renderer, bg_texture, textures, rectangles, 2);
-        // même clique(trouver 1 solution)
-        // mouvement_jouer_carte(renderer,background_texture,textures,rectangles,
-        // 3);
-      } else if (event.type == SDL_MOUSEBUTTONDOWN &&
-                 event.button.button == SDL_BUTTON_RIGHT) {
-        echanger_pioche(renderer, bg_texture, textures, rectangles, 3);
-      }
-    }
-    display(bg_texture, cadri, renderer);
-  }
-}
-
-void tour_de_jeu(SDL_Renderer *renderer, tab_carte *cartes, cadrillage *cadri,
-                 SDL_Texture *bg_texture, sitjoueur *joueur1,
-                 sitjoueur *joueur2) {
-  // Tab_carte il faut que ca soit vu comme un dictionnaire qu'on vient copier
-  // dans le main et dans la grille
-
-  bool quit = false;
-  SDL_Event event;
-
-  while (!quit) {
-    while (SDL_PollEvent(&event)) {
-      if (event.type == SDL_QUIT) {
-        quit = true;
-      }
-      phase_de_pioche(renderer, cartes, cadri, bg_texture, joueur1, joueur2);
-      phase_de_echange(renderer, cartes, cadri, bg_texture, joueur1, joueur2);
-      phase_de_construction(renderer, cartes, cadri, bg_texture, joueur1,
-                            joueur2);
-      phase_de_pioche(renderer, cartes, cadri, bg_texture, joueur2, joueur1);
-      phase_de_echange(renderer, cartes, cadri, bg_texture, joueur2, joueur1);
-      phase_de_construction(renderer, cartes, cadri, bg_texture, joueur2,
-                            joueur1);
-    }
-    display(bg_texture, cartes, renderer);
-  }
-
-  SDL_DestroyTexture(bg_texture);
-}
-
-void jeu() {
-  SDL_Window *window = NULL;
-  SDL_Renderer *renderer = NULL;
-
-  if (!init(&window, &renderer)) {
-    return 1;
-  }
-
-  const char *image_paths[NB_CARTES] = {
-      "../Images/routeA.png",
-      "../Images/chevalierA.png",
-      "../Images/colonie.png",
-      "../Images/ville.png",
-      "../Images/developpement_eglise.png",
-      "../Images/routeB.png",
-      "../Images/chevalierB.png",
-
-      "../Images/ressource_bois.png",
-      "../Images/ressource_argile.png",
-      "../Images/ressource_mouton.png",
-      "../Images/ressource_minerai.png",
-      "../Images/ressource_ble.png",
-
-      "../Images/dos.png",
-      "../Images/emp_carte.png",
-      "../Images/fondblanc.png",
-  };
-
-  cadrillage cadri;
-  cadri = cadrillage_carte(cadri);
-
-  tab_carte cartes;
-  cartes = creation_tab_carte();
-
-  if (!init_cartes(&cartes, renderer, image_paths)) {
-    cleanup(window, renderer, &cartes);
-    return 1;
-  }
-
-  SDL_Texture *bg_texture = IMG_LoadTexture(renderer, image_paths[14]);
-  if (!bg_texture) {
-    printf("Erreur IMG_LoadTexture pour bg_texture: %s\n", IMG_GetError());
-    cleanup(window, renderer, &cartes);
-    return 1;
-  }
-
-  bool quit = false;
-  SDL_Event event;
-  sitjoueur *joueur1 = creation_sitjoueur(1);
-  sitjoueur *joueur2 = creation_sitjoueur(2);
-
-  while (!quit) {
-    while (SDL_PollEvent(&event)) {
-      if (event.type == SDL_QUIT) {
-        quit = true;
-      }
-    }
-    tour_de_jeu(renderer, &cartes, &cadri, bg_texture, &joueur1, &joueur2);
-    display(bg_texture, &cartes, renderer);
-
-    // Move the function calls outside of the while loop
-  }
-
-  SDL_DestroyTexture(bg_texture);
-  cleanup(window, renderer, cartes);
-}
-
-int main(int argc, char *argv[]) {
-  (void)argc;
-  (void)argv;
-  jeu();
-  return 1;
+  return 0;
 }

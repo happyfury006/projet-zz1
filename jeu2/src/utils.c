@@ -1,65 +1,10 @@
 #include "utils.h"
-#include <stdbool.h>
-#include <stdio.h>
+
 #include <stdlib.h>
-#include <time.h>
-
-carte *creation_carte(int carte_construction) {
-  carte *carte1 = malloc(sizeof(carte));
-  if (carte1 != NULL) {
-    carte1->type = carte_construction;
-    carte1->nbr_points = 0;
-    carte1->selected = 0;
-    carte1->posee = 0;
-    carte1->texture = NULL;
-  }
-  return carte1;
-}
-
-tab_carte creation_tab_carte() {
-  tab_carte tab;
-  for (int i = 0; i < NB_CONSTRUCTION + 2 + NB_RESSOURCE + 2; i++) {
-    switch (i) {
-    case 2:
-      tab.tab_carte[i] = creation_carte(2);
-      tab.tab_carte[i]->nbr_points = 1;
-      break;
-    case 3:
-      tab.tab_carte[i] = creation_carte(3);
-      tab.tab_carte[i]->nbr_points = 2;
-      break;
-    case 4:
-      tab.tab_carte[i] = creation_carte(4);
-      tab.tab_carte[i]->nbr_points = 3;
-      break;
-    case 5: // Face B de la carte ROUTE
-      tab.tab_carte[i] = creation_carte(5);
-      tab.tab_carte[i]->nbr_points = 1;
-      break;
-    case 6: // Face B de la carte CHEVALIER
-      tab.tab_carte[i] = creation_carte(6);
-      tab.tab_carte[i]->nbr_points = 1;
-      break;
-    default:
-      tab.tab_carte[i] = creation_carte(i);
-      break;
-    }
-  }
-  return tab;
-}
-trouple *creer_trouple(int premier, int deuxieme, int troisieme) {
-  trouple *c = malloc(sizeof(trouple));
-  if (c != NULL) {
-    c->premier = premier;
-    c->deuxieme = deuxieme;
-    c->troisieme = troisieme;
-  }
-  return c;
-}
 
 int randomiser(int N) { return rand() % N; }
 
-int nbr_carte_liste(int liste[], int N) {
+int nbr_carte_liste(const int liste[], int N) {
   int compteur = 0;
   for (int i = 0; i < N; i++) {
     compteur += liste[i];
@@ -67,31 +12,19 @@ int nbr_carte_liste(int liste[], int N) {
   return compteur;
 }
 
-unsigned long hash(int echange_pioche[5], int construction,
-                   int carte_donnee_marche[5], int carte_recu_marche[5]) {
-  unsigned long hash = 5381;
-  int i;
-
-  // Hash the echange_pioche array
-  for (i = 0; i < 5; i++) {
-    hash = ((hash << 5) + hash) +
-           echange_pioche[i]; // hash * 33 + echange_pioche[i]
+// Retire une carte au hasard d'un tas (pioche, marché...) en respectant les
+// proportions : avec 11 bois et 15 moutons, un mouton sort plus souvent.
+// Renvoie la ressource tirée, ou -1 si le tas est vide.
+int tirer_carte(int tas[NB_RESSOURCE]) {
+  int total = nbr_carte_liste(tas, NB_RESSOURCE);
+  if (total == 0) return -1;
+  int n = randomiser(total);
+  for (int r = 0; r < NB_RESSOURCE; r++) {
+    if (n < tas[r]) {
+      tas[r]--;
+      return r;
+    }
+    n -= tas[r];
   }
-
-  // Hash the construction integer
-  hash = ((hash << 5) + hash) + construction;
-
-  // Hash the carte_donnee_marche array
-  for (i = 0; i < 5; i++) {
-    hash = ((hash << 5) + hash) +
-           carte_donnee_marche[i]; // hash * 33 + carte_donnee_marche[i]
-  }
-
-  // Hash the carte_recu_marche array
-  for (i = 0; i < 5; i++) {
-    hash = ((hash << 5) + hash) +
-           carte_recu_marche[i]; // hash * 33 + carte_recu_marche[i]
-  }
-
-  return hash;
+  return -1;
 }

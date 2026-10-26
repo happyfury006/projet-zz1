@@ -1,42 +1,14 @@
 #include "victoire.h"
-#include "situation.h"
-#include "utils.h"
-#include <stdbool.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
-bool victoire_point_obj(sitjoueur *joueur) {
-  if (joueur->compteur_points_joueur >= 10) {
-    return true;
-  }
-  return false;
+// Le premier à 10 points gagne
+bool victoire_point_obj(const sitjoueur *joueur) {
+  return joueur->compteur_points_joueur >= POINTS_VICTOIRE;
 }
 
-bool victoire_point_pioche(sitjoueur *joueur) {
-  if (nbr_carte_liste(joueur->pioche, 5) == 0) {
-    return true;
-  }
-  return false;
-}
-
-int victoire(sitjoueur *joueur1, sitjoueur *joueur2) {
-  if (victoire_point_obj(joueur1) == true) {
-    printf("Victoire du joueur %d\n", joueur1->joueur);
-    return joueur1->joueur;
-  }
-
-  else if (victoire_point_pioche(joueur1) == true) {
-    if (joueur1->compteur_points_joueur > joueur2->compteur_points_joueur) {
-      printf("Victoire du joueur %d\n", joueur1->joueur);
-      return joueur1->joueur;
-    } else if (joueur1->compteur_points_joueur <
-               joueur2->compteur_points_joueur) {
-      printf("Victoire du joueur %d\n", joueur2->joueur);
-      return joueur2->joueur;
-    } else {
-      printf("Egalité\n");
-      return 0;
-    }
-  }
+// La pioche est vide : le joueur qui a le plus de points gagne
+void terminer_partie(situation *s) {
+  int p0 = s->joueurs[0].compteur_points_joueur;
+  int p1 = s->joueurs[1].compteur_points_joueur;
+  s->finie = true;
+  s->gagnant = p0 > p1 ? 0 : p1 > p0 ? 1 : -1;
 }

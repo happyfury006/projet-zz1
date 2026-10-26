@@ -1,104 +1,72 @@
 #include "action.h"
-#include "utils.h"
-#include <stdarg.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
 
-void defausser(sitjoueur *joueur1, sitjoueur *joueur2, int ressource1) {
-  if (ressource1 < 0 || ressource1 > 4) {
-    printf("Ressource invalide\n");
-  } else {
-    if (joueur1->mainjoueur[ressource1] > 0) {
-      joueur1->mainjoueur[ressource1]--;
-      joueur1->defausse[ressource1]++;
-      joueur2->defausse[ressource1]++;
-    }
+#include "regles.h"
+#include "victoire.h"
+
+// Le joueur pioche des cartes ; renvoie faux si la pioche s'est vidée avant
+bool piocher(situation *s, int joueur, int nombre_carte) {
+  for (int i = 0; i < nombre_carte; i++) {
+    int r = tirer_carte(s->pioche);
+    if (r < 0) return false;
+    s->joueurs[joueur].mainjoueur[r]++;
+  }
+  return true;
+}
+
+// Complète la main jusqu'à sa taille. Si la pioche ne suffit pas, la partie
+// s'arrête : le joueur qui a le plus de points gagne.
+void completer_main(situation *s, int joueur) {
+  sitjoueur *j = &s->joueurs[joueur];
+  int manque = j->nb_cartes_mainjoueur - nbr_carte_liste(j->mainjoueur, NB_RESSOURCE);
+  if (manque > 0 && !piocher(s, joueur, manque)) {
+    terminer_partie(s);
   }
 }
 
-void piocher(sitjoueur *joueur1, sitjoueur *joueur2, int nombre_carte) {
-  while (nombre_carte > 0) {
-    int nbr_random = randomiser(5);
-    if (joueur1->pioche[nbr_random] > 0) {
-      joueur1->pioche[nbr_random]--;
-      joueur2->pioche[nbr_random]--;
-      joueur1->mainjoueur[nbr_random]++;
-      nombre_carte--;
-    }
-  }
-}
-void initialisation_marchee(sitjoueur *joueur1, sitjoueur *joueur2) {
-  for (int i = 0; i < TAILLE_MARCHER; i++) {
-    int nbr_random = randomiser(5);
-    joueur1->marchee[nbr_random]++;
-    joueur2->marchee[nbr_random]++;
-    joueur1->pioche[nbr_random]--;
-    joueur2->pioche[nbr_random]--;
+void initialisation_marchee(situation *s) {
+  for (int i = 0; i < TAILLE_MARCHE; i++) {
+    int r = tirer_carte(s->pioche);
+    if (r >= 0) s->marchee[r]++;
   }
 }
 
-int valide_nb_echange_marchee(sitjoueur *joueur1, int nombre_echange_voulu) {
-  if (nombre_echange_voulu <= joueur1->nb_echanges_marchee) {
-    return 1;
-  }
-  return 0;
-}
-int valide_nb_echange_pioche(sitjoueur *joueur1, int nombre_echange_voulu) {
-  if (nombre_echange_voulu <= nbr_carte_liste(joueur1->pioche, 5)) {
-    return 1;
-  }
-  return 0;
+void defausser(situation *s, int ressource) {
+  s->joueurs[s->trait].mainjoueur[ressource]--;
+  s->defausse[ressource]++;
 }
 
-void echanger_marchee(sitjoueur *joueur1, sitjoueur *joueur2, int ressourcemain,
-                      int ressource) {
-  if (valide_nb_echange_marchee(joueur1, 1) == 1 &&
-      joueur1->mainjoueur[ressourcemain] > 0 &&
-      joueur1->marchee[ressource] > 0) {
-    joueur1->mainjoueur[ressourcemain]--;
-    joueur1->mainjoueur[ressource]++;
-    joueur1->marchee[ressourcemain]++;
-    joueur1->marchee[ressource]--;
-    joueur2->marchee[ressourcemain]++;
-    joueur2->marchee[ressource]--;
-  } else {
-    printf("Echange impossible\n");
-  }
-
-  // if (joueur1->mainjoueur[ressourcemain]>0 || joueur1->marchee[ressource]>0)
-  // {
-
-  // }
+// Une carte de la main contre une carte du marché
+bool echanger_marchee(situation *s, int ressourcemain, int ressource) {
+  if (!valide_echange_marchee(s, ressourcemain, ressource)) return false;
+  sitjoueur *j = &s->joueurs[s->trait];
+  j->mainjoueur[ressourcemain]--;
+  j->mainjoueur[ressource]++;
+  s->marchee[ressourcemain]++;
+  s->marchee[ressource]--;
+  s->echanges_marchee_restants--;
+  return true;
 }
 
-void echanger_pioche(sitjoueur *joueur1, sitjoueur *joueur2,
-                     int num_ressources) {
-  if (valide_nb_echange_pioche(joueur1, num_ressources) == 1) {
-    defausser(joueur1, joueur2, num_ressources);
-    piocher(joueur1, joueur2, 1);
-  } else {
-    printf("Echange impossible\n");
-  }
+// Une carte de la main va à la défausse, et on en pioche une autre
+bool echanger_pioche(situation *s, int ressourcemain) {
+  if (!valide_echange_pioche(s, ressourcemain)) return false;
+  defausser(s, ressourcemain);
+  piocher(s, s->trait, 1);
+  s->echanges_pioche_restants--;
+  return true;
 }
 
-// void echanger_pioche(sitjoueur* joueur1,sitjoueur* joueur2, int
-// num_ressources, ...)
-// {
-//     if(num_ressources<=joueur1->nb_echanges_marchee || num_ressources<=
-//     nbr_carte_liste(joueur1->pioche,5))
-//     {
-//         va_list args;
-//         va_start(args, num_ressources);
+// Début du tour : on complète sa main et on remet les compteurs d'échanges
+void debut_tour(situation *s) {
+  completer_main(s, s->trait);
+  s->echanges_pioche_restants = ECHANGES_PIOCHE_MAX;
+  s->echanges_marchee_restants = s->joueurs[s->trait].nb_echanges_marchee;
+  s->a_construit = false;
+}
 
-//         for (int i = 0; i < num_ressources; i++)
-//         {
-//             int ressource = va_arg(args, int);
-//             defausser(joueur1,joueur2,ressource);
-//         }
-
-//         va_end(args);
-
-//         piocher(joueur1,joueur2,num_ressources);
-//     }
-// }
+void fin_tour(situation *s) {
+  if (s->finie) return;
+  s->trait = 1 - s->trait;
+  if (s->trait == 0) s->tour++;
+  debut_tour(s);
+}

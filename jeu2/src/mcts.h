@@ -1,72 +1,24 @@
 #ifndef GARDIEN_UNIQUE_MCTS_H
 #define GARDIEN_UNIQUE_MCTS_H
 
-#include <stdbool.h>
+#include "situation.h"
 
-typedef struct CoupleInt {
-  int premier;
-  int second;
-} CoupleInt;
+// Une action d'un tour : échange avec le marché, échange avec la pioche,
+// construction ou fin du tour
+typedef enum { ECHANGE_MARCHEE, ECHANGE_PIOCHE, CONSTRUIRE, FIN_TOUR } type_action;
 
-// union pour contenir soit un entier, soit un couple d'entiers
-typedef union EntierOuCouple {
-  int entierUnique;
-  CoupleInt coupleEntiers;
-} EntierOuCouple;
+typedef struct action {
+  type_action type;
+  int a;  // ressource donnée, ou construction
+  int b;  // ressource prise au marché
+} action;
 
-//énumération pour indiquer le type de données stocké dans l'union
-typedef enum TypeValeur { UNIQUE, COUPLE } TypeValeur;
+#define NB_ACTIONS_MAX (NB_RESSOURCE * NB_RESSOURCE + NB_RESSOURCE + NB_CONSTRUCTION + 1)
+#define ITERATIONS_IA 3000
 
-// structure pour contenir l'union et son type
-typedef struct Conteneur {
-  EntierOuCouple valeur;
-  TypeValeur type;
-} Conteneur;
-
-// structure pour contenir un couple de couples d'entiers
-typedef struct CoupleDeCouple {
-  CoupleInt premierCouple;
-  CoupleInt secondCouple;
-} CoupleDeCouple;
-
-// union pour contenir soit un couple d'entiers, soit un couple de couples
-// d'entiers
-typedef union CoupleOuCoupleDeCouple {
-  CoupleInt couple;
-  CoupleDeCouple coupleDeCouples;
-} CoupleOuCoupleDeCouple;
-
-//énumération pour indiquer le type de données stocké dans l'union
-typedef enum TypeValeurCouple {
-  COUPLE_SIMPLE,
-  COUPLE_DE_COUPLES
-} TypeValeurCouple;
-
-// structure pour contenir l'union et son type
-typedef struct ConteneurCouple {
-  CoupleOuCoupleDeCouple valeur;
-  TypeValeurCouple type;
-} ConteneurCouple;
-
-typedef struct Nodemcts {
-  int visite;
-  int victoire;
-  float esperance;
-  bool phase_echange;
-  int coup_construction;
-  struct Conteneur *coup_defausse;
-  struct ConteneurCouple *coup_marche;
-  struct Nodemcts *next;
-} Nodemcts;
-
-Conteneur initConteneurUnique(int entier);
-Conteneur initConteneurCouple(int premier, int second);
-ConteneurCouple initConteneurCoupleSimple(int premier, int second);
-ConteneurCouple initConteneurCoupleDeCouples(int premier1, int second1,
-                                             int premier2, int second2);
-Nodemcts *initNodemcts(Conteneur *defausse, ConteneurCouple *marche,
-                       int construction);
-void freeNodemcts(Nodemcts *tete);
-Nodemcts *trouverPremierNonVisite(Nodemcts *tete);
+int lister_actions(const situation *s, action liste[NB_ACTIONS_MAX]);
+void appliquer_action(situation *s, action a);
+action choisir_action_glouton(const situation *s);
+action choisir_action_mcts(const situation *s, int iterations);
 
 #endif

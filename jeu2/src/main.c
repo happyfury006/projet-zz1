@@ -1,30 +1,20 @@
-#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
 
-#include "action.h"
-#include "construction.h"
-#include "regles.h"
-#include "situation.h"
-#include "utils.h"
-#include "victoire.h"
-//#include "SDL.h"
-//#include "mcts.h"
-#include "affichageterminal.h"
-#include "coups.h"
+#include "SDL.h"
 #include "partie.h"
 
-int main() {
-  srand(time(NULL));
-  sitjoueur *joueur1 = creation_situation(1);
-  sitjoueur *joueur2 = creation_situation(2);
-
-  // affichage(joueur1, joueur2);
-  // partie(joueur1, joueur2);
-  afficher_listes_coup_possible(liste_coup_possible(joueur1));
-
-  destruction_situation(joueur1);
-  destruction_situation(joueur2);
-  return 0;
+int main(int argc, char *argv[]) {
+  srand((unsigned)time(NULL));
+  if (argc > 1 && strcmp(argv[1], "--console") == 0) {
+    printf("Catane, le jeu de cartes : premier à 10 points.\n");
+    printf("1 : contre l'IA, 2 : à deux joueurs ? ");
+    int choix = 0;
+    if (scanf("%d", &choix) != 1) return 1;
+    partie(choix == 1);
+    return 0;
+  }
+  return lancer_sdl();
 }

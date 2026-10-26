@@ -1,20 +1,17 @@
 #ifndef GARDIEN_UNIQUE_ACTION_H
 #define GARDIEN_UNIQUE_ACTION_H
 
-// #include <stdio.h>
-// #include <stdarg.h>
-// #include <stdlib.h>
-// #include <time.h>
+#include <stdbool.h>
+
 #include "situation.h"
 
-// void deplacement(int joueur);
+bool piocher(situation *s, int joueur, int nombre_carte);
+void completer_main(situation *s, int joueur);
+void initialisation_marchee(situation *s);
+void defausser(situation *s, int ressource);
+bool echanger_marchee(situation *s, int ressourcemain, int ressource);
+bool echanger_pioche(situation *s, int ressourcemain);
+void debut_tour(situation *s);
+void fin_tour(situation *s);
 
-void defausser(sitjoueur *joueur1, sitjoueur *joueur2, int ressource1);
-void piocher(sitjoueur *joueur1, sitjoueur *joueur2, int nombre_carte);
-void initialisation_marchee(sitjoueur *joueur1, sitjoueur *joueur2);
-void echanger_marchee(sitjoueur *joueur1, sitjoueur *joueur2, int ressourcemain,
-                      int ressource);
-void echanger_pioche(sitjoueur *joueur1, sitjoueur *joueur2,
-                     int num_ressources);
-
-#endif // GARDIEN_UNIQUE_ACTION_H
+#endif

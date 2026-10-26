@@ -1,88 +1,59 @@
-
 #include "construction.h"
-#include "utils.h"
-#include <stdarg.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
 
-void actualiser_board(sitjoueur *joueur1, sitjoueur *joueur2, int construc) {
-  joueur1->tab_constru_board[construc]--; // on enleve la carte de sa pile
-  joueur2->tab_constru_board[construc]--;
-  joueur1->tab_constru_joueur[construc]++; // on ajoute la carte sur le board du
-                                           // joueur
-}
+#include "action.h"
+#include "regles.h"
+#include "victoire.h"
 
-void construction_route(sitjoueur *joueur1, sitjoueur *joueur2, int construc) {
-  joueur1->mainjoueur[0]--; // on enleve 1 bois
-  joueur1->mainjoueur[1]--; // 1 argile
-  actualiser_board(joueur1, joueur2, construc);
-  if (joueur1->tab_constru_joueur[construc] % 2 == 1) {
-    joueur1->nb_echanges_marchee += 1;
-  } else {
-    joueur1->compteur_points_joueur += 1;
+// Effet de chaque carte, d'après son texte :
+// - route : face A (1re, 3e...) un échange avec le marché de plus par tour, face B 1 point
+// - chevalier : face A une carte de plus en main, face B 1 point
+// - colonie : 1 point
+// - ville : 2 points, et « jour du marché » : le marché est défaussé et remplacé
+// - développement : 3 points
+bool construction(situation *s, int construc) {
+  if (!valide_construction(s, construc)) return false;
+  sitjoueur *joueur = &s->joueurs[s->trait];
+
+  // les ressources dépensées vont à la défausse
+  for (int r = 0; r < NB_RESSOURCE; r++) {
+    for (int k = 0; k < GUIDE_CONSTRUCTION[construc][r]; k++) defausser(s, r);
   }
-}
+  s->tab_constru_board[construc]--;
+  joueur->tab_constru_joueur[construc]++;
+  bool face_a = joueur->tab_constru_joueur[construc] % 2 == 1;
 
-void construction_chevalier(sitjoueur *joueur1, sitjoueur *joueur2,
-                            int construc) {
-  joueur1->mainjoueur[2]--; // on enleve 1 mouton
-  joueur1->mainjoueur[3]--; // 1 minerai
-  joueur1->mainjoueur[4]--; // 1 blé
-  actualiser_board(joueur1, joueur2, construc);
-  if (joueur1->tab_constru_joueur[construc] % 2 == 1) {
-    joueur1->nb_cartes_mainjoueur += 1;
-  } else {
-    joueur1->compteur_points_joueur += 1;
-  }
-}
-
-void construction_colonie(sitjoueur *joueur1, sitjoueur *joueur2,
-                          int construc) {
-  joueur1->mainjoueur[0]--; // 1 bois
-  joueur1->mainjoueur[1]--; // 1 argile
-  joueur1->mainjoueur[2]--; // on enleve 1 mouton
-  joueur1->mainjoueur[4]--; // 1 blé
-  actualiser_board(joueur1, joueur2, construc);
-  joueur1->compteur_points_joueur += 1;
-}
-
-void construction_ville(sitjoueur *joueur1, sitjoueur *joueur2, int construc) {
-  joueur1->mainjoueur[3] -= 3; // on enleve 3 minerai
-  joueur1->mainjoueur[4] -= 2; // 2 blé
-  actualiser_board(joueur1, joueur2, construc);
-  joueur1->compteur_points_joueur += 2;
-}
-
-void construction_developpement(sitjoueur *joueur1, sitjoueur *joueur2,
-                                int construc) {
-  joueur1->mainjoueur[3]--;    // on enleve 1 minerai
-  joueur1->mainjoueur[2] -= 3; // 3 mouton
-  actualiser_board(joueur1, joueur2, construc);
-  joueur1->compteur_points_joueur += 3;
-}
-
-void construction(sitjoueur *joueur1, sitjoueur *joueur2, int construc) {
-  // int construc = carte_construction;
   switch (construc) {
-  case 0: // route
-    construction_route(joueur1, joueur2, construc);
-    break;
-
-  case 1: // chevalier
-    construction_chevalier(joueur1, joueur2, construc);
-    break;
-
-  case 2: // colonie
-    construction_colonie(joueur1, joueur2, construc);
-    break;
-
-  case 3: // ville
-    construction_ville(joueur1, joueur2, construc);
-    break;
-
-  case 4: // developpement
-    construction_developpement(joueur1, joueur2, construc);
-    break;
+    case ROUTE:
+      if (face_a) {
+        joueur->nb_echanges_marchee++;
+        s->echanges_marchee_restants++;  // utilisable dès ce tour
+      } else {
+        joueur->compteur_points_joueur += 1;
+      }
+      break;
+    case CHEVALIER:
+      if (face_a) joueur->nb_cartes_mainjoueur++;
+      else joueur->compteur_points_joueur += 1;
+      break;
+    case COLONIE:
+      joueur->compteur_points_joueur += 1;
+      break;
+    case VILLE:
+      joueur->compteur_points_joueur += 2;
+      for (int r = 0; r < NB_RESSOURCE; r++) {  // jour du marché
+        s->defausse[r] += s->marchee[r];
+        s->marchee[r] = 0;
+      }
+      initialisation_marchee(s);
+      break;
+    case CARTE_DEVELOPPEMENT:
+      joueur->compteur_points_joueur += 3;
+      break;
   }
+  s->a_construit = true;
+  if (victoire_point_obj(joueur)) {
+    s->finie = true;
+    s->gagnant = s->trait;
+  }
+  return true;
 }

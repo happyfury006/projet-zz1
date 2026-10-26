@@ -1,60 +1,39 @@
 #include "situation.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-//#include <time.h>
-#include "action.h"
-#include "utils.h"
 
-sitjoueur *creation_situation(int joueur) {
-  sitjoueur *s = malloc(sizeof(sitjoueur));
-  s->joueur = joueur;
-  // Initialisation des cartes ressources du joueur, de la defausse, du marcher,
-  // des constructions du joueur et de l'adversaire
-  for (int i = 0; i < NB_RESSOURCE; i++) {
-    s->mainjoueur[i] = 0;
-    s->defausse[i] = 0;
-    s->marchee[i] = 0;
-    if (i == 0 || i == 1) {
-      s->tab_constru_joueur[i] = 1;
-      s->tab_constru_advers[i] = 1;
-    } else {
-      s->tab_constru_joueur[i] = 0;
-      s->tab_constru_advers[i] = 0;
-    }
+#include <string.h>
+
+#include "action.h"
+
+void creation_situation(situation *s) {
+  memset(s, 0, sizeof *s);
+  // chaque joueur commence avec une route et un chevalier, face A
+  for (int j = 0; j < 2; j++) {
+    sitjoueur *joueur = &s->joueurs[j];
+    joueur->tab_constru_joueur[ROUTE] = 1;
+    joueur->tab_constru_joueur[CHEVALIER] = 1;
+    joueur->nb_echanges_marchee = 1;
+    joueur->nb_cartes_mainjoueur = MAIN_DE_BASE + 1;
   }
-  // Initialisation des cartes ressources de la pioche
+
+  // cartes ressource de la pioche
   s->pioche[BOIS] = 11;
   s->pioche[ARGILE] = 11;
   s->pioche[MOUTON] = 15;
   s->pioche[BLE] = 14;
   s->pioche[MINERAI] = 11;
 
-  // Initialisation des cartes du board construction
-  s->tab_constru_board[ROUTE] =
-      9 - s->tab_constru_joueur[ROUTE] - s->tab_constru_advers[ROUTE];
-  s->tab_constru_board[CHEVALIER] =
-      14 - s->tab_constru_joueur[CHEVALIER] - s->tab_constru_advers[CHEVALIER];
+  // cartes construction disponibles (les routes et chevaliers de départ en moins)
+  s->tab_constru_board[ROUTE] = 9 - 2;
+  s->tab_constru_board[CHEVALIER] = 14 - 2;
   s->tab_constru_board[COLONIE] = 15;
   s->tab_constru_board[VILLE] = 15;
   s->tab_constru_board[CARTE_DEVELOPPEMENT] = 9;
 
-  s->compteur_points_joueur = 0;
-  s->nb_echanges_marchee = 0 + s->tab_constru_joueur[ROUTE];
-  s->nb_cartes_mainjoueur = 3 + s->tab_constru_joueur[CHEVALIER];
-
-  return s;
+  initialisation_marchee(s);
+  s->trait = 0;
+  s->tour = 1;
+  s->gagnant = -1;
+  // le joueur 2 complète sa main tout de suite, le joueur 1 au début de son tour
+  completer_main(s, 1);
+  debut_tour(s);
 }
-
-sitjoueur *initilisation_depart(sitjoueur *joueur1, sitjoueur *joueur2) {
-  // sitjoueur* joueur1 = creation_situation(1);
-  // sitjoueur* joueur2 = creation_situation(2);
-  // Initialisation des cartes ressources du joueur, du marcher après la
-  // premiere pioche de début de partie
-
-  // piocher(joueur1,joueur2,3);
-  // piocher(joueur2,joueur1,3);
-  initialisation_marchee(joueur1, joueur2);
-}
-
-void destruction_situation(sitjoueur *s) { free(s); }

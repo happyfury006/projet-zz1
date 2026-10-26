@@ -1,105 +1,38 @@
 #include "affichageterminal.h"
-#include "situation.h"
-#include "utils.h"
+
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
-void affichagemainjoueur(sitjoueur *joueur) {
-  for (int i = 0; i < NB_RESSOURCE; i++) {
-    printf(" [%d] ", joueur->mainjoueur[i]);
-  }
-  printf("\n");
-}
+const char *NOMS_RESSOURCES[NB_RESSOURCE] = {"bois", "argile", "mouton", "minerai", "blé"};
+const char *NOMS_CONSTRUCTIONS[NB_CONSTRUCTION] = {"route", "chevalier", "colonie", "ville", "développement"};
 
-void affichagepioche(sitjoueur *joueur) {
-  for (int i = 0; i < NB_RESSOURCE; i++) {
-    printf(" [%d] ", joueur->pioche[i]);
-  }
-  printf("\n");
-}
-void affichagedefausse(sitjoueur *joueur) {
-  for (int i = 0; i < NB_RESSOURCE; i++) {
-    printf(" [%d] ", joueur->defausse[i]);
-  }
-  printf("\n");
-}
-void affichagemarchee(sitjoueur *joueur) {
-  for (int i = 0; i < NB_RESSOURCE; i++) {
-    printf(" [%d] ", joueur->marchee[i]);
-  }
-  printf("\n");
-}
-void affichagetab_constru_board(sitjoueur *joueur) {
-  for (int i = 0; i < NB_CONSTRUCTION; i++) {
-    printf(" [%d] ", joueur->tab_constru_board[i]);
-  }
-  printf("\n");
-}
-void affichagetab_constru_joueur(sitjoueur *joueur) {
-  for (int i = 0; i < NB_CONSTRUCTION; i++) {
-    printf(" [%d] ", joueur->tab_constru_joueur[i]);
-  }
-  printf("\n");
-}
-void affichage_joueur(sitjoueur *joueur) {
-  printf("Joueur %d, points: %d\n", joueur->joueur,
-         joueur->compteur_points_joueur);
-  printf("================\n");
-  printf("Main joueur %d\n", joueur->joueur);
-  affichagemainjoueur(joueur);
-  printf("Tab constru joueur %d\n", joueur->joueur);
-  affichagetab_constru_joueur(joueur);
+static void affichage_tas(const char *titre, const int tas[NB_RESSOURCE]) {
+  printf("%-10s", titre);
+  for (int r = 0; r < NB_RESSOURCE; r++) printf(" %s:%d", NOMS_RESSOURCES[r], tas[r]);
   printf("\n");
 }
 
-void affichage_board(sitjoueur *joueur) {
-  printf("Situation Board\n");
-  printf("================\n");
-  printf("Tab constru board\n");
-  affichagetab_constru_board(joueur);
-  printf("Pioche \n");
-  affichagepioche(joueur);
-  printf("Defausse \n");
-  affichagedefausse(joueur);
-  printf("Marchee \n");
-  affichagemarchee(joueur);
-  printf("\n");
+void affichage(const situation *s) {
+  printf("\n===== Tour %d, joueur %d =====\n", s->tour, s->trait + 1);
+  for (int j = 0; j < 2; j++) {
+    const sitjoueur *joueur = &s->joueurs[j];
+    printf("Joueur %d : %d points |", j + 1, joueur->compteur_points_joueur);
+    for (int c = 0; c < NB_CONSTRUCTION; c++) printf(" %s:%d", NOMS_CONSTRUCTIONS[c], joueur->tab_constru_joueur[c]);
+    printf("\n");
+  }
+  affichage_tas("Marché", s->marchee);
+  printf("Pioche : %d cartes\n", nbr_carte_liste(s->pioche, NB_RESSOURCE));
+  affichage_tas("Votre main", s->joueurs[s->trait].mainjoueur);
+  printf("Échanges restants : %d avec la pioche, %d avec le marché%s\n", s->echanges_pioche_restants,
+         s->echanges_marchee_restants, s->a_construit ? " (déjà construit ce tour)" : "");
 }
 
-void affichage(sitjoueur *joueur1, sitjoueur *joueur2) {
-  // printf("----------------\n");
-  // printf("\n");
-  // printf("Joueur 1, points: %d\n",joueur1->compteur_points_joueur);
-  // printf("================\n");
-  // printf("Main joueur 1\n");
-  // affichagemainjoueur(joueur1);
-  // printf("Tab constru joueur 1\n");
-  // affichagetab_constru_joueur(joueur1);
-  // printf("\n");
-  // printf("----------------\n");
-  // printf("\n");
-  // printf("Situation Board\n");
-  // printf("================\n");
-  // printf("Tab constru board\n");
-  // affichagetab_constru_board(joueur1);
-  // printf("Pioche \n");
-  // affichagepioche(joueur2);
-  // printf("Defausse \n");
-  // affichagedefausse(joueur2);
-  // printf("Marchee \n");
-  // affichagemarchee(joueur2);
-  // printf("\n");
-  // printf("----------------\n");
-  // printf("\n");
-  // printf("Joueur 2,points : %d\n",joueur2->compteur_points_joueur);
-  // printf("================\n");
-  // printf("Main joueur 2\n");
-  // affichagemainjoueur(joueur2);
-  // printf("Tab constru joueur 2\n");
-  // affichagetab_constru_joueur(joueur2);
-  // printf("\n");
-  affichage_joueur(joueur1);
-  affichage_board(joueur1);
-  affichage_joueur(joueur2);
+void affichage_action(action a) {
+  switch (a.type) {
+    case ECHANGE_MARCHEE:
+      printf("échanger 1 %s contre 1 %s du marché", NOMS_RESSOURCES[a.a], NOMS_RESSOURCES[a.b]);
+      break;
+    case ECHANGE_PIOCHE: printf("défausser 1 %s et piocher", NOMS_RESSOURCES[a.a]); break;
+    case CONSTRUIRE: printf("construire : %s", NOMS_CONSTRUCTIONS[a.a]); break;
+    case FIN_TOUR: printf("finir le tour"); break;
+  }
 }
