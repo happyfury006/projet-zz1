@@ -53,3 +53,4 @@ dkms.conf
 
 # Compilation du Quantik
 jeu1/build/
+jeu2/build/
