@@ -16,6 +16,8 @@ make console    # version dans le terminal
 make test       # tests des règles et parties automatiques de l'IA
 ```
 
+Les deux jeux se jouent aussi dans un navigateur, compilés en WebAssembly avec [Emscripten](https://emscripten.org) : `make web` produit le dossier `build-web/` (page, code et images), à publier tel quel sur un site. La version de bureau ne change pas : les adaptations au navigateur sont dans des blocs `#ifdef __EMSCRIPTEN__` (rendre la main à la page à chaque image, chemin des images). Les jeux en ligne : [Quantik](https://julen.sometgarcia.fr/jeux/quantik/) et [Catane](https://julen.sometgarcia.fr/jeux/catane/).
+
 Dans les deux jeux, la fenêtre s'adapte à l'écran ; **F** passe en plein écran, **Échap** en sort ou revient au menu. Les règles s'affichent avant chaque partie.
 
 ## Quantik (`jeu1/`)

@@ -39,7 +39,19 @@ $(BUILD_DIR)/test : tests/test_catane.c $(JEU)
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
 
-clean:
-	rm -rf $(BUILD_DIR) doc
+# Version web (WebAssembly), avec Emscripten : build-web/ se publie tel quel.
+# Les images sont empaquetées dans /Images ; ASYNCIFY permet de garder la boucle
+# de jeu du bureau en rendant la main au navigateur à chaque image.
+EMCC=emcc
+WEB_DIR=./build-web
+web:
+	mkdir -p $(WEB_DIR)
+	$(EMCC) -O2 $(SRC) -o $(WEB_DIR)/catane.js -sUSE_SDL=2 -sUSE_SDL_IMAGE=2 -sSDL2_IMAGE_FORMATS='["png"]' \
+		-sASYNCIFY -sALLOW_MEMORY_GROWTH -sENVIRONMENT=web \
+		--preload-file Images@/Images --exclude-file '*capture.png' --exclude-file '*Start.png' --exclude-file '*fondblanc.png'
+	cp web/index.html web/config.js web/jeu.css $(WEB_DIR)/
 
-.PHONY: all console test doc valgrind clean
+clean:
+	rm -rf $(BUILD_DIR) $(WEB_DIR) doc
+
+.PHONY: all console test doc valgrind clean web

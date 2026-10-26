@@ -1,0 +1,14 @@
+html, body { margin: 0; height: 100%; background: #111; color: #ddd; font: 15px/1.4 system-ui, sans-serif; }
+header { display: flex; justify-content: space-between; gap: 1rem; padding: 10px 16px; height: 44px; box-sizing: border-box; }
+header a { color: #ffb547; text-decoration: none; }
+header span { color: #999; }
+main { display: grid; place-items: center; height: calc(100% - 44px); }
+#chargement { position: absolute; }
+/* le jeu est dessiné en 1300 x 900 : le canvas garde ces proportions et s'adapte à la fenêtre */
+#canvas {
+  display: block;
+  width: min(100vw, calc((100vh - 44px) * 1300 / 900)) !important;
+  height: auto !important;
+  aspect-ratio: 1300 / 900;
+  outline: none;
+}

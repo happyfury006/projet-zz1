@@ -11,6 +11,10 @@
 #include "mcts.h"
 #include "regles.h"
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
+
 #define WINDOW_LARGEUR 1300
 #define WINDOW_HAUTEUR 900
 #define DELAI_IA 450  // pause entre deux actions de l'IA, en millisecondes
@@ -68,6 +72,17 @@ static SDL_Texture *charger(SDL_Renderer *renderer, const char *nom) {
     exit(EXIT_FAILURE);
   }
   return t;
+}
+
+// Version web (make web) : dans un navigateur, le programme doit rendre la main
+// à la page pour qu'elle affiche l'image et reçoive les clics. Sans effet dans
+// la version de bureau.
+static void rendre_la_main(int ms) {
+#ifdef __EMSCRIPTEN__
+  emscripten_sleep(ms);
+#else
+  (void)ms;
+#endif
 }
 
 // ---------- dessin ----------
@@ -320,6 +335,7 @@ static void jouer(jeu_sdl *jeu, action a) {
 static void tour_ia(SDL_Renderer *r, textures *tx, jeu_sdl *jeu) {
   while (jeu->etat == PARTIE && !jeu->s.finie && jeu->s.trait == 1) {
     afficher(r, tx, jeu, true);
+    rendre_la_main(0);  // le message « L'IA réfléchit » s'affiche avant le calcul
     action a = choisir_action_mcts(&jeu->s, ITERATIONS_IA);
     jouer(jeu, a);
     afficher(r, tx, jeu, a.type != FIN_TOUR);
@@ -474,15 +490,23 @@ int lancer_sdl(void) {
     return 1;
   }
   IMG_Init(IMG_INIT_PNG);
+#ifdef __EMSCRIPTEN__
+  // version web : les images sont empaquetées dans /Images (--preload-file)
+  snprintf(chemin_images, sizeof chemin_images, "/Images/");
+#else
   // les images sont dans jeu2/Images, l'exécutable dans jeu2/build
   char *base = SDL_GetBasePath();
   snprintf(chemin_images, sizeof chemin_images, "%s../Images/", base ? base : "./");
   SDL_free(base);
+#endif
 
   // fenêtre adaptée à l'écran : le jeu est dessiné en 1300 x 900 puis mis à l'échelle
   SDL_Rect ecran = {0, 0, WINDOW_LARGEUR, WINDOW_HAUTEUR};
   SDL_GetDisplayUsableBounds(0, &ecran);
   float echelle = SDL_min(1.0f, SDL_min(0.92f * ecran.w / WINDOW_LARGEUR, 0.92f * ecran.h / WINDOW_HAUTEUR));
+#ifdef __EMSCRIPTEN__
+  echelle = 1.0f;  // dans la page web, c'est le CSS qui adapte le canvas à l'écran
+#endif
   SDL_Window *window = SDL_CreateWindow("Catane", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
                                         (int)(WINDOW_LARGEUR * echelle), (int)(WINDOW_HAUTEUR * echelle),
                                         SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_RESIZABLE);
@@ -502,6 +526,7 @@ int lancer_sdl(void) {
     }
     if (jeu.contre_ia && jeu.etat == PARTIE && !jeu.s.finie && jeu.s.trait == 1) tour_ia(renderer, &tx, &jeu);
     afficher(renderer, &tx, &jeu, false);
+    rendre_la_main(16);
   }
 
   SDL_DestroyRenderer(renderer);  // détruit aussi les textures
