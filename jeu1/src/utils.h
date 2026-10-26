@@ -1,42 +1,25 @@
 #ifndef GARDIEN_UNIQUE_UTILS_H
 #define GARDIEN_UNIQUE_UTILS_H
 
-#include<stdio.h>
+// Constantes communes au jeu, à l'IA et à l'interface
 
+#define TAILLE 4          // le plateau fait 4 x 4 cases
+#define NB_FORMES 4       // quatre formes différentes
+#define NB_EXEMPLAIRES 2  // chaque joueur a deux pièces de chaque forme
+#define NB_COUPS_MAX (TAILLE * TAILLE * NB_FORMES)
 
-enum formes{        // faire le lien entre la forme et un entier
-    cone = 1,
-    cube = 2,
-    cylindre = 3,
-    sphere = 4
+enum formes {  // faire le lien entre la forme et un entier
+  vide = 0,
+  cone = 1,
+  cube = 2,
+  cylindre = 3,
+  sphere = 4
 };
 
-typedef struct joueur {
-    int numJoueur;              //0=>joueur1=>piece blanche | 1=>joueur2=>piece noir
-    int ia;                     //0=>joueur humain | >0 profondeur de l'arbre parcourue
-    int piecerestante[4][2];    //tableau des pieces restantes
-} joueur;
-
-// extern enum formes forme;
-typedef struct piece {      //structure d'une pièce
-    int formes;             //forme de la pièce
-    struct joueur* joueur;  //0=>joueur1=>piece blanche | 1=>joueur2=>piece noir
-    SDL_Texture *texture;
-    SDL_Rect rect;
-    int selected;             
-} piece;
-
-typedef struct list {
-    piece* piece;          
-    struct list * next;
-} list;
-
-
-int estdanslaliste(piece* piece,list * listparcouru);
-void ajoutliste(piece* piece,list * listparcouru);
-// fichier d'entete classique ou l'on declare les types necessaires,            
-// les fonctions implementees dans le fichier .c                                
-// les declaration de variables globales externes   
-
+enum joueurs {  // le joueur 1 a les pièces blanches, le joueur 2 les noires
+  personne = -1,
+  joueur1 = 0,
+  joueur2 = 1
+};
 
 #endif
