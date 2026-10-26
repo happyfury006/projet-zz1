@@ -24,7 +24,9 @@ make console    # version dans le terminal
 make test       # tests des règles et de l'IA
 ```
 
-Dans l'interface, choisissez **1 Vs IA** ou **1 Vs 1**, puis glissez une pièce de votre réserve sur le plateau : les cases autorisées s'affichent en bleu, et une pièce lâchée sur une case interdite revient dans la réserve.
+Dans l'interface, choisissez **1 Vs IA** ou **1 Vs 1** : les règles s'affichent, puis un clic lance la partie. Glissez une pièce de votre réserve sur le plateau : les cases autorisées s'affichent en bleu, et une pièce lâchée sur une case interdite revient dans la réserve.
+
+La fenêtre s'adapte à la taille de l'écran et peut être redimensionnée. **F** passe en plein écran, **Échap** en sort ou revient au menu.
 
 ## Organisation
 

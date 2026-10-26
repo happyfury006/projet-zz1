@@ -24,7 +24,7 @@ static const int CENTRE_X[TAILLE][TAILLE] = {
     {117, 256, 399, 543}, {117, 256, 399, 543}, {117, 258, 403, 548}, {117, 258, 403, 548}};
 static const int CENTRE_Y[TAILLE] = {104, 252, 383, 556};
 
-typedef enum { MENU, PARTIE, FIN } etat_t;
+typedef enum { MENU, REGLES, PARTIE, FIN } etat_t;
 
 typedef struct piece {  // une pièce affichée à l'écran
   SDL_Texture *texture;
@@ -38,6 +38,7 @@ typedef struct piece {  // une pièce affichée à l'écran
 typedef struct textures {
   SDL_Texture *fond, *plateau, *titre, *regles, *un_joueur, *deux_joueurs;
   SDL_Texture *joueur[2], *ia, *gagne[2], *ia_gagne, *reflexion, *retour_menu;
+  SDL_Texture *regles_detail, *touches;
   SDL_Texture *formes[2][NB_FORMES + 1];
 } textures;
 
@@ -175,6 +176,13 @@ static void afficher(SDL_Renderer *renderer, textures *tx, jeu_sdl *jeu, bool ia
     dessiner_centre(renderer, tx->regles, WINDOW_LARGEUR / 2, 300);
     dessiner_centre(renderer, tx->un_joueur, WINDOW_LARGEUR / 2, 480);
     dessiner_centre(renderer, tx->deux_joueurs, WINDOW_LARGEUR / 2, 660);
+    dessiner_centre(renderer, tx->touches, WINDOW_LARGEUR / 2, 830);
+    SDL_RenderPresent(renderer);
+    return;
+  }
+  if (jeu->etat == REGLES) {
+    dessiner_centre(renderer, tx->regles_detail, WINDOW_LARGEUR / 2, WINDOW_HAUTEUR / 2 - 20);
+    dessiner_centre(renderer, tx->touches, WINDOW_LARGEUR / 2, WINDOW_HAUTEUR - 70);
     SDL_RenderPresent(renderer);
     return;
   }
@@ -272,7 +280,7 @@ static void clic_menu(jeu_sdl *jeu, textures *tx, int mx, int my) {
     if (SDL_PointInRect(&souris, &r)) {
       jeu->contre_ia = b == 0;
       nouvelle_partie(jeu, tx);
-      jeu->etat = PARTIE;
+      jeu->etat = REGLES;  // on affiche les règles avant de jouer
     }
   }
 }
@@ -296,6 +304,66 @@ static void lacher(jeu_sdl *jeu) {
   jeu->deplacee = -1;
 }
 
+// Traite un événement clavier ou souris ; renvoie faux pour quitter le jeu
+static bool traiter_evenement(SDL_Window *window, jeu_sdl *jeu, textures *tx, const SDL_Event *event) {
+  switch (event->type) {
+    case SDL_QUIT:
+      return false;
+    case SDL_WINDOWEVENT:
+      // fenêtre redimensionnée (par l'utilisateur, le plein écran ou macOS) :
+      // on recalcule la mise à l'échelle pour garder le jeu centré
+      if (event->window.event == SDL_WINDOWEVENT_SIZE_CHANGED) {
+        SDL_RenderSetLogicalSize(SDL_GetRenderer(window), WINDOW_LARGEUR, WINDOW_HAUTEUR);
+      }
+      break;
+    case SDL_KEYDOWN: {
+      bool plein_ecran = SDL_GetWindowFlags(window) & SDL_WINDOW_FULLSCREEN_DESKTOP;
+      if (event->key.keysym.sym == SDLK_f) {
+        SDL_SetWindowFullscreen(window, plein_ecran ? 0 : SDL_WINDOW_FULLSCREEN_DESKTOP);
+      } else if (event->key.keysym.sym == SDLK_ESCAPE) {
+        if (plein_ecran) {
+          SDL_SetWindowFullscreen(window, 0);
+        } else {
+          jeu->deplacee = -1;
+          jeu->etat = MENU;
+        }
+      }
+      break;
+    }
+    case SDL_MOUSEBUTTONDOWN:
+      if (event->button.button != SDL_BUTTON_LEFT) break;
+      if (jeu->etat == MENU) {
+        clic_menu(jeu, tx, event->button.x, event->button.y);
+      } else if (jeu->etat == REGLES) {
+        jeu->etat = PARTIE;
+      } else if (jeu->etat == FIN) {
+        jeu->etat = MENU;
+      } else if (!est_ia(jeu, jeu->plateau.trait)) {
+        // on ne peut prendre qu'une pièce de sa propre réserve
+        SDL_Point souris = {event->button.x, event->button.y};
+        for (int i = NB_PIECES - 1; i >= 0; i--) {
+          piece *p = &jeu->pieces[i];
+          if (!p->posee && p->joueur == jeu->plateau.trait && SDL_PointInRect(&souris, &p->rect)) {
+            jeu->deplacee = i;
+            break;
+          }
+        }
+      }
+      break;
+    case SDL_MOUSEMOTION:
+      if (jeu->deplacee >= 0) {
+        piece *p = &jeu->pieces[jeu->deplacee];
+        p->rect.x = event->motion.x - p->rect.w / 2;
+        p->rect.y = event->motion.y - p->rect.h / 2;
+      }
+      break;
+    case SDL_MOUSEBUTTONUP:
+      if (event->button.button == SDL_BUTTON_LEFT && jeu->deplacee >= 0 && jeu->etat == PARTIE) lacher(jeu);
+      break;
+  }
+  return true;
+}
+
 // ---------- boucle principale ----------
 
 int lancer_sdl(void) {
@@ -309,9 +377,18 @@ int lancer_sdl(void) {
   snprintf(chemin_images, sizeof chemin_images, "%s../images/", base ? base : "./");
   SDL_free(base);
 
+  // La fenêtre s'adapte à l'écran (sur un écran de 1366 x 768, une fenêtre de
+  // 1300 x 900 sortait de l'écran et cachait la réserve du joueur 1). Le jeu est
+  // dessiné en 1300 x 900 puis mis à l'échelle : SDL convertit aussi les
+  // coordonnées de la souris.
+  SDL_Rect ecran = {0, 0, WINDOW_LARGEUR, WINDOW_HAUTEUR};
+  SDL_GetDisplayUsableBounds(0, &ecran);
+  float echelle = SDL_min(1.0f, SDL_min(0.92f * ecran.w / WINDOW_LARGEUR, 0.92f * ecran.h / WINDOW_HAUTEUR));
   SDL_Window *window = SDL_CreateWindow("Quantik", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-                                        WINDOW_LARGEUR, WINDOW_HAUTEUR, SDL_WINDOW_ALLOW_HIGHDPI);
+                                        (int)(WINDOW_LARGEUR * echelle), (int)(WINDOW_HAUTEUR * echelle),
+                                        SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_RESIZABLE);
   SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+  SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
   SDL_RenderSetLogicalSize(renderer, WINDOW_LARGEUR, WINDOW_HAUTEUR);
 
   textures tx = {
@@ -327,6 +404,8 @@ int lancer_sdl(void) {
       .ia_gagne = charger(renderer, "iagagne.png"),
       .reflexion = charger(renderer, "reflexion.png"),
       .retour_menu = charger(renderer, "retourmenu.png"),
+      .regles_detail = charger(renderer, "reglesdetail.png"),
+      .touches = charger(renderer, "touches.png"),
   };
   const char *noms[NB_FORMES + 1] = {NULL, "cone", "cube", "cylindre", "sphere"};
   for (int f = cone; f <= sphere; f++) {
@@ -342,33 +421,7 @@ int lancer_sdl(void) {
   while (continuer) {
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
-      if (event.type == SDL_QUIT) continuer = false;
-      if (event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT) {
-        int mx = event.button.x, my = event.button.y;
-        if (jeu.etat == MENU) {
-          clic_menu(&jeu, &tx, mx, my);
-        } else if (jeu.etat == FIN) {
-          jeu.etat = MENU;
-        } else if (!est_ia(&jeu, jeu.plateau.trait)) {
-          // on ne peut prendre qu'une pièce de sa propre réserve
-          SDL_Point souris = {mx, my};
-          for (int i = NB_PIECES - 1; i >= 0; i--) {
-            piece *p = &jeu.pieces[i];
-            if (!p->posee && p->joueur == jeu.plateau.trait && SDL_PointInRect(&souris, &p->rect)) {
-              jeu.deplacee = i;
-              break;
-            }
-          }
-        }
-      }
-      if (event.type == SDL_MOUSEMOTION && jeu.deplacee >= 0) {
-        piece *p = &jeu.pieces[jeu.deplacee];
-        p->rect.x = event.motion.x - p->rect.w / 2;
-        p->rect.y = event.motion.y - p->rect.h / 2;
-      }
-      if (event.type == SDL_MOUSEBUTTONUP && event.button.button == SDL_BUTTON_LEFT && jeu.deplacee >= 0) {
-        lacher(&jeu);
-      }
+      if (!traiter_evenement(window, &jeu, &tx, &event)) continuer = false;
     }
     if (jeu.etat == PARTIE && est_ia(&jeu, jeu.plateau.trait)) {
       tour_ia(renderer, &tx, &jeu);
@@ -379,7 +432,7 @@ int lancer_sdl(void) {
 
   SDL_Texture *toutes[] = {tx.fond, tx.plateau, tx.titre, tx.regles, tx.un_joueur, tx.deux_joueurs,
                            tx.joueur[0], tx.joueur[1], tx.ia, tx.gagne[0], tx.gagne[1], tx.ia_gagne,
-                           tx.reflexion, tx.retour_menu};
+                           tx.reflexion, tx.retour_menu, tx.regles_detail, tx.touches};
   for (size_t i = 0; i < sizeof toutes / sizeof toutes[0]; i++) SDL_DestroyTexture(toutes[i]);
   for (int j = 0; j < 2; j++) {
     for (int f = cone; f <= sphere; f++) SDL_DestroyTexture(tx.formes[j][f]);
